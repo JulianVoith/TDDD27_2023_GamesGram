@@ -6,6 +6,11 @@
 
 ## Overview
 
+### Team members
+
+- Weixiong Zheng (weizh994@student.liu.se)
+- Julian Voith (julvo429@student.liu.se)
+
 ### Functional concept
 An online platform were people can share screenshots, artworks, ideas or videos about there favorite games/mods of a game. 
 The content is either created/shared by normal users or also by game development studios to promote, or gather input for a upcomping game/early access game. 
