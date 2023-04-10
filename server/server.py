@@ -1,12 +1,16 @@
 from flask import Flask
+from flask_restful import Api, Resource, reqparse
 
 app = Flask(__name__)
 
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+api = Api(app)
 
-# starts the appliocation and is similar to the maisfngsgn method/function
-if __name__ == "__main__":
-    app.debug == True
-    app.run()
+parser = reqparse.RequestParser()
+parser.add_argument('task')
+class Message(Resource):
+    def get(self):
+        return {"message": 'Hello World'}
+api.add_resource(Message, '/hello')
+
+if __name__ == '__main__':
+    app.run(debug=True)
