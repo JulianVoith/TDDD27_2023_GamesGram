@@ -1,6 +1,6 @@
-import styles from '../styles/Home.module.css'
-import { useEffect, useState } from 'react'
-import Head from 'next/head'
+import styles from '../styles/Home.module.css';
+import { useEffect, useState } from 'react';
+import Head from 'next/head';
 import LoginForm from '@/pages/LoginAndSignUp/login-gamesgram';
 import Image from 'next/image';
 import Sidebar from '@/components/Siderbar';

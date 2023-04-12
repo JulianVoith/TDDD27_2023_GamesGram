@@ -32,17 +32,6 @@ export default function SignUpForm(){
                 <button className="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
             </form>
         </div>
-        <div>
-            <h2 className={styles.h2}><span className={styles.h2span}>Or</span></h2>
-        </div> 
-
-        <div>
-            Here will be steam
-        </div>
-        <div>
-            Here will be Google
-        </div>
-
         <div><Link href={"/LoginAndSignUp/login-gamesgram"}>Go Back</Link></div>
 
       </main>

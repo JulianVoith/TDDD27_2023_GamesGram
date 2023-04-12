@@ -1,10 +1,40 @@
-import styles from '@/styles/Login.module.css'
-import cx from 'classnames'
-import Link from 'next/link'
+import styles from '@/styles/Login.module.css';
+import cx from 'classnames';
+import Link from 'next/link';
+import Image from 'next/image';
 
 
 export default function LoginForm(){
     // what is cx classname doing?
+
+    const LoginWSteam = () => (
+        <Image
+          src="/images/steam_logo.png" // Route of the image file
+          height={60} // Desired size with correct aspect ratio
+          width={60} // Desired size with correct aspect ratio
+          alt="LogoSteam"
+        />
+      );
+    
+      const LoginWGoggle = () => (
+        <Image
+          src="/images/google_logo.png" // Route of the image file
+          height={60} // Desired size with correct aspect ratio
+          width={60} // Desired size with correct aspect ratio
+          alt="LogoGoggle"
+        />
+      );
+
+      const callLogin = async () => {
+        try{
+            const res = await fetch('/login/');
+            const data = await res.json();
+        }catch (err){
+            console.log(err);
+        }
+      };
+
+
     return (
         <>
         
@@ -30,6 +60,14 @@ export default function LoginForm(){
             <button className="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
             </form>
             </div>
+        <div>
+            <h2 className={styles.h2}><span className={styles.h2span}>Or</span></h2>
+        </div> 
+
+        <div >
+            <LoginWSteam />   <LoginWGoggle />
+        </div>
+
         <div className={styles.signUp}>
             <div>
                 <div class="card mb-4 rounded-3 shadow-sm">
