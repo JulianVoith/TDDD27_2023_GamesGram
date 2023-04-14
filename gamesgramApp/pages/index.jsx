@@ -1,7 +1,7 @@
 import styles from '../styles/Home.module.css';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
-import LoginForm from '@/pages/LoginAndSignUp/login-gamesgram';
+import LoginForm from '@/components/Login&SignUp/loginForm';
 import Image from 'next/image';
 import Sidebar from '@/components/Siderbar';
 
@@ -30,15 +30,9 @@ import Sidebar from '@/components/Siderbar';
 
 
 export default function Home(){
+    const [logined, setLogIn] = useState(false);
+    const [signUp, setSignUp] = useState(false);
 
-    const LoginIcon = () => (
-        <Image
-          src="/images/logo.png" // Route of the image file
-          height={144} // Desired size with correct aspect ratio
-          width={144} // Desired size with correct aspect ratio
-          alt="Logo"
-        />
-      );
     return(
         <div>
             <Head>
@@ -46,17 +40,7 @@ export default function Home(){
                 <link rel="icon" href="/favicon.ico"/>
             </Head>
             <main>
-                <Sidebar></Sidebar>
-                <div className={styles.container}>
-                    <Image
-                        src="/images/logo.png" // Route of the image file
-                        height={256} // Desired size with correct aspect ratio
-                        width={256} // Desired size with correct aspect ratio
-                        alt="Logo"
-                        />
-                    <LoginForm/>
-                    </div>
-                
+            <LoginForm />
             </main>
         </div>
     )
