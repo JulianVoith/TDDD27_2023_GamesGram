@@ -4,7 +4,7 @@ import Head from 'next/head';
 import LoginForm from '@/components/Login&SignUp/loginForm';
 import Image from 'next/image';
 import Sidebar from '@/components/Siderbar';
-
+import Auth from '@/components/Login&SignUp/AuthButton';
 
 
 /*export function TestApi() {
@@ -30,8 +30,13 @@ import Sidebar from '@/components/Siderbar';
 
 
 export default function Home(){
-    const [logined, setLogIn] = useState(false);
+    const [token, setToken] = useState(null);
     const [signUp, setSignUp] = useState(false);
+
+    const handleLogin = (token) => {
+        console.log(`Logged in with token ${token}`);
+        setToken(token);
+      };
 
     return(
         <div>
@@ -39,8 +44,9 @@ export default function Home(){
                 <title>Login to GamesGram</title>
                 <link rel="icon" href="/favicon.ico"/>
             </Head>
-            <main>
-            <LoginForm />
+            <main >
+                {!token ? <LoginForm onLogin={handleLogin} />: <p>{token}</p>};
+                
             </main>
         </div>
     )

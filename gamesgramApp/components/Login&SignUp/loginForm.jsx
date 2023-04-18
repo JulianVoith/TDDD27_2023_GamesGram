@@ -1,21 +1,34 @@
-export default function LoginForm() {
-    const handleSubmit = async (event) => {
+import styles from '@/styles/Login.module.css';
+import cx from 'classnames';
+import { useState, useEffect } from 'react';
+
+export default function LoginForm(props) {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleEmailChange = (event) => {
+    setEmail(event.target.value);
+  };
+
+  const handlePasswordChange = (event) => {
+    setPassword(event.target.value);
+  };
+    const submitForm = async (email, password) => {
         // Stop the form from submitting and refreshing the page.
-        event.preventDefault()
+        //event.preventDefault()
     
         // Get data from the form.
-        const data = {
-          email: event.target.email.value,
-          password: event.target.password.value,
+        const FormData = {
+          email: email,
+          password: password,
         }
 
-        console.log("data",data)
-    
         // Send the data to the server in JSON format.
-        const JSONdata = JSON.stringify(data)
+        const JSONdata = JSON.stringify(FormData)
     
         // API endpoint where we send form data.
-        const endpoint = '/login'
+        const endpoint = '/api/login'
     
         // Form the request for sending data to the server.
         const options = {
@@ -31,26 +44,43 @@ export default function LoginForm() {
     
         // Send the form data to our forms API on Vercel and get a response.
         const response = await fetch(endpoint, options)
-    
-        // Get the response data from server as JSON.
+        
+        const data = await response.json();
+        return data.token;
         // If server returns the name submitted, that means the form works.
         
-        console.log(response);
         //TODO: reset state
-
-        return false;
       }
 
+      const handleSubmit = async (event) => {
+        event.preventDefault();
+        const token = await submitForm(email, password);
+        props.onLogin(token);
+        return false;
+      };
+
     return (
+      <div className={cx(styles["login-gamesgram"],"text-center","mt-5")}> 
+      <div className="card mb-4 rounded-3 shadow-sm">
       <form onSubmit={handleSubmit}>
-        <h1 >Please sign in</h1>
-        <label htmlFor="email">Email address</label>
-        <input type="text" id="email" name="email" required />
-  
-        <label htmlFor="password">password</label>
-        <input type="password" id="password" name="password" required />
-  
-        <button type="submit">Sign in</button>
+        <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
+        <div className="form-floating">
+            <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com" value={email} onChange={handleEmailChange} />
+            <label htmlFor="floatingInput">Email address</label>
+        </div>
+        <div className="form-floating">
+            <input type="password" className="form-control" id="floatingPassword" placeholder="Password" value={password} onChange={handlePasswordChange}/>
+            <label htmlFor="floatingPassword">Password</label>
+        </div>
+
+        <div className={cx(styles.checkbox,"mb-3")}>
+            <label>
+            <input type="checkbox" value="remember-me" /> Remember me
+            </label>
+        </div>
+        <button className="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
       </form>
+      </div> 
+      </div>
     )
   }
