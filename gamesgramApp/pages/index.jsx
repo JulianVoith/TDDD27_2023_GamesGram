@@ -2,8 +2,8 @@ import styles from '../styles/Home.module.css';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import LoginForm from '@/components/Login&SignUp/loginForm';
+import HomeMain from '@/components/Home';
 import Image from 'next/image';
-import Sidebar from '@/components/Siderbar';
 import Auth from '@/components/Login&SignUp/AuthButton';
 
 
@@ -45,7 +45,7 @@ export default function Home(){
                 <link rel="icon" href="/favicon.ico"/>
             </Head>
             <main >
-                {!token ? <LoginForm onLogin={handleLogin} />: <p>{token}</p>};
+                {!token ? <LoginForm onLogin={handleLogin} />: <HomeMain/>}
                 
             </main>
         </div>

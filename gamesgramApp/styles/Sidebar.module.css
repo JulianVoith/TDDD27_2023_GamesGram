@@ -3,9 +3,8 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    padding: 6rem;
     height: 100vh; /* Full-height: remove this if you want "auto" height */
-    width:5vw;
+    width:18vw;
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     background-color: antiquewhite;
     z-index: 1; /* Stay on top */
@@ -13,4 +12,5 @@
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 20px;
+    padding: 8px,12px,12px;
   }

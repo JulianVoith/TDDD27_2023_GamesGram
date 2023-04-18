@@ -47,9 +47,6 @@ export default function LoginForm(props) {
         
         const data = await response.json();
         return data.token;
-        // If server returns the name submitted, that means the form works.
-        
-        //TODO: reset state
       }
 
       const handleSubmit = async (event) => {
