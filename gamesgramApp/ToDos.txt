@@ -1,7 +1,8 @@
 ToDo/NextSteps:
 -Send signup or sign-in data to server and create account (includes validation, databse like in webprogramming)
 -Basic home page of the website => /components/Home
--login with google and stream
+-login with steam
+-Add the session
 
 Notice:
 - use component replace instad page routes
