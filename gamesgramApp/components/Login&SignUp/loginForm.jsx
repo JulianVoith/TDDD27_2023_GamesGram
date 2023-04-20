@@ -4,24 +4,34 @@ import { useState, useEffect } from 'react';
 
 export default function LoginForm(props) {
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  //const [email, setEmail] = useState('');
+  //const [password, setPassword] = useState('');
+  const [steamID, setSteamId] = useState('');
 
-  const handleEmailChange = (event) => {
+  /*const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };
 
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
+  };*/
+
+  const handleSteamIDChange = (event) => {
+    setSteamId(event.target.value);
   };
-    const submitForm = async (email, password) => {
+
+    const submitForm = async (steamID) => { //email, password) => {
         // Stop the form from submitting and refreshing the page.
         //event.preventDefault()
     
         // Get data from the form.
-        const FormData = {
+        /*const FormData = {
           email: email,
           password: password,
+        }*/
+
+        const FormData = {
+          steamID: steamID,
         }
 
         // Send the data to the server in JSON format.
@@ -51,7 +61,7 @@ export default function LoginForm(props) {
 
       const handleSubmit = async (event) => {
         event.preventDefault();
-        const token = await submitForm(email, password);
+        const token = await submitForm(steamID);//email, password);
         props.onLogin(token);
         return false;
       };
@@ -62,14 +72,9 @@ export default function LoginForm(props) {
       <form onSubmit={handleSubmit}>
         <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
         <div className="form-floating">
-            <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com" value={email} onChange={handleEmailChange} />
-            <label htmlFor="floatingInput">Email address</label>
+            <input type="text" className="form-control" id="floatingInput" placeholder="STEAM_ID" value={steamID} onChange={handleSteamIDChange} />
+            <label htmlFor="floatingInput">STEAM ID</label>
         </div>
-        <div className="form-floating">
-            <input type="password" className="form-control" id="floatingPassword" placeholder="Password" value={password} onChange={handlePasswordChange}/>
-            <label htmlFor="floatingPassword">Password</label>
-        </div>
-
         <div className={cx(styles.checkbox,"mb-3")}>
             <label>
             <input type="checkbox" value="remember-me" /> Remember me
@@ -81,3 +86,17 @@ export default function LoginForm(props) {
       </div>
     )
   }
+
+
+  /*
+        <h1 className="h3 mb-3 fw-normal">Please sign in</h1>
+        <div className="form-floating">
+            <input type="email" className="form-control" id="floatingInput" placeholder="name@example.com" value={email} onChange={handleEmailChange} />
+            <label htmlFor="floatingInput">Email address</label>
+        </div>
+        <div className="form-floating">
+            <input type="password" className="form-control" id="floatingPassword" placeholder="Password" value={password} onChange={handlePasswordChange}/>
+            <label htmlFor="floatingPassword">Password</label>
+        </div>
+
+  */

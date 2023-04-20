@@ -7,8 +7,10 @@ from flask_cors import CORS,  cross_origin
 from os import environ
 from pysteamsignin.steamsignin import SteamSignIn #import for steam signin
 
+import database_helper
 import json
 import os, sys
+import requests
 
 
 app = Flask(__name__)
@@ -18,6 +20,8 @@ CORS(app, resources={r"/*": {"origins": "*"}}) # enable CORS on all routes
 
 
 steam_openid_url = 'https://steamcommunity.com/openid/login'
+
+api_key = 'FB453E73DBD4107207669FA395CBC366'
 
 parser = reqparse.RequestParser()
 parser.add_argument('task')
@@ -30,39 +34,101 @@ api.add_resource(Message, '/hello')
 class Login(Resource):
     def post(self):
         data = request.json
-        print("data")
-        token = hashlib.sha1(os.urandom(24)).hexdigest()
-        print("token")
-        # created dictonary response
-        tokenResp = {"token": token}
-        print(token)
-        # session created and user is logged in
-        return make_response(jsonify(tokenResp), 201)  # CREATED
+        steamid=data['steamID']
+        if database_helper.activeSessionSteamid(steamid):
+             token= database_helper.activeSessionSteamid(steamid)
+             tokenResp = {"token": token}
+             return make_response(jsonify(tokenResp), 200) #OK
+        else:
+            token = hashlib.sha1(os.urandom(24)).hexdigest()
+            # created dictonary response
+            tokenResp = {"token": token}
+            if database_helper.createUserSession(steamid, token):
+                # session created and user is logged in
+                return make_response(jsonify(tokenResp), 201) #CREATED
+            else:
+            # database error
+                return "", 500  # internal server error
+            
+@api.resource('/GetUserInfo')
+class GetUserInfo(Resource):
+    def post(self):
+        data = request.json
+        token=data['token']
+        if database_helper.getSteamidByToken(token):
+            steamids=database_helper.getSteamidByToken(token)
+            url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
+            params={
+                "key": api_key,
+                "steamids":steamids
+            }
+            DetailFriendList=requests.get(url, params)
+            return make_response(DetailFriendList, 200)  # OK
+        else:
+             # database error
+                return "", 500  # internal server error
+
+    
+@api.resource('/GetFriendList')
+class GetFriendList(Resource):
+    def GetPlayerSummaries(self):
+        def FriendList(self,steamid):
+            params={"key": api_key,"steamid":steamid}
+            url='https://api.steampowered.com/ISteamUser/GetFriendList/v0001/'
+            response=requests.get(url, params)
+            FriendList=[]
+            for friend in response['friendslist']['friends']:
+                FriendList.append(friend['steamid'])
+            steamids=','.join(FriendList)
+            return steamids  # Comma-delimited list of SteamIDs
+        steamid = request.json #fetch steamid from client
+        steamids=FriendList(steamid)
+        url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
+        params={
+             "key": api_key,
+             "steamids":steamids
+        }
+        DetailFriendList=requests.get(url, params)
+        return make_response(DetailFriendList, 200)  # OK
+
+    
 
 @api.resource('/authWSteam')
 class SteamLogin(Resource):
     def loginSteam(self):
         print("test")
         steamLogin = SteamSignIn()
-        return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:5000/processSteamLogin'))
+        return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:3000/processSteamLogin'))
 
 @app.route('/authWSteam2')
-@cross_origin()
 def loginSteam():
     print("test")
     steamLogin = SteamSignIn()
-    return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:5000/processSteamLogin'))
+    return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:3000/'))
 
-@app.route('/processSteamLogin', methods=["GET"])
-def process():
-
-    returnData = request.values
-    print(returnData)
-    SteamLogin = SteamSignIn()
-    steamID = SteamLogin.ValidateResults(returnData)
-
-    print('SteamID returned is: ', steamID)
-    return make_response(jsonify({"steamID": steamID}), 201)
+@api.resource('/processSteamLogin')
+class processSteamLogin(Resource):
+    def post(self):
+        print("coming")
+        
+        returnData = request.json
+        print(returnData)
+        SteamLogin = SteamSignIn()
+        steamid = SteamLogin.ValidateResults(returnData)
+        if database_helper.activeSessionSteamid(steamid):
+             token= database_helper.activeSessionSteamid(steamid)
+             tokenResp = {"token": token}
+             return make_response(jsonify(tokenResp), 200) #OK
+        else:
+            token = hashlib.sha1(os.urandom(24)).hexdigest()
+            # created dictonary response
+            tokenResp = {"token": token}
+            if database_helper.createUserSession(steamid, token):
+                # session created and user is logged in
+                return make_response(jsonify(tokenResp), 201) #CREATED
+            else:
+            # database error
+                return "", 500  # internal server error
 
 #    def post(self):
  #       params = {
@@ -97,7 +163,7 @@ def main():
 
 	#return 'Click <a href="/?login=true">to log in</a>'
 
-@app.route('/processlogin')
+""" @app.route('/processlogin')
 def process2():
 
 	returnData = request.values
@@ -110,9 +176,8 @@ def process2():
 	if steamID is not False:
 		return 'We logged in successfully!<br />SteamID: {0}'.format(steamID)
 	else:
-		return 'Failed to log in, bad details?'
+		return 'Failed to log in, bad details?' """
 
 
 if __name__ == '__main__':
-    app.debug == True
-    app.run()
+    app.run(debug=True)#host="localhost", port=3000)

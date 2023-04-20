@@ -4,5 +4,14 @@ ToDo/NextSteps:
 -login with steam
 -Add the session
 
+
+Next Steps:
+build profile page with followers
+allow uploading videos or pictures sharing with all or specific people
+category per post
+with comments and likes and ratings
+polls in description with timing?
+
+
 Notice:
 - use component replace instad page routes
