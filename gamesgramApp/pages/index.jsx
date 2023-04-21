@@ -8,48 +8,25 @@ import Image from 'next/image';
 import Auth from '@/components/Login&SignUp/AuthButton';
 import { useRouter } from 'next/router';
 
-
-/*export function TestApi() {
-    const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        fetch('/hello/')
-            .then(res => res.json())
-            .then(data => {
-                setMessage(data.message);
-                setLoading(false);
-            })
-    }, [])
-
-    return (
-        <div className={styles.container}>
-            <p> {!loading ? message : "Loading.."}</p>
-        </div>
-    )
-}*/
-
-
-
 export default function Home(){
     const [token, setToken] = useState(null);
     const [signUp, setSignUp] = useState(false);
 
     // check if user is logged 
     // TODO: should modify after session established
-/*     if(localStorage.getItem('token')!= null){
+    if(typeof window !== 'undefined'&&localStorage.getItem('token')){
         setToken(localStorage.getItem('token'))
-    } */
+    }
     const handleLogin = (token) => {
         console.log(`Logged in with token ${token}`);
         setToken(token);
-        localStorage.setItem("token",token);
+        if (typeof window !== 'undefined')
+        {localStorage.setItem("token",token);}
       };
 
-    async function Post(){
-        console.log("POST")
+     const Post =async()=>{
         const router = useRouter()
-        if(Object.keys(router.query).length!==0)
+        if(Object.keys(router.query).length!==0&&token===null)
         {
             console.log(router.query,'=======')
             const JSONdata = JSON.stringify(router.query)
