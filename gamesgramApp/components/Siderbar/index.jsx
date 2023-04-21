@@ -61,6 +61,7 @@ export default function Sidebar(props){
       let navbarItem;
       const items = ["Home", "Search", "Reels", "TeamMates", "Profile"];
 
+
       for (let i = 0; i < items.length; ++i){
         navbarItem = document.getElementById(items[i]);
         navbarItem.className = "nav-link text-white";
