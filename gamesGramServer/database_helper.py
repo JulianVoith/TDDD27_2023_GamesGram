@@ -71,13 +71,14 @@ def deleteSession(steamid):
         return False
 
 
-# get email of user by the token
+# get steamid of user by the token
 def getSteamidByToken(token):
+    print("token")
     cursor = get_db().execute(
-        "select email from userSessions where token like ?;", [token]
+        "select steamid from userSessions where token like ?;", [token]
     )
-    userEmail = cursor.fetchall()
+    userSteamid = cursor.fetchall()
     cursor.close()
 
-    return userEmail[0][0]
+    return userSteamid[0][0]
 

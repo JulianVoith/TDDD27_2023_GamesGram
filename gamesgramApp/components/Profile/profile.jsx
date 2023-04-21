@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 export default function profile(userInfo){
     userInfo =  {
@@ -53,7 +54,7 @@ export default function profile(userInfo){
         </>
     )
 }
-function Avatar(userInfo){
+export function Avatar(userInfo){
     console.log(userInfo)
     return(
         <>

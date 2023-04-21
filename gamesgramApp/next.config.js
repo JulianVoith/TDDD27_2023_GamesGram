@@ -2,6 +2,7 @@
 
 // next.config.js
 module.exports = () => {
+
   const rewrites = () => {
     return [
       {
@@ -19,11 +20,18 @@ module.exports = () => {
       {
         source: "/processSteamLogin/:path*",
         destination: "http://127.0.0.1:5000/processSteamLogin/:path*",
+      },
+      {
+        source: "/api/GetUserInfo/:path*",
+        destination: "http://127.0.0.1:5000/GetUserInfo/:path*",
       }
     ];
   };
 
   return {
+    images: {
+      domains: ["steamcdn-a.akamaihd.net","avatars.akamai.steamstatic.com"],
+    },
     rewrites,
   };
 

@@ -10,25 +10,61 @@ import { useRouter } from 'next/router';
 
 export default function Home(){
     const [token, setToken] = useState(null);
-    const [signUp, setSignUp] = useState(false);
+    const [userInfo,setuserInfo] = useState(null);
+    const router = useRouter()
 
-    // check if user is logged 
-    // TODO: should modify after session established
-    if(typeof window !== 'undefined'&&localStorage.getItem('token')){
-        setToken(localStorage.getItem('token'))
+  useEffect(() => {
+    // Check if it is running in a browser environment
+    if (typeof window !== "undefined") {
+      // Find the value with token as key in localStorage
+      setToken (window.localStorage.getItem("token"));
     }
+  }, []);
+
+  const GetuserInfo = async()=>{
+    if(!userInfo&&token!==null){
+        const JSONdata = JSON.stringify({'token':token})
+        
+            // API endpoint where we send form data.
+            const endpoint = '/api/GetUserInfo'
+        
+            // Form the request for sending data to the server.
+            const options = {
+                // The method is POST because we are sending data.
+                method: 'POST',
+                // Tell the server we're sending JSON.
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                // Body of the request is the JSON data we created above.
+                body: JSONdata,
+            }
+        
+            // Send the form data to our forms API on Vercel and get a response.
+            const response = await fetch(endpoint, options)
+            const data = await response.json();
+            setuserInfo(data.response.players[0])
+    }
+}
+  useEffect(()=>{
+    GetuserInfo()
+    },[token]);
+
     const handleLogin = (token) => {
         console.log(`Logged in with token ${token}`);
         setToken(token);
         if (typeof window !== 'undefined')
-        {localStorage.setItem("token",token);}
+        {
+            localStorage.setItem("token",token);
+            console.log("JUMP")
+            router.push("/");
+        }
       };
 
-     const Post =async()=>{
-        const router = useRouter()
+     const Post =async()=>{//should work as an onEvent function?
+        
         if(Object.keys(router.query).length!==0&&token===null)
         {
-            console.log(router.query,'=======')
             const JSONdata = JSON.stringify(router.query)
         
             // API endpoint where we send form data.
@@ -51,25 +87,22 @@ export default function Home(){
             
             const data = await response.json();
             handleLogin(data.token)
+
         }
-        else{
-            console.log("NULL")
-        }
+
     }
     Post()
     return(
         <div>
             <Head>
-                <title>Login to GamesGram</title>
-                <link rel="icon" href="/favicon.ico"/>
+                {!token ? <title>Welcome to GamesGram</title>: <title>GamesGram</title>}
+                
+                <link rel="icon" href="/images/GPic.jpg"/>
             </Head>
             <main >
-                {!token ? <LoginForm onLogin={handleLogin} />: <HomeMain/>}
-                <HomeMain />
-                <LoginWSteam />
+                {!token||!userInfo ? <LoginWSteam />: <HomeMain userInfo={userInfo}/>}
             </main>
         </div>
     )
 
 }
-//<LoginWSteam />

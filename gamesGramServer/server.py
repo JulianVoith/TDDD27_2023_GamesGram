@@ -55,18 +55,22 @@ class GetUserInfo(Resource):
     def post(self):
         data = request.json
         token=data['token']
-        if database_helper.getSteamidByToken(token):
-            steamids=database_helper.getSteamidByToken(token)
-            url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
-            params={
-                "key": api_key,
-                "steamids":steamids
-            }
-            DetailFriendList=requests.get(url, params)
-            return make_response(DetailFriendList, 200)  # OK
-        else:
-             # database error
+        if token:
+            if database_helper.getSteamidByToken(token):
+                steamids=database_helper.getSteamidByToken(token)
+                print('steamids:',steamids)
+                url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
+                params={
+                    "key": api_key,
+                    "steamids":steamids
+                }
+                DetailFriendList=requests.get(url, params)
+                return make_response(DetailFriendList.content, 200)  # OK
+            else:
+                # database error
                 return "", 500  # internal server error
+        else:
+            return "",404 #
 
     
 @api.resource('/GetFriendList')
