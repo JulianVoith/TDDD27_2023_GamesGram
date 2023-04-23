@@ -2,7 +2,7 @@ import styles from '@/styles/Sidebar.module.css'
 import cx from 'classnames';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import Profile from '../Profile/profile';
+import Profile from '../Profile';
 //import { functions } from 'cypress/types/lodash';
 
 
@@ -68,12 +68,12 @@ export default function Sidebar(props){
 
       return (
         <div >
-          <ul className="nav nav-pills flex-column mb-auto">
+          <ul role="button" className="nav nav-pills flex-column mb-auto">
             <li className="nav-item">
               <a id="Home" className={cssStates.home} onClick={() => onClickNavbar(0)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 Home
               </a>
-            </li>#
+            </li>
             <li>
               <a id="Search" className={cssStates.search} onClick={() => onClickNavbar(1)} onMouseOver={mouseOver} onMouseLeave={hoverLeave} >
                 Search

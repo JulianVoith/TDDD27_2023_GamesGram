@@ -1,33 +1,29 @@
- .main {
-    display: flex;
-    flex-direction: column;
-   /* justify-content: space-between;*/
-    /*align-items: center; */
-    height: 100vh; /* Full-height: remove this if you want "auto" height */
-    width:18vw;
-    position: fixed;  /* Fixed Sidebar (stay in place on scroll) */ 
-    /*background-color: antiquewhite; */
-    z-index: 1; /* Stay on top */
-    top: 0; /* Stay at the top */
-    left: 0;
-    overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 20px;
-    padding: 8px,12px,12px; 
-  } 
+.main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Full-height: remove this if you want "auto" height */
+  width:20vw;
+  position: fixed;  /* Fixed Sidebar (stay in place on scroll) */ 
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+  padding: 8px,12px,12px; 
+} 
 
 
 .hr:not([size]) {
-  height: 1px;
+height: 1px;
 }
 .hr{
-  margin: 1rem 0;
-  color: inherit;
-  background-color: currentColor;
-  border: 0;
-  opacity: .25;
+margin: 1rem 0;
+color: inherit;
+background-color: currentColor;
+border: 0;
+opacity: .25;
 }
-
 .avatar{
-  border-radius: 5px;
-  margin-right: 5px;
+border-radius: 5px;
+margin-right: 5px;
 }
