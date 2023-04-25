@@ -28,6 +28,10 @@ module.exports = () => {
       {
         source: "/api/SignOut/:path*",
         destination: "http://127.0.0.1:5000/signout/:path*",
+      },
+      {
+        source: "/api/search/:path*",
+        destination: "http://127.0.0.1:5000/search/:path*",
       }
     ];
   };

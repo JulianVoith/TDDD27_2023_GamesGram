@@ -197,7 +197,18 @@ class processSteamLogin(Resource):
             
                 # session created and user is logged in
                 
-            
+@api.resource("//search/<string:searchTerm>")
+class GetUser(Resource):
+    def get(self, searchTerm):
+        
+        print(searchTerm)
+
+        result = database_helper.searchUser(searchTerm)
+        if len(result):
+            return make_response(result, 200)  # OK
+        else:
+            return "",404 # NO FOUND
+
             
 if __name__ == '__main__':
     app.run(debug=True)#host="localhost", port=3000)

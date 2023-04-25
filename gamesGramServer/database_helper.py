@@ -73,7 +73,7 @@ def deleteSession(token):
 
 # get steamid of user by the token
 def getSteamidByToken(token):
-    print("database,token",token)
+    #print("database,token",token)
     cursor = get_db().execute(
         "select steamid from userSessions where token like ?;", [token]
     )
@@ -132,3 +132,12 @@ def getFollower(steamid):
         return True
     else:
         return False
+    
+#method to fuzzy search User 
+def searchUser(searchTerm):
+    cursor = get_db().execute(
+        "select steamid from userInfo where personname like ?;", (f"%{searchTerm}%",)
+    )
+    userSteamid = cursor.fetchall()
+    cursor.close()
+    return userSteamid

@@ -1,15 +1,16 @@
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { DebounceInput } from 'react-debounce-input';
 import cx from 'classnames';
-import styles from '@/styles/Profile.module.css';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import styles from '@/styles/Search.module.css';
+import {Button,Modal,Form} from 'react-bootstrap';
+import SearchBar from './SearchBar';
 
 export default function Search(){
 
-    return (
+    return(
         <>
-        <h1>Search</h1>
+        <SearchBar/>
         </>
-    )
+    );
 }

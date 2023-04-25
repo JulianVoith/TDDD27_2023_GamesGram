@@ -2,9 +2,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import cx from 'classnames';
 import styles from '@/styles/Profile.module.css';
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
+import {Button,Modal,Form} from 'react-bootstrap';
 
 //col-md-10 col-lg-8 col-xl-7 image above
 /*
