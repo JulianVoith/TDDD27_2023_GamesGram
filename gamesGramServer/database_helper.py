@@ -62,9 +62,9 @@ def activeSessionSteamid(steamid):
 
 
 # method to delete active user session
-def deleteSession(steamid):
+def deleteSession(token):
     try:
-        get_db().execute("delete from userSessions where steamid like (?);", [steamid])
+        get_db().execute("delete from userSessions where token like (?);", [token])
         get_db().commit()
         return True
     except:
@@ -73,7 +73,7 @@ def deleteSession(steamid):
 
 # get steamid of user by the token
 def getSteamidByToken(token):
-    print("token")
+    print("database,token",token)
     cursor = get_db().execute(
         "select steamid from userSessions where token like ?;", [token]
     )
@@ -82,3 +82,53 @@ def getSteamidByToken(token):
 
     return userSteamid[0][0]
 
+# method to check existence of user
+def userExists(steamid):
+    # fetch user by email
+    cursor = get_db().execute("select steamid from userInfo where steamid like ?;", [steamid])
+    user = cursor.fetchall()
+    cursor.close()
+    # check if user exists and return true or false
+    if user != []:
+        return True
+    else:
+        return False
+        
+# create user in database
+def createUser(userInformation):
+    # insert passed dictionary and create user in database
+    try:
+        get_db().execute(
+            "insert into userInfo values (?,?,?);",
+            [
+                userInformation["steamid"],
+                userInformation["personname"],
+                userInformation["aboutProfile"]
+            ],
+        )
+        get_db().commit()
+        return True
+    except:
+        return False
+
+#method to create follow entry
+def followUser(steamid, followid):
+    # insert user's steamid and token
+    try:
+        get_db().execute("insert into followRel values (?,?);", [steamid, followid])
+        get_db().commit()
+        return True
+    except:
+        return False
+
+#method to create follow entry
+def getFollower(steamid):
+    # get a users followers
+    cursor = get_db().execute("select steamid from userInfo where followid like ?;", [steamid])
+    user = cursor.fetchall()
+    cursor.close()
+    # check if user exists and return true or false
+    if user != []:
+        return True
+    else:
+        return False

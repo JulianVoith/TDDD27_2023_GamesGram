@@ -1,15 +1,22 @@
 ToDo/NextSteps:
 
 Current ToDos:
--Fix login steam URL
--Create user in database based on steam (Create table with steam id and profile description)
--Create Session when logging in  
--Transition from HomeScreen to Profile
--Create skeleton of profile with friend counter based on steam FriendList
+
+1st Prio:
+-Create user in database based on steam (Create table with steam id and profile description)//DONE
+
+-Component for userInfo in card style, which can be reused for followers, search and steamfriends
+-Data structure for following
+-Make it possivble to search for someone and follow his profile
 -uploading media with restriction to friends or all
 -component to click on media where you can create comments, likes, ratings, polls or whatever
+
+2st Prio
+-revise backend with return codes etc
 -Uploading with categories or something? to make search possible
 -page for games ? and statistics from steam ?
+-First time login welcome page: add self about profile text
+-token handling
 
 
 Notice:

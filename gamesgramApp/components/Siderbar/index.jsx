@@ -1,26 +1,24 @@
 import styles from '@/styles/Sidebar.module.css'
 import cx from 'classnames';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import Profile from '../Profile';
-//import { functions } from 'cypress/types/lodash';
-
 
 export default function Sidebar(props){
-
 //Hooks for css states of each sidebar component
   const[cssStates, setState] = useState({
     home: "nav-link active",
     search: "nav-link text-white",
     reels: "nav-link text-white",
     teamMates: "nav-link text-white",
-    profile: "nav-link text-white"
+    profile: "nav-link text-white",
+    signout: "nav-link text-white",
   });
 
 //const for header of side bar
   const Header = () => {
       return (
-        <div className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <Link className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none" href="/">
           <Image 
             src={"/images/Gpic.jpg"} 
             height={60} // Desired size with correct aspect ratio
@@ -29,9 +27,32 @@ export default function Sidebar(props){
             className ="rounded-circle"
             />
           <h1>amesGram</h1>
-        </div>
+        </Link>
       );
     };
+    const handleSignout = async ()=>{
+      const endpoint = '/api/SignOut'
+        
+            // Form the request for sending data to the server.
+            const options = {
+                // The method is POST because we are sending data.
+                method: 'DELETE',
+                // Tell the server we're sending JSON.
+                headers: {
+                'Content-Type': 'application/json',
+                'token':window.localStorage.getItem("token"),
+                },
+                // Body of the request is the JSON data we created above.
+            }
+        
+            // Send the form data to our forms API on Vercel and get a response.
+            const response = await fetch(endpoint, options)
+            if (response.status===200){
+              localStorage.clear();
+              window.localStorage.clear();
+            }
+            if (typeof window !== "undefined") {window.location.reload()}
+    }
 
 //const for navigation bar and events
     const NavigationBar = () => {
@@ -100,6 +121,10 @@ export default function Sidebar(props){
                 />
                  Profile
               </a>
+              <hr/>
+              <a id="Signout" className={cssStates.signout}  onClick={handleSignout} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+                SignOut
+              </a>
             </li>
           </ul>
         </div>
@@ -148,7 +173,6 @@ export default function Sidebar(props){
             <Header />
             <hr />
             <NavigationBar />
-            <hr />
           </div>
           </>
       )

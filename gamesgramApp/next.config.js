@@ -14,16 +14,20 @@ module.exports = () => {
         destination: "http://127.0.0.1:5000/authWSteam2/:path*",
       },
       {
-        source: "/auth/:path*",
-        destination: "http://127.0.0.1:5000/auth/:path*",
-      },
-      {
         source: "/processSteamLogin/:path*",
         destination: "http://127.0.0.1:5000/processSteamLogin/:path*",
       },
       {
         source: "/api/GetUserInfo/:path*",
         destination: "http://127.0.0.1:5000/GetUserInfo/:path*",
+      },
+      {
+        source: "/api/GetFriendList/:path*",
+        destination: "http://127.0.0.1:5000/GetFriendList/:path*",
+      },
+      {
+        source: "/api/SignOut/:path*",
+        destination: "http://127.0.0.1:5000/signout/:path*",
       }
     ];
   };

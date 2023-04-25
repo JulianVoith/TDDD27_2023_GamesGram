@@ -30,7 +30,7 @@ class Message(Resource):
         return {"message": 'Hello World'}
 api.add_resource(Message, '/hello')
 
-@api.resource('/login')
+@api.resource('/login')#Not in use now
 class Login(Resource):
     def post(self):
         data = request.json
@@ -49,16 +49,64 @@ class Login(Resource):
             else:
             # database error
                 return "", 500  # internal server error
+
+@api.resource('/signout')#Not in use now
+class SignOut(Resource):
+    def delete(self):
+        if request.headers['token']:
+            if database_helper.deleteSession(request.headers['token']):
+                # Session successfully deleted
+                return "", 200  # OK
+            else:
+                # database error
+                return "", 500  # internal server error
+        else:
+            # response if not signed in
+            return "", 401  # UNAUTHORIZED
+        
+
+#API resource to follow other user
+@api.resource('/follow')
+class FollowUser(Resource):
+    def post(self):
+        data = request.json
+        steamid = database_helper.getSteamidByToken(data['token'])
+        if steamid:
+            if database_helper.userExists(data['followid']):
+                if database_helper.followUser(steamid, data['followid']):
+                    return "", 201 #OK
+                else:
+                    return "", 500 #internal server error
+            else:
+                return "",404 # NO FOUND
+
+        else:
+            return "", 404 # NO FOUND
+        
+#API resource to follow other user
+@api.resource('/getFollower')
+class GetFollower(Resource):
+    def post(self):
+        data = request.json
+        steamid = data['steamid']
+        if steamid:
+            if database_helper.userExists(steamid):
+                databaseData = database_helper.getFollower(steamid)
+                return make_response(jsonify(databaseData), 200)
+            else:
+                return "",404 #
+
+        else:
+            return "", 401
             
 @api.resource('/GetUserInfo')
 class GetUserInfo(Resource):
-    def post(self):
-        data = request.json
-        token=data['token']
-        if token:
+    def get(self):
+        if request.headers['token']:
+            token=request.headers['token']
             if database_helper.getSteamidByToken(token):
                 steamids=database_helper.getSteamidByToken(token)
-                print('steamids:',steamids)
+                #print('steamids:',steamids)
                 url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
                 params={
                     "key": api_key,
@@ -72,116 +120,113 @@ class GetUserInfo(Resource):
         else:
             return "",404 #
 
-    
 @api.resource('/GetFriendList')
 class GetFriendList(Resource):
-    def GetPlayerSummaries(self):
-        def FriendList(self,steamid):
-            params={"key": api_key,"steamid":steamid}
-            url='https://api.steampowered.com/ISteamUser/GetFriendList/v0001/'
-            response=requests.get(url, params)
-            FriendList=[]
-            for friend in response['friendslist']['friends']:
-                FriendList.append(friend['steamid'])
-            steamids=','.join(FriendList)
-            return steamids  # Comma-delimited list of SteamIDs
-        steamid = request.json #fetch steamid from client
-        steamids=FriendList(steamid)
-        url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
-        params={
-             "key": api_key,
-             "steamids":steamids
-        }
-        DetailFriendList=requests.get(url, params)
-        return make_response(DetailFriendList, 200)  # OK
+    def post(self):
 
-    
+        steamid = request.json['steamid'] #fetch steamid from client
+        params={"key": api_key,"steamid":steamid,"relationship": "friend"}
+        url='https://api.steampowered.com/ISteamUser/GetFriendList/v0001/'
+        response = requests.get(url, params)
 
-@api.resource('/authWSteam')
-class SteamLogin(Resource):
-    def loginSteam(self):
-        print("test")
-        steamLogin = SteamSignIn()
-        return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:3000/processSteamLogin'))
+        #url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
+        #params={
+        #     "key": api_key,
+        #     "steamids":steamids
+        #}
+        #DetailFriendList=requests.get(url, params)
+        return make_response(response.content, 200)  # OK
+
+#build method for fetching details of users. only when needed!
 
 @app.route('/authWSteam2')
 def loginSteam():
-    print("test")
     steamLogin = SteamSignIn()
     return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:3000/'))
 
 @api.resource('/processSteamLogin')
 class processSteamLogin(Resource):
     def post(self):
-        print("coming")
-        
         returnData = request.json
-        print(returnData)
-        SteamLogin = SteamSignIn()
-        steamid = SteamLogin.ValidateResults(returnData)
-        if database_helper.activeSessionSteamid(steamid):
+        steamid = returnData['openid.claimed_id'][37:]
+
+        # Better method, should fix it latter
+
+        #SteamLogin = SteamSignIn()
+        #steamid = SteamLogin.ValidateResults(returnData)
+
+        if database_helper.activeSessionSteamid(steamid) and steamid:
              token= database_helper.activeSessionSteamid(steamid)
              tokenResp = {"token": token}
-             return make_response(jsonify(tokenResp), 200) #OK
+             return make_response(jsonify(tokenResp), 200) # OK
         else:
+            print(steamid)
             token = hashlib.sha1(os.urandom(24)).hexdigest()
             # created dictonary response
             tokenResp = {"token": token}
-            if database_helper.createUserSession(steamid, token):
-                # session created and user is logged in
-                return make_response(jsonify(tokenResp), 201) #CREATED
+            if database_helper.userExists(steamid):
+                 if database_helper.createUserSession(steamid, token) and steamid:
+                     return make_response(jsonify(tokenResp), 201) #CREATED
+                 else:
+                # database error
+                    return "", 500  # internal server error
             else:
-            # database error
-                return "", 500  # internal server error
-
-#    def post(self):
- #       params = {
-#            'openid.ns': "http://specs.openid.net/auth/2.0",
-#            'openid.identity': "http://specs.openid.net/auth/2.0/identifier_select",
-#            'openid.claimed_id': "http://specs.openid.net/auth/2.0/identifier_select",
-#            'openid.mode': 'checkid_setup',
-#           'openid.return_to': 'http://127.0.0.1:5000/authorize',
-#           'openid.realm': 'http://127.0.0.1:5000'
-#        }
-#        query_string = urlencode(params)
-#        auth_url = steam_openid_url + "?" + query_string
-#        print(auth_url)
-#       return redirect(auth_url)
-    
-@app.route("/gamesgram/authorize", methods=["GET"])
-def test():
-  #print(request.args)
-  print("blalba")
-  #return json.dumps(request.args) + '<br><br><a href="http://localhost:5000/auth">Login with steam</a>'
-  return 'hello world with react'
-
-
-@app.route('/test')
-def main():
-
-	#shouldLogin = request.args.get('login')
-	#if shouldLogin is not None:
-	steamLogin = SteamSignIn()
-	# Flask expects an explicit return on the route.
-	return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:5000/processlogin'))
-
-	#return 'Click <a href="/?login=true">to log in</a>'
-
-""" @app.route('/processlogin')
-def process2():
-
-	returnData = request.values
-
-	steamLogin = SteamSignIn()
-	steamID = steamLogin.ValidateResults(returnData)
-
-	print('SteamID returned is: ', steamID)
-
-	if steamID is not False:
-		return 'We logged in successfully!<br />SteamID: {0}'.format(steamID)
-	else:
-		return 'Failed to log in, bad details?' """
-
-
+                 params={
+                    "key": api_key,
+                    "steamids":steamid
+                }
+                 url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
+                 response = requests.get(url, params)
+                 if response.status_code==200:
+                     personaname=json.loads(response.content)['response']['players'][0]['personaname']
+                     userInformation={
+                        "steamid": steamid,
+                        "personname": personaname,
+                        "aboutProfile": None
+                     }
+                     if database_helper.createUser(userInformation):
+                         if database_helper.createUserSession(steamid, token) and steamid:
+                            return make_response(jsonify(tokenResp), 201) #CREATED
+                         else:
+                            # database error
+                            return "", 500  # internal server error
+                     else:
+                         return "",500 
+                 else:
+                     return "", 502  # Bad Gateway
+            
+                # session created and user is logged in
+                
+            
+            
 if __name__ == '__main__':
     app.run(debug=True)#host="localhost", port=3000)
+
+#Backup can be deleted soon
+
+#@api.resource('/authWSteam')
+#class SteamLogin(Resource):
+#    def loginSteam(self):
+#        print("test")
+#        steamLogin = SteamSignIn()
+#        return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:3000/processSteamLogin'))
+
+"""              if database_helper.userExists(steamid):
+                 return make_response(jsonify(tokenResp), 200) #OK
+             else:
+                 params={"key": api_key,"steamid":steamid,"relationship": "friend"}
+                 url='https://api.steampowered.com/ISteamUser/GetFriendList/v0001/'
+                 response = requests.get(url, params)
+                 if response.status_code==200:
+                     personaname=json.loads(response.content)['response']['players'][0]['personaname']
+                     userInformation={
+                        "steamid": steamid,
+                        "personname": personaname,
+                        "aboutProfile": None
+                     }
+                     if database_helper.createUser(userInformation):
+                         return "",201 # Created
+                     else:
+                         return "",500 
+                 else:
+                     return "", 502  # Bad Gateway  """
