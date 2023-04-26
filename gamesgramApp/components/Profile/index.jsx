@@ -1,8 +1,11 @@
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useState, useContext } from 'react';
+import { useRouter } from 'next/router';
 import cx from 'classnames';
 import styles from '@/styles/Profile.module.css';
 import {Button,Modal,Form} from 'react-bootstrap';
+import FriendsContext from '@/context/FriendsContext';
 
 //col-md-10 col-lg-8 col-xl-7 image above
 /*
@@ -18,9 +21,11 @@ import {Button,Modal,Form} from 'react-bootstrap';
                     profile items
 */
 export default function profile(props){
-    const [nFriends, setFriends] = useState(0);
+    const router = useRouter()
+    const { nFriends,setFriends } = useContext(FriendsContext);
     const [nFollower, setFollower] = useState(0);
     const [triggerUpl, setTriggerUpl] = useState(false);
+    
 
     const amountFriends = async () => {
 
@@ -49,7 +54,7 @@ export default function profile(props){
                 const response = await fetch(endpoint, options); //, options)
                 const data = await response.json();
 
-                setFriends(data["friendslist"]["friends"].length);
+                setFriends(data["friendslist"]["friends"]);
         //}
     }
 
@@ -147,6 +152,13 @@ export default function profile(props){
             );
         }
 
+        const routeToSteam_friends = () => {
+            router.push({
+              pathname: '/steam_friends',
+            });
+          };
+        
+
         return (
         
         <div >
@@ -174,13 +186,13 @@ export default function profile(props){
                             -possible to follower
                             -showing pictures with comments etc
                             </div>
-                            <a href="#" className="d-inline-block text-dark">
+                            <a href="/followers" className="d-inline-block text-dark">
                             <strong>{nFollower}</strong>
                             <span className="text-muted"> followers</span>
                             </a>
                             <br />
-                            <a href="#" className="d-inline-block text-dark ml-3">
-                            <strong>{nFriends}</strong>
+                            <a onClick={routeToSteam_friends} className="d-inline-block text-dark ml-3" >
+                            {nFriends ? <strong>{nFriends.length}</strong> :<strong>Loading...</strong>}
                             <span className="text-muted"> Steam friends</span>
                             </a>
                         </div>

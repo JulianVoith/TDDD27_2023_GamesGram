@@ -11,5 +11,5 @@ export async function GetUserInfo(steamid = null) {
       },};
     const response = await fetch(endpoint, options);
     const data = await response.json();
-    return data.response.players[0]; // parses JSON response into native JavaScript objects
+    return data.response.players; // parses JSON response into native JavaScript objects
   }

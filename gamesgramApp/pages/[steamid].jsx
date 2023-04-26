@@ -65,7 +65,7 @@ const UserProfile = ({ userData }) => {
     <main>
     <div className={styles.main}>
       {myInfo &&  <div className={styles.one}><Sidebar navigate={handleNavigation} userInfo={myInfo}/></div>}
-      {userInfo && <Profile userInfo={userInfo} />}
+      {userInfo ? <Profile userInfo={userInfo} />:<h1>404</h1>}
     </div>
 </main>
   );

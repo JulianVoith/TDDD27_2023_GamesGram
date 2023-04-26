@@ -25,7 +25,7 @@ export default function Search(){
         {searchResults.length !== 0 && (
             <div className={styles.resultsContainer}>
               {searchResults.map((result) => (
-                <UserCard key={result} className={styles.resultItem} steamid = {result} />
+                <UserCard key={result} steamid = {result} />
               ))}
             </div>
           )}
@@ -33,26 +33,38 @@ export default function Search(){
     );
 }
 
-function UserCard(props){
-    const [userInfo, setUserInfo] = useState(null);
+export function UserCard(props){
+    const [usersInfo, setUsersInfo] = useState(null);
 
     useEffect(() => {
       const fetchUserInfo = async () => {
-        const data = await GetUserInfo(props.steamid);
-        //console.log(data)
-        setUserInfo(data);
+        if(props.steamid)
+        {const data = await GetUserInfo(props.steamid);
+        setUsersInfo(data);
+    }
       };
   
       fetchUserInfo();
     }, [props.steamid]);
-  
+    
     // Render the component
     return (
-      <div>
-        {userInfo ? (
-          <>
+      <div className={styles.resultItem}>
+        {usersInfo !==null ? 
+            usersInfo.map((userInfo)=><Card key={userInfo.steamid} userInfo={userInfo}/>)
+         : (
+          <p>Loading...</p>
+        )}
+      </div>
+    );
+}
+
+export function Card(props){
+    const userInfo = props.userInfo;
+    return(
+            <>
             <h1>{userInfo.personaname}</h1>
-            <Link href={userInfo.profileurl} target="_blank" >
+            <Link href={`/${userInfo.steamid}`} shallow={true} >
             <Image 
             src={userInfo.avatarfull} 
             width={100}
@@ -61,9 +73,5 @@ function UserCard(props){
             />
             </Link>
           </>
-        ) : (
-          <p>Loading...</p>
-        )}
-      </div>
     );
 }
