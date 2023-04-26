@@ -58,14 +58,12 @@ export default function profile(props){
         //}
     }
 
-   
-
-
     function Header(){
 
         useEffect(()=>{
-            amountFriends()
-        }, []);
+            if(nFriends===undefined)
+            {amountFriends()}
+        }, [null]);
 
         const [show, setShow] = useState(false);
 
@@ -213,7 +211,7 @@ export default function profile(props){
             </div>
         
         );
-    } //image and hr
+    }
 
     return (
         <>

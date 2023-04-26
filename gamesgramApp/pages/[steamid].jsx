@@ -39,7 +39,7 @@ const UserProfile = ({ userData }) => {
       if (myInfo === null) {
         const data = await GetUserInfo();
         if (data) {
-          setMyInfo(data);
+          setMyInfo(data[0]);
         }
       }
     };
@@ -53,7 +53,7 @@ const UserProfile = ({ userData }) => {
         console.log("Search")
         const data = await GetUserInfo(steamid);
         if (data) {
-          setUserInfo(data);
+          setUserInfo(data[0]);
         }
       }
     };

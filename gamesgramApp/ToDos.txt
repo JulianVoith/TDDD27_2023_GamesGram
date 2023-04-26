@@ -10,6 +10,8 @@ Current ToDos:
 -Make it possivble to search for someone and follow his profile
 -uploading media with restriction to friends or all
 -component to click on media where you can create comments, likes, ratings, polls or whatever
+-fix navigation after search
+-check getfriendlist frequency
 
 2st Prio
 -revise backend with return codes etc

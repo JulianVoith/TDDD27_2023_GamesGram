@@ -102,7 +102,7 @@ export default function Sidebar(props){
             </li>
             <li>
               <a id="Reels" className={cssStates.reels} onClick={() => onClickNavbar(2)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
-                Reels
+                Galaries/Reels
               </a>
             </li>
             <li>
