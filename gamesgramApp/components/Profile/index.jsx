@@ -53,17 +53,18 @@ export default function profile(props){
                 // Send the form data to our forms API on Vercel and get a response.
                 const response = await fetch(endpoint, options); //, options)
                 const data = await response.json();
-
-                setFriends(data["friendslist"]["friends"]);
+                if(data!==nFriends)
+                {
+                    setFriends(data["friendslist"]["friends"]);
+                }
         //}
     }
 
     function Header(){
 
         useEffect(()=>{
-            if(nFriends===undefined)
-            {amountFriends()}
-        }, [null]);
+            amountFriends()
+        }, [nFriends]);
 
         const [show, setShow] = useState(false);
 
