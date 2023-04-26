@@ -1,6 +1,6 @@
-export async function GetUserInfo(steamid = {}) {
+export async function GetUserInfo(steamid = null) {
     // Default options are marked with *
-    const endpoint =`/api/GetUserInfo/${steamid}`;
+    const endpoint = steamid ? `/api/GetUserInfo/${steamid}` : '/api/GetUserInfo';
     const options = {
       // The method is POST because we are sending data.
       method: 'GET',

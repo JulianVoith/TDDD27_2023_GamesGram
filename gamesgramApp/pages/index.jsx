@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 export default function Home(){
     const [hastoken, setToken] = useState(false);
     const [userInfo,setuserInfo] = useState(null);
+    //const [steamid,setsteamid] =useState(undefined);
     const router = useRouter()
 
   useEffect(() => {

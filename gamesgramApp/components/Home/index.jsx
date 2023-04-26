@@ -10,8 +10,6 @@ export default function HomeMain(userInfo){
     const [page, setPage] = useState("home");
 
     userInfo = userInfo.userInfo;
-    //console.log("home",userInfo)
-    console.log(userInfo);
     
     //Function is being called when interacting with navigation bar
     //sets page hook depending in selection and executes rendering of component
