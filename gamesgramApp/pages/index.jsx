@@ -57,14 +57,10 @@ useEffect(()=>{
 
     const handleLogin = (token) => {
         //console.log(`Logged in with token ${token}`);
-        //setToken(token);
         if (typeof window !== 'undefined'&&typeof token!== 'undefined')
         {
             localStorage.setItem("token",token);
             setToken (true);
-            console.log("state",token);
-            console.log("localStorage",localStorage.getItem("token"));
-            console.log("JUMP")
             router.push("/");
         }
       };
@@ -92,7 +88,6 @@ useEffect(() => {
 
         // Send the form data to our forms API on Vercel and get a response.
         const response = await fetch(endpoint, options);
-        console.log("Done")
         const data = await response.json();
         handleLogin(data.token);
       }

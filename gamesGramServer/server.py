@@ -99,26 +99,31 @@ class GetFollower(Resource):
         else:
             return "", 401
             
-@api.resource('/GetUserInfo')
+@api.resource('/GetUserInfo', '/GetUserInfo/<string:steamid>')
 class GetUserInfo(Resource):
-    def get(self):
-        if request.headers['token']:
-            token=request.headers['token']
-            if database_helper.getSteamidByToken(token):
-                steamids=database_helper.getSteamidByToken(token)
-                #print('steamids:',steamids)
-                url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
-                params={
-                    "key": api_key,
-                    "steamids":steamids
-                }
-                DetailFriendList=requests.get(url, params)
-                return make_response(DetailFriendList.content, 200)  # OK
-            else:
-                # database error
-                return "", 500  # internal server error
-        else:
-            return "",404 #
+    def get(self, steamid=None):
+        # Check if the request header contains a token
+        token = request.headers.get('token')
+        if not token:
+            return "", 401  # Unauthorized
+
+        # Get steamid from the database if not provided as a parameter
+        if steamid is None:
+            steamid = database_helper.getSteamidByToken(token)
+            if not steamid:
+                return "", 500  # Internal server error
+
+        # Request user details from the Steam API
+        url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
+        params = {
+            "key": api_key,
+            "steamids": steamid
+        }
+        detail_friend_list = requests.get(url, params)
+
+        return make_response(detail_friend_list.content, 200)  # OK
+                
+        
 
 @api.resource('/GetFriendList')
 class GetFriendList(Resource):
@@ -151,10 +156,10 @@ class processSteamLogin(Resource):
         steamid = returnData['openid.claimed_id'][37:]
 
         # Better method, should fix it latter
-
-        #SteamLogin = SteamSignIn()
-        #steamid = SteamLogin.ValidateResults(returnData)
-
+        """ 
+        SteamLogin = SteamSignIn()
+        steamid = SteamLogin.ValidateResults(returnData)
+        """
         if database_helper.activeSessionSteamid(steamid) and steamid:
              token= database_helper.activeSessionSteamid(steamid)
              tokenResp = {"token": token}
@@ -171,12 +176,14 @@ class processSteamLogin(Resource):
                 # database error
                     return "", 500  # internal server error
             else:
+                 #first login, create the user info
                  params={
                     "key": api_key,
                     "steamids":steamid
                 }
                  url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
                  response = requests.get(url, params)
+                # fetch user personaname by steamid, personaname is for search user
                  if response.status_code==200:
                      personaname=json.loads(response.content)['response']['players'][0]['personaname']
                      userInformation={
@@ -193,25 +200,25 @@ class processSteamLogin(Resource):
                      else:
                          return "",500 
                  else:
+                     # steam server is not available
                      return "", 502  # Bad Gateway
             
                 # session created and user is logged in
                 
-@api.resource("//search/<string:searchTerm>")
+@api.resource("/search/<string:searchTerm>")
 class GetUser(Resource):
     def get(self, searchTerm):
-        
-        print(searchTerm)
-
         result = database_helper.searchUser(searchTerm)
         if len(result):
-            return make_response(result, 200)  # OK
+            result_str = [(str(n),) for n in result]
+            response_data = json.dumps(result_str)
+            return make_response(response_data, 200)  # OK
         else:
             return "",404 # NO FOUND
 
             
 if __name__ == '__main__':
-    app.run(debug=True)#host="localhost", port=3000)
+    app.run(debug=True)
 
 #Backup can be deleted soon
 
@@ -221,23 +228,3 @@ if __name__ == '__main__':
 #        print("test")
 #        steamLogin = SteamSignIn()
 #        return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:3000/processSteamLogin'))
-
-"""              if database_helper.userExists(steamid):
-                 return make_response(jsonify(tokenResp), 200) #OK
-             else:
-                 params={"key": api_key,"steamid":steamid,"relationship": "friend"}
-                 url='https://api.steampowered.com/ISteamUser/GetFriendList/v0001/'
-                 response = requests.get(url, params)
-                 if response.status_code==200:
-                     personaname=json.loads(response.content)['response']['players'][0]['personaname']
-                     userInformation={
-                        "steamid": steamid,
-                        "personname": personaname,
-                        "aboutProfile": None
-                     }
-                     if database_helper.createUser(userInformation):
-                         return "",201 # Created
-                     else:
-                         return "",500 
-                 else:
-                     return "", 502  # Bad Gateway  """

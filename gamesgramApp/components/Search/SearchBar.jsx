@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import styles from '@/styles/Search.module.css';
 
-export default function SearchBar(){
+export default function SearchBar(props){
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
   
@@ -31,7 +31,9 @@ export default function SearchBar(){
       fetchData();
     }, [searchTerm]);
 
-    searchResults.map((result)=>console.log(result))
+    useEffect(()=>{
+      props.onSearch(searchResults);
+    },[searchResults]);
     
     return (
         <div className={styles.searchContainer}>
@@ -43,16 +45,6 @@ export default function SearchBar(){
             className={styles.searchInput}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          {searchResults.length > 0 && (
-            <ul className={styles.resultsContainer}>
-              {searchResults.map((result) => (
-                <li key={result} className={styles.resultItem}>
-                  {result}
-                </li>
-              ))}
-            </ul>
-          )}
-          
         </div>
       );
 }
