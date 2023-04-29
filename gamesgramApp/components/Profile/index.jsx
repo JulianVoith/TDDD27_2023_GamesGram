@@ -1,28 +1,12 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
-import cx from 'classnames';
-import styles from '@/styles/Profile.module.css';
 import {Button,Modal,Form} from 'react-bootstrap';
-import FriendsContext from '@/context/FriendsContext';
+import Context from '@/context/Context';
 
-//col-md-10 col-lg-8 col-xl-7 image above
-/*
-                    <li className="nav-item">
-                    <a className="nav-link py-4" href="#">Likes</a>
-                    </li>
-                    <li className="nav-item">
-                    <a className="nav-link py-4" href="#">Followers</a>
-                    </li>
-                    <li className="nav-item">
-                    <a className="nav-link py-4" href="#">Following</a>
-                    </li>
-                    profile items
-*/
 export default function profile(props){
     const router = useRouter()
-    const { nFriends,setFriends } = useContext(FriendsContext);
+    const { nFriends,setFriends } = useContext(Context);
     const [nFollower, setFollower] = useState(0);
     const [triggerUpl, setTriggerUpl] = useState(false);
     
@@ -75,9 +59,6 @@ export default function profile(props){
         //shall bee shown in a small popup
         //under construct!!!!
         function UploadMedia(){
-
-            //const [steamID, setSteamId] = useState('');
-            //const [steamID, setSteamId] = useState('');
             
             const handleSubmit = async (event) => {
                 event.preventDefault();

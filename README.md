@@ -2,6 +2,7 @@
 
 ## Updates
 
+- [2023.04.26] Version 0.2 with overall mock-up of the platform GamesGram including user profile outline and user search.
 - [2023.04.06] We updated a readme document.
 
 ## Overview
@@ -25,7 +26,7 @@ The overall goal is also to make it mobile adjusted so an iOS web application ca
 
 #### Client Framework
 
-- [React](https://react.dev/)
+- [Next](https://nextjs.org/)
 
 #### Server Framework
 

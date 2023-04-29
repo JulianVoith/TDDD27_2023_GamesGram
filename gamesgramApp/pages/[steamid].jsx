@@ -1,36 +1,25 @@
 import { useRouter } from 'next/router';
+
 import { useEffect, useState } from 'react';
 import {GetUserInfo} from '@/components/Tools/getUserInfo'
-import HomeMain from '@/components/Home';
 import Sidebar from '@/components/Siderbar';
 import Profile from '@/components/Profile';
-import Search from '@/components/Search';
 import styles from '@/styles/Home.module.css';
 
 const UserProfile = ({ userData }) => {
-  const [page, setPage] = useState("search");
   const [userInfo,setUserInfo] = useState(null);
   const [myInfo,setMyInfo] = useState(null);
   const router = useRouter();
   const { steamid } = router.query;
 
-  const handleNavigation = (nav) => {
-    setPage(nav);
-}
-  //Helper function to change rendering
-  function RenderNavigatedPage(){
-    if(page == "home"){
-        
-    }else if(page == "search"){
-        return <Search classname=""/>;
-    }else if(page == "reels"){
-        
-    }else if(page == "teamMates"){
-        
-    }else{
-        return <Profile classname="" userInfo={userInfo} />;
-    } 
-}
+    //constant for the sidebar selection css which is passed as a prop
+    const SidebarSelect = 
+                          {home: "nav-link text-white",
+                          search: "nav-link text-white",
+                          reels: "nav-link text-white",
+                          teamMates: "nav-link text-white",
+                          profile: "nav-link active",
+                          signout: "nav-link text-white"};
 
   useEffect(() => {
 
@@ -60,12 +49,12 @@ const UserProfile = ({ userData }) => {
   
     fetchUserInfo();
   }, [steamid, userInfo]);
-  console.log(userInfo)
+ 
   return (
     <main>
     <div className={styles.main}>
-      {myInfo &&  <div className={styles.one}><Sidebar navigate={handleNavigation} userInfo={myInfo}/></div>}
-      {userInfo ? <Profile userInfo={userInfo} />:<h1>404</h1>}
+      {myInfo &&  <div className={styles.one}><Sidebar selection={SidebarSelect} userInfo={myInfo}/></div>}
+      {userInfo ? <Profile userInfo={userInfo} />:404}
     </div>
 </main>
   );

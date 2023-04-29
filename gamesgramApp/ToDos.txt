@@ -11,7 +11,7 @@ Current ToDos:
 -uploading media with restriction to friends or all
 -component to click on media where you can create comments, likes, ratings, polls or whatever
 -fix navigation after search
--check getfriendlist frequency
+-check getfriendlist frequency -> related to the form problem an blinking buttons
 
 2st Prio
 -revise backend with return codes etc
@@ -23,3 +23,28 @@ Current ToDos:
 
 Notice:
 - use component replace instad page routes
+
+
+---------------------------------------
+
+Restructering (This weeken 29-30.04):
+- Integrated Home component into index
+- Create pages for search and profile and link to them --> reduces the amount of components(only stuff which is reused)
+
+Focus:
+- finish profile (upload, component to comment on picture, follow etc.) 
+- Feeding home
+
+Roguh databse outline for media and post (simmilar to previous course):
+ (UserPost (category, description, timestamp, MEDIA) 
+    -> userMedia 
+    -> CommentTable( LIKE, text, userid, postid, commentID; query with POSTID ->) 
+    -> Liketable(postid, commentID, steamid))
+
+Follow -> steamID followSteamID
+
+
+tomorrow:
+fix profile and search check!!!
+- about text from database
+-upload media?

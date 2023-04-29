@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { useContext,useEffect, useState } from 'react';
-import FriendsContext from '@/context/FriendsContext';
+import Context from '@/context/Context';
 import {GetUserInfo} from '@/components/Tools/getUserInfo'
-import {Card} from '@/components/Search'
+import {Card} from '@/components/Search';
 import styles from '@/styles/Home.module.css';
 import Sidebar from '@/components/Siderbar';
 
@@ -11,7 +11,7 @@ const SteamFriends = () => {
   const [page, setPage] = useState("search");
   const [FriendsInfo,setFriendsInfo] = useState(null)
   const [myInfo,setMyInfo] = useState(null);
-  const { nFriends } = useContext(FriendsContext);
+  const { nFriends } = useContext(Context);
 
   let steamidArray = undefined
   let steamidString = undefined
