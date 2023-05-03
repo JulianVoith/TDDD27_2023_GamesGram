@@ -32,6 +32,10 @@ module.exports = () => {
       {
         source: "/api/search/:path*",
         destination: "http://127.0.0.1:5000/search/:path*",
+      },
+      {
+        source: "/api/GetRecentlyPlayedGames/:path*",
+        destination: "http://127.0.0.1:5000/GetRecentlyPlayedGames/:path*",
       }
     ];
   };

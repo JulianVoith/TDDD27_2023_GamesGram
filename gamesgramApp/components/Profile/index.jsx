@@ -3,10 +3,12 @@ import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import {Button,Modal,Form} from 'react-bootstrap';
 import Context from '@/context/Context';
+import styles from '@/styles/Profile.module.css';
+import RecentGame from './resentGame';
 
 export default function profile(props){
     const router = useRouter()
-    const { nFriends,setFriends } = useContext(Context);
+    const {nFriends,setFriends } = useContext(Context);
     const [nFollower, setFollower] = useState(0);
     const [triggerUpl, setTriggerUpl] = useState(false);
     
@@ -17,7 +19,7 @@ export default function profile(props){
 
         //if(!props.userInfo && token !== null){
             const JSONdata = JSON.stringify({'steamid': props.userInfo.steamid})
-            console.log(JSONdata);
+            //console.log(JSONdata);
             
                 // API endpoint where we send form data.
                 const endpoint = '/api/GetFriendList'
@@ -119,18 +121,7 @@ export default function profile(props){
     
         }
 
-        function Follow(){
-            //different display depending on profile
-            //your own profile? maybe disapear
-            //others depending on follow or not follow. possibility to unfollow
-            return (
-                <>
-                    <Button variant="primary">
-                     Follow
-                    </Button>
-                </>
-            );
-        }
+
 
         const routeToSteam_friends = () => {
             router.push({
@@ -180,6 +171,7 @@ export default function profile(props){
                         <Follow /> 
                         <UploadMedia />
                     </div>
+                    <RecentGame />
                 </div>
                 
                 <ul className="nav nav-tabs tabs-alt justify-content-center">
@@ -205,4 +197,18 @@ export default function profile(props){
         </div>
         </>
     )
+}
+
+
+function Follow(){
+    //different display depending on profile
+    //your own profile? maybe disapear
+    //others depending on follow or not follow. possibility to unfollow
+    return (
+        <>
+            <Button variant="primary">
+             Follow
+            </Button>
+        </>
+    );
 }
