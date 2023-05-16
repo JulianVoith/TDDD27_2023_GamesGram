@@ -18,7 +18,8 @@ export default function Sidebar(props){
 
   //Fetch userContext
   const {userInfo} = useContext(Context); 
-
+  const steamid = window.localStorage.getItem("steamid");
+  const avatar = window.localStorage.getItem("avatar");
   
 
 //const for header of side bar
@@ -119,12 +120,12 @@ export default function Sidebar(props){
               </a>
             </li>
             <li>
-              <Link href={`/${userInfo.steamid}`} id="Profile" className={props.selection.profile} onClick={() => onClickNavbar(4)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+              <Link href={`/${steamid}`} id="Profile" className={props.selection.profile} onClick={() => onClickNavbar(4)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 <Image 
-                src={userInfo.avatar}
+                src={avatar}
                 width={20}
                 height={20}
-                alt={userInfo.personaname}
+                alt={steamid}
                 className={styles.avatar}
                 />
                  Profile

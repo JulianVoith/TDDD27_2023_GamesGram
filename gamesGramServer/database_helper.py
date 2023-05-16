@@ -228,3 +228,6 @@ def getMedia(filenam):
         return media[0]
     else:
         return False
+
+def setFollow():
+    pass

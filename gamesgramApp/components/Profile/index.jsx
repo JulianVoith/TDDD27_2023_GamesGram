@@ -11,7 +11,7 @@ import RecentGame from './resentGame';
 
 export default function profile(props){
     const router = useRouter()
-    const {nFriends,setFriends } = useContext(Context);
+    const {nFriends,setFriends,userInfo} = useContext(Context);
     const [nFollower, setFollower] = useState(0);
     
 
@@ -249,10 +249,10 @@ export default function profile(props){
                             </a>
                         </div>
                         <br />
-                        <Follow /> 
-                        <CreatePost />
+                        {userInfo.steamid!==props.userInfo.steamid ? <Follow />:<CreatePost /> }
+                        
                     </div>
-                    <RecentGame />
+                    
                 </div>
                 
                 <ul className="nav nav-tabs tabs-alt justify-content-center">
@@ -262,7 +262,7 @@ export default function profile(props){
                 </ul>
                 </div>
             </div>
-
+            
             </div>
         
         );
@@ -271,13 +271,13 @@ export default function profile(props){
 //fetching media of inspected user
     const Media = () => {
         let medias = props.media;
-       
+        console.log(medias);
           return (
             <Container fluid>
                <Row md={4} >
-                {medias.map((mediae) => (
+                {medias? medias.map((mediae) => (
                     <MediaCard key={mediae.filenam} media={mediae} />
-                ))}
+                )): <p>Post some New</p>}
                 </Row> 
             </Container>
           );
@@ -299,9 +299,11 @@ function Follow(){
     //different display depending on profile
     //your own profile? maybe disapear
     //others depending on follow or not follow. possibility to unfollow
+
+    
     return (
         <>
-            <Button variant="primary">
+            <Button variant="primary" onCleck>
              Follow
             </Button>
         </>

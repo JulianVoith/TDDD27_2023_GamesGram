@@ -7,7 +7,6 @@ from os import environ
 from urllib.parse import urlencode
 from flask_cors import CORS,  cross_origin
 from os import environ
-from pysteamsignin.steamsignin import SteamSignIn #import for steam signin
 from werkzeug.utils import secure_filename
 
 import database_helper

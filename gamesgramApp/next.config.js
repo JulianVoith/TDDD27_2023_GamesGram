@@ -55,6 +55,14 @@ module.exports = () => {
   return {
     images: {
       domains: ["steamcdn-a.akamaihd.net","avatars.akamai.steamstatic.com"],
+      remotePatterns: [
+        {
+          protocol: 'http',
+          hostname: 'localhost',
+          port: '5000',
+          pathname: '/image_feed/**'
+        }
+      ],
     },
     rewrites,
   };

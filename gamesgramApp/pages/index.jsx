@@ -48,7 +48,9 @@ export default function Home(){
             // Send the form data to our forms API on Vercel and get a response.
             const response = await fetch(endpoint, options)
             const data = await response.json();
-            setuserInfo(data.response.players[0])
+            setuserInfo(data.response.players[0]);
+            window.localStorage.setItem("steamid",data.response.players[0].steamid);
+            window.localStorage.setItem("avatar",data.response.players[0].avatar);
     }
 }
     
