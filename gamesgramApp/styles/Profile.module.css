@@ -76,3 +76,45 @@
 .nav-tabs .nav-link.active {
     border-bottom-color: #fff;
 }
+
+.gameContainer{
+    display: flex;
+    overflow-x: scroll;
+    padding: 16px 0;
+    gap: 16px;
+    background-color: #f8f8f8;
+    /* hidden scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.gameContainer::-webkit-scrollbar {
+    display: none;
+  }
+
+.gameItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px;
+    font-size: 14px;
+    color: #444;
+}
+/* game picture */
+.gameItem img {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #d6249f;
+    box-sizing: border-box;
+  }
+  
+  /* game name */
+.gameItem .name {
+    margin-top: 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }

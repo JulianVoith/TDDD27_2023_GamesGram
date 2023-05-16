@@ -6,10 +6,12 @@ import Context from '@/context/Context';
 import MediaCard from '@/components/Profile/MediaCard'
 
 //QUESTION: when const and when function?
+import styles from '@/styles/Profile.module.css';
+import RecentGame from './resentGame';
 
 export default function profile(props){
     const router = useRouter()
-    const { nFriends,setFriends } = useContext(Context);
+    const {nFriends,setFriends } = useContext(Context);
     const [nFollower, setFollower] = useState(0);
     
 
@@ -250,6 +252,7 @@ export default function profile(props){
                         <Follow /> 
                         <CreatePost />
                     </div>
+                    <RecentGame />
                 </div>
                 
                 <ul className="nav nav-tabs tabs-alt justify-content-center">
@@ -289,4 +292,18 @@ export default function profile(props){
         </div>
         </>
     )
+}
+
+
+function Follow(){
+    //different display depending on profile
+    //your own profile? maybe disapear
+    //others depending on follow or not follow. possibility to unfollow
+    return (
+        <>
+            <Button variant="primary">
+             Follow
+            </Button>
+        </>
+    );
 }

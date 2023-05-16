@@ -57,7 +57,6 @@ useEffect(()=>{
     },[hastoken]);
 
     const handleLogin = (token) => {
-        //console.log(`Logged in with token ${token}`);
         if (typeof window !== 'undefined'&&typeof token!== 'undefined')
         {
             localStorage.setItem("token",token);

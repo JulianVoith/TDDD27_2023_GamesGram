@@ -44,6 +44,10 @@ module.exports = () => {
       {
         source: "/image_feed/:path*",
         destination: "http://127.0.0.1:5000/image_feed/:path*",
+      },
+      {
+        source: "/api/GetRecentlyPlayedGames/:path*",
+        destination: "http://127.0.0.1:5000/GetRecentlyPlayedGames/:path*",
       }
     ];
   };
