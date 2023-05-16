@@ -19,6 +19,7 @@ Current ToDos:
 -page for games ? and statistics from steam ?
 -First time login welcome page: add self about profile text
 -token handling
+-post/get stuff (Requests)
 
 
 Notice:
@@ -41,10 +42,10 @@ Roguh databse outline for media and post (simmilar to previous course):
     -> CommentTable( LIKE, text, userid, postid, commentID; query with POSTID ->) 
     -> Liketable(postid, commentID, steamid))
 
-Follow -> steamID followSteamID
+Follow -> steamID followSteamID 
+
+
 
 
 tomorrow:
-fix profile and search check!!!
-- about text from database
--upload media?
+-show media on page

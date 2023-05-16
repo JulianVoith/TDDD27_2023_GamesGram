@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 from flask_cors import CORS,  cross_origin
 from os import environ
 from pysteamsignin.steamsignin import SteamSignIn #import for steam signin
+from werkzeug.utils import secure_filename
 
 import database_helper
 import json
@@ -18,10 +19,18 @@ app = Flask(__name__)
 api = Api(app)
 CORS(app, resources={r"/*": {"origins": "*"}}) # enable CORS on all routes
 
-
+#Gloabal declarations
+#Steam authentification
 steam_openid_url = 'https://steamcommunity.com/openid/login'
-
 api_key = 'FB453E73DBD4107207669FA395CBC366'
+#Media upload
+# paths for media 
+img_path = "data/images/"
+audio_path = "data/audios/"
+video_path = "data/videos/"
+upload_path_img = os.path.join(app.root_path, img_path)
+upload_path_audio = os.path.join(app.root_path, audio_path)
+upload_path_video = os.path.join(app.root_path, video_path)
 
 parser = reqparse.RequestParser()
 parser.add_argument('task')
@@ -119,9 +128,20 @@ class GetUserInfo(Resource):
             "key": api_key,
             "steamids": steamid
         }
-        detail_friend_list = requests.get(url, params)
 
-        return make_response(detail_friend_list.content, 200)  # OK
+        #fetch information from stem api
+        details = requests.get(url, params).json()
+        #fetch user information from platform databse
+        platforminfo = database_helper.getUser(steamid)
+
+        #add custom user description if existing
+        if platforminfo:
+            details["response"]["players"][0]["description"] = platforminfo[2]
+        else:
+            details["response"]["players"][0]["description"] = "No information available."
+            
+
+        return make_response(details, 200)  # OK
                 
         
 
@@ -165,7 +185,6 @@ class processSteamLogin(Resource):
              tokenResp = {"token": token}
              return make_response(jsonify(tokenResp), 200) # OK
         else:
-            print(steamid)
             token = hashlib.sha1(os.urandom(24)).hexdigest()
             # created dictonary response
             tokenResp = {"token": token}
@@ -189,7 +208,7 @@ class processSteamLogin(Resource):
                      userInformation={
                         "steamid": steamid,
                         "personname": personaname,
-                        "aboutProfile": None
+                        "aboutProfile": "No information availabe."
                      }
                      if database_helper.createUser(userInformation):
                          if database_helper.createUserSession(steamid, token) and steamid:
@@ -216,15 +235,151 @@ class GetUser(Resource):
         else:
             return "",404 # NO FOUND
 
+#Interface for creating a post with media
+@api.resource("/createPost")
+class CreatePost(Resource):
+    def post(self):
+        
+        #Fetch token from header and check if session is acrive
+        token = request.headers.get('token')
+
+        if database_helper.activeSession(token):
+
+            #get media data
+            media = request.files.get("file")
+
+            # validate if file is an image, audio or video
+            if (
+                media.content_type[0:5] == "image"
+                or media.content_type[0:5] == "audio"
+                or media.content_type[0:5] == "video" 
+            ) and media is not None:
+                
+                # make safe filename give it the next id and save it into message data
+                mediaFilename = media.filename
+                # create new filename with an unique ID
+                partition = mediaFilename.rpartition(".")
+                # fetch latest used id
+                lastId = database_helper.getLastUsedID()
+                
+                if lastId is None:
+                    lastId = 1
+                else:
+                    lastId = lastId + 1
+                
+                # create new filename for media
+                mediaFilename = secure_filename(
+                    str(lastId) + partition[1] + partition[2]
+                ).lower()
+
+                # create new table entry
+                if database_helper.uploadMedia(mediaFilename, media.content_type[0:5]):
+                    # save image to disk depending on media type
+                    if media.content_type[0:5] == "image":
+                        uploadpath = upload_path_img
+                    elif media.content_type[0:5] == "audio":
+                        uploadpath = upload_path_audio
+                    else:
+                        uploadpath = upload_path_video
+
+                    # save media on disk
+                    media.save(os.path.join(uploadpath, mediaFilename))
+
+                    # create post itself after media upload
+                    if database_helper.createPost(database_helper.getSteamidByToken(token), request.form.get("category"), request.form.get("descr"), request.form.get("access"), mediaFilename):
+
+                        return "", 201  # successfully uploaded
+                    
+                    else:
+
+                        #If post upload goes wrong associated media gets deleted from disc
+                        database_helper.deleteMedia(mediaFilename)
+                        os.remove(os.path.join(uploadpath, mediaFilename))
+
+                        return "", 500  # internal server error
+
+                else:
+                    # incase upload goes wron. remove linkage from emssage
+                    database_helper.updateUserMessageMedia(
+                        "", request.form.get("messageID")
+                    )
+                    # database error
+                    return "", 500  # internal server error
+            else:
+                return "", 400 #badrequst
+            #check content type
+        #create database entry with id
+        else:
+            return "", 401  # Unauthorized
+
+#Interface for creating a post with media
+@api.resource("/getPosts/<string:steamid>")
+class GetPosts(Resource):
+    def get(self, steamid):
+        
+        print(steamid)
+
+         #Fetch token from header and check if session is acrive
+        token = request.headers.get('token')
+
+        #Check if there is an active session
+        if database_helper.activeSession(token):
             
+            #response init
+            postResponse = []
+
+            #fetch posts by steamid
+            posts = database_helper.getUserPosts(steamid)
+
+            #iterate through posts and creat dictionary and stream url and pass back to client
+            for post in posts:
+
+                typeOfMedia = database_helper.getMedia(post[4])
+                print(typeOfMedia);
+                if typeOfMedia[1] == "image":
+                    url = "/image_feed/" + post[4]
+                elif typeOfMedia[1] == "video":
+                    url = "/video_feed/" + post[4]
+                else:
+                    url = "/audio_feed/" + post[4]
+
+                postResponse.append({
+                    "steamid": post[0],
+                    "appid": post[1],
+                    "descr": post[2],
+                    "accessRuleID": post[3],
+                    "filenam": post[4],
+                    "timestamp": post[5],
+                    "url": url
+                })
+            
+            #if existing return json of table entries
+            if postResponse is not None:
+
+                return make_response(jsonify(postResponse), 200) #OK
+            
+            else:
+                return 404 #notfound
+        else:
+            return "", 401 #unauthorized
+
+# function for streaming an image to the wall
+@app.route("/image_feed/<image>", methods=["GET"])
+def image_feed(image):
+    # partition for correct mimetype
+    mime = image.rpartition(".")
+    mimetype = "image/" + mime[2]
+
+    # method to stream image for Response
+    def gen(imagename):
+        # get image and stream
+        image = open(
+            upload_path_img + imagename, "rb"
+        ).read()  # send_from_directory(upload_path_img, imagename)
+        yield image
+
+    return Response(gen(image), status=200, mimetype=mimetype), 200       
+
 if __name__ == '__main__':
     app.run(debug=True)
 
-#Backup can be deleted soon
-
-#@api.resource('/authWSteam')
-#class SteamLogin(Resource):
-#    def loginSteam(self):
-#        print("test")
-#        steamLogin = SteamSignIn()
-#        return steamLogin.RedirectUser(steamLogin.ConstructURL('http://localhost:3000/processSteamLogin'))

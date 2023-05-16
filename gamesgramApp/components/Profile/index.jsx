@@ -1,23 +1,25 @@
 import Image from 'next/image';
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
-import {Button,Modal,Form} from 'react-bootstrap';
+import {Button,Modal,Form, Container, Row} from 'react-bootstrap';
 import Context from '@/context/Context';
+import MediaCard from '@/components/Profile/MediaCard'
+
+//QUESTION: when const and when function?
 
 export default function profile(props){
     const router = useRouter()
     const { nFriends,setFriends } = useContext(Context);
     const [nFollower, setFollower] = useState(0);
-    const [triggerUpl, setTriggerUpl] = useState(false);
     
 
     const amountFriends = async () => {
 
         let token = localStorage.getItem("token");
+        let data = 0;
 
         //if(!props.userInfo && token !== null){
             const JSONdata = JSON.stringify({'steamid': props.userInfo.steamid})
-            console.log(JSONdata);
             
                 // API endpoint where we send form data.
                 const endpoint = '/api/GetFriendList'
@@ -36,18 +38,23 @@ export default function profile(props){
             
                 // Send the form data to our forms API on Vercel and get a response.
                 const response = await fetch(endpoint, options); //, options)
-                const data = await response.json();
-                if(data!==nFriends)
+                data = await response.json();
+                
+                if(data["friendslist"]["friends"].length!=nFriends.length)
                 {
+                    
                     setFriends(data["friendslist"]["friends"]);
                 }
+            
         //}
     }
 
     function Header(){
 
+        //refreshing way to often --> issue solved --> for presentation maybe check why
         useEffect(()=>{
             amountFriends()
+            
         }, [nFriends]);
 
         const [show, setShow] = useState(false);
@@ -56,40 +63,106 @@ export default function profile(props){
         const handleShow = () => setShow(true);
     
         
-        //shall bee shown in a small popup
-        //under construct!!!!
-        function UploadMedia(){
+        //function to create a post
+        function CreatePost(){
+
+            //hook for form data
+            const [formData, setFormData] = useState({
+               descr: "",
+               file: null,
+               access: 1, 
+               category: 111
+            });
+
+            //handleinput to save current states into hook
+            const handleInput = (e) => {
+                const fieldName = e.target.name;
+                const fieldValue = e.target.value; 
+
+                //fileupload needs different handling then others
+                if (fieldName == "file"){
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        [fieldName]: e.target.files[0]
+                    }));
+                }else{
+                    setFormData((prevState) => ({
+                        ...prevState,
+                        [fieldName]: fieldValue
+                    }));
+                }
+           
+            }
             
+            //sending form data to backend
             const handleSubmit = async (event) => {
-                event.preventDefault();
-               const token = await submitForm(steamID);//email, password);
-               props.onLogin(token);
-               return false;
+            //preventing auto refresh
+            event.preventDefault();
+
+            //creation of formdata for post
+            let postData = new FormData();
+            
+            //append postData for request
+            postData.append("descr", formData.descr);
+            postData.append("file", formData.file);
+            postData.append("access", formData.access);
+            postData.append("category", formData.category);
+        
+            
+            // API endpoint where we send form data.
+            const endpoint = '/api/createPost'
+            
+            // Form the request for sending data to the server.
+            const options = {
+                // The method is POST because we are sending data.
+                method: 'POST',
+                // Tell the server we're sending JSON.
+                headers: {
+                //'Content-Type': 'multipart/form-data',
+                'token': localStorage.getItem("token"),//window.localStorage.getItem("token"),
+                },
+                // Body of the request is the JSON data we created above.
+                body: postData,
+            }
+            
+            // Send the form data to our forms API on Vercel and get a response.
+            const response = await fetch(endpoint, options); //, options)
+            
+            if (!response.ok){
+                console.log("error");
+            }else{
+                console.log("success");
+            }
+
+            //close modal
+               setShow(false);
+               //return false;
             };
 
+            //create post modal with all components
            return (
              <>
                <Button variant="primary" onClick={handleShow}>
-                 Upload Media
+                 Create Post
                </Button>
 
                <Modal show={show} onHide={handleClose}>
                  <Modal.Header closeButton>
-                   <Modal.Title>Upload Media</Modal.Title>
+                   <Modal.Title>Create Post</Modal.Title>
                  </Modal.Header>
                  <Modal.Body>
-                    <Form>
+                    <Form id="uploadForm">
                         <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                             <Form.Label>Description</Form.Label>
-                            <Form.Control as="textarea" rows={3} />
+                            <Form.Control as="textarea" rows={3} name="descr" onChange={handleInput} required/>
                         </Form.Group>
                         <Form.Group controlId="formFile" className="mb-3">
                             <Form.Label>Select file</Form.Label>
-                            <Form.Control type="file" />
+                            <Form.Control type="file" accept="image/*, video/*, audio/*" name="file" onChange={handleInput} required/>
                         </Form.Group>
                         <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
                             <Form.Label>Who should see your post?</Form.Label>
-                            <Form.Select aria-label="Default select example">
+                            <Form.Select aria-label="Default select example" name="access" onChange={handleInput}>
                                 <option value="1">Everyone</option>
                                 <option value="2">Followers</option>
                                 <option value="3">Steam friends</option>
@@ -97,20 +170,21 @@ export default function profile(props){
                         </Form.Group>
                         <Form.Group controlId="formFile" className="mb-3">
                             <Form.Label>Category/Game</Form.Label>
-                            <Form.Select aria-label="Default select example">
+                            <Form.Select aria-label="Default select example" name="categroy" onChange={handleInput}>
                                 <option value="1">Example: Mirror's Edge</option>
                                 <option value="2">Example: Overwatch 2</option>
                             </Form.Select>
                         </Form.Group>
+                        
                     </Form>
                  </Modal.Body>
                  <Modal.Footer>
-                   <Button variant="secondary" onClick={handleClose}>
-                     Close
-                   </Button>
-                   <Button variant="primary" onClick={handleClose}>
-                     Upload
-                   </Button>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button type="submit" form="uploadForm"variant="primary" onClick={handleSubmit}>
+                        Upload
+                    </Button>
                  </Modal.Footer>
                </Modal>
              </>
@@ -119,6 +193,7 @@ export default function profile(props){
     
         }
 
+        //TODO: Implementation of follow
         function Follow(){
             //different display depending on profile
             //your own profile? maybe disapear
@@ -138,7 +213,7 @@ export default function profile(props){
             });
           };
         
-
+            
         return (
         
         <div >
@@ -159,12 +234,7 @@ export default function profile(props){
                         <div className="col media-body ml-5">
                             <h4 className="font-weight-bold mb-4">{props.userInfo.personaname}</h4>
                             <div className="text-muted mb-4">
-                            Add About Text here. Needs to be aligned with data structure and possible to change.
-                            Could be possible through table and possibility to change
-                            TODOS:
-                            -Upload Image with category and authorization
-                            -possible to follower
-                            -showing pictures with comments etc
+                                {props.userInfo.description}
                             </div>
                             <a href="/followers" className="d-inline-block text-dark">
                             <strong>{nFollower}</strong>
@@ -178,13 +248,13 @@ export default function profile(props){
                         </div>
                         <br />
                         <Follow /> 
-                        <UploadMedia />
+                        <CreatePost />
                     </div>
                 </div>
                 
                 <ul className="nav nav-tabs tabs-alt justify-content-center">
                     <li className="nav-item">
-                    <a className="nav-link py-4 active" href="#">Media</a>
+                        <a className="nav-link py-4 active" href="#">Media</a>
                     </li>
                 </ul>
                 </div>
@@ -195,13 +265,27 @@ export default function profile(props){
         );
     }
 
+//fetching media of inspected user
+    const Media = () => {
+        let medias = props.media;
+       
+          return (
+            <Container fluid>
+               <Row md={4} >
+                {medias.map((mediae) => (
+                    <MediaCard key={mediae.filenam} media={mediae} />
+                ))}
+                </Row> 
+            </Container>
+          );
+    };
+
+
     return (
         <>
         <div> 
-            <Header />
-        </div>
-        <div>
-            Place for Media
+            <div><Header /></div>
+            <div><Media/></div>
         </div>
         </>
     )

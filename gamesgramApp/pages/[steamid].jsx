@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 
 import { useEffect, useState } from 'react';
 import {GetUserInfo} from '@/components/Tools/getUserInfo'
+import {GetUserMedia} from '@/components/Tools/getUsermedia'
 import Sidebar from '@/components/Siderbar';
 import Profile from '@/components/Profile';
 import styles from '@/styles/Home.module.css';
@@ -9,6 +10,7 @@ import styles from '@/styles/Home.module.css';
 const UserProfile = ({ userData }) => {
   const [userInfo,setUserInfo] = useState(null);
   const [myInfo,setMyInfo] = useState(null);
+  const [mediaPosts,setMediaPosts] = useState(null);
   const router = useRouter();
   const { steamid } = router.query;
 
@@ -21,6 +23,7 @@ const UserProfile = ({ userData }) => {
                           profile: "nav-link active",
                           signout: "nav-link text-white"};
 
+//fetch logged-in user information on login
   useEffect(() => {
 
     const fetchMyInfo = async () => {
@@ -36,10 +39,10 @@ const UserProfile = ({ userData }) => {
     fetchMyInfo();
   }, [myInfo]);
 
+  //fetch inspected user information
   useEffect(() => {
     const fetchUserInfo = async () => {
       if (userInfo === null&&steamid) {
-        console.log("Search")
         const data = await GetUserInfo(steamid);
         if (data) {
           setUserInfo(data[0]);
@@ -49,12 +52,26 @@ const UserProfile = ({ userData }) => {
   
     fetchUserInfo();
   }, [steamid, userInfo]);
- 
+
+  //fetch posted media for inspected or logged-in user by steamid
+  useEffect(() => {
+      const fetchPostData = async () =>{
+        if(mediaPosts === null && steamid){
+          const posts = await GetUserMedia(steamid);
+          if(posts){
+            setMediaPosts(posts);
+          }
+        }
+      };
+
+      fetchPostData();
+  }, [mediaPosts]);
+
   return (
     <main>
     <div className={styles.main}>
       {myInfo &&  <div className={styles.one}><Sidebar selection={SidebarSelect} userInfo={myInfo}/></div>}
-      {userInfo ? <Profile userInfo={userInfo} />:404}
+      {userInfo ? <Profile userInfo={userInfo} media={mediaPosts} />:404}
     </div>
 </main>
   );

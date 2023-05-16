@@ -94,7 +94,7 @@ def userExists(steamid):
     else:
         return False
         
-# create user in database
+# create user with platform specific information
 def createUser(userInformation):
     # insert passed dictionary and create user in database
     try:
@@ -110,6 +110,19 @@ def createUser(userInformation):
         return True
     except:
         return False
+
+#get user information from database
+def getUser(steamid):
+   # fetch user by email
+    cursor = get_db().execute("select * from userInfo where steamid like ?;", [steamid])
+    userInfo = cursor.fetchall()
+    cursor.close()
+    # check if user exists and return true or false
+    if userInfo != []:
+        return userInfo[0]
+    else:
+        return False 
+
 
 #method to create follow entry
 def followUser(steamid, followid):
@@ -141,3 +154,77 @@ def searchUser(searchTerm):
     userSteamid = cursor.fetchall()
     cursor.close()
     return userSteamid
+
+#method to reate post in database
+def createPost(steamid, appid, descr, accessRuleID, postMedia):
+    try:
+        print(steamid, appid, descr, accessRuleID, postMedia)
+        cursor = get_db().execute(
+            "insert into userPost (steamid, appid, descr, accessRuleID, postMedia, ts) values (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);",
+            [steamid, appid, descr, accessRuleID, postMedia],
+        )
+        
+        get_db().commit()
+        cursor.close()
+        return True
+    except:
+        return False
+
+#method to fetch id for media filename (based on last id)
+def getLastUsedID():
+    cursor = get_db().execute("select max(rowid) from userMedia;")
+
+    lastId = cursor.fetchall()
+    cursor.close()
+
+    return lastId[0][0]
+
+#create database entry for media
+def uploadMedia(filenam, typeofm):
+    try:
+        cursor = get_db().execute(
+            "insert into userMedia (filenam, typeofm) values (?, ?);",
+            [filenam, typeofm],
+        )
+        get_db().commit()
+        cursor.close()
+        return True
+    except:
+        return False
+    
+#delete database entry for media
+def deleteMedia(filenam):
+    try:
+        cursor = get_db().execute(
+            "delete from userMedia where filenam like ?;",
+            [filenam],
+        )
+        get_db().commit()
+        cursor.close
+        return True
+    except:
+        return False
+    
+#fetch posts of user
+def getUserPosts(steamid):
+    cursor = get_db().execute(
+        "select * from userPost where steamid like ?;", [steamid]
+    )
+    posts = cursor.fetchall()
+    cursor.close()
+    if posts != []:
+        return posts
+    else:
+        return False
+    
+#fetch media for a post
+def getMedia(filenam):
+    cursor = get_db().execute(
+        "select * from userMedia where filenam like ?;", [filenam]
+    )
+    media = cursor.fetchall()
+    cursor.close()
+    if media != []:
+        return media[0]
+    else:
+        return False

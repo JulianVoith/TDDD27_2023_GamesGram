@@ -4,4 +4,6 @@ create table userInfo(steamid int(64), personname varchar(120), aboutProfile var
 
 create table followRel (steamid int(64), followsID int(64));
 
-create table media (streamid int(64), appid(64), mediaID ,accesRuleID)
+create table userPost (steamid int(64), appid int(64), descr varchar(300), accessRuleID int(16), postMedia varchar(120), ts TIMESTAMP);
+create table userMedia (filenam varchar(120), typeofm varchar(20), primary key(filenam)) ;
+create table accessRules (accessID int(16), descr varchar(120), primary key(accessID));

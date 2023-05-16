@@ -19,7 +19,6 @@ export default function Sidebar(props){
   //Fetch userContext
   const {userInfo} = useContext(Context); 
 
-  console.log(props);
   
 
 //const for header of side bar

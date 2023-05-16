@@ -32,6 +32,18 @@ module.exports = () => {
       {
         source: "/api/search/:path*",
         destination: "http://127.0.0.1:5000/search/:path*",
+      },
+      {
+        source: "/api/createPost/:path*",
+        destination: "http://127.0.0.1:5000/createPost/:path*",
+      },
+      {
+        source: "/api/getPosts/:path*",
+        destination: "http://127.0.0.1:5000/getPosts/:path*",
+      },
+      {
+        source: "/image_feed/:path*",
+        destination: "http://127.0.0.1:5000/image_feed/:path*",
       }
     ];
   };

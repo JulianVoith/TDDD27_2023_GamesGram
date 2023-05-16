@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router';
+
 import { useContext,useEffect, useState } from 'react';
 import Context from '@/context/Context';
 import {GetUserInfo} from '@/components/Tools/getUserInfo'
@@ -7,27 +7,32 @@ import styles from '@/styles/Home.module.css';
 import Sidebar from '@/components/Siderbar';
 
 const SteamFriends = () => {
-  const router = useRouter();
-  const [page, setPage] = useState("search");
   const [FriendsInfo,setFriendsInfo] = useState(null)
   const [myInfo,setMyInfo] = useState(null);
   const { nFriends } = useContext(Context);
 
+  //constant for the sidebar selection css which is passed as a prop
+  const SidebarSelect = 
+      {home: "nav-link text-white",
+      search: "nav-link text-white",
+      reels: "nav-link text-white",
+      teamMates: "nav-link text-white",
+      profile: "nav-link active",
+      signout: "nav-link text-white"};
+
   let steamidArray = undefined
   let steamidString = undefined
+
   if(nFriends.length !== 0)
   {
     steamidArray = nFriends.map(friend => friend.steamid);
     steamidString = steamidArray.join(',');
   }
-  const handleNavigation = (nav) => {
-    setPage(nav);
-  }
+
   useEffect(()=>{
     const fetchUserInfo = async () => {
         if(steamidString!==undefined)
         {const data = await GetUserInfo(steamidString);
-        console.log(data)
         setFriendsInfo(data);}
       };
   
@@ -51,7 +56,7 @@ const SteamFriends = () => {
 
   return (
     <div className={styles.main}>
-      {myInfo &&  <div className={styles.one}><Sidebar navigate={handleNavigation} userInfo={myInfo}/></div>}
+      {myInfo &&  <div className={styles.one}><Sidebar selection={SidebarSelect} /></div>}
       <div className={styles.two}>
     {FriendsInfo!==null?  
     FriendsInfo.map((FriendInfo)=><Card key={FriendInfo.steamid} userInfo={FriendInfo }/>)
