@@ -229,5 +229,30 @@ def getMedia(filenam):
     else:
         return False
 
-def setFollow():
-    pass
+def setFollow(steamid, followid):
+    try:
+        get_db().execute("insert into followRel values (?,?);", [steamid, followid])
+        get_db().commit()
+        return True
+    except:
+        return False
+    
+def deleteFollow(steamid, followid):
+    try:
+        get_db().execute("delete from followRel where steamid like (?) and followsID like (?);", [steamid, followid])
+        get_db().commit()
+        return True
+    except:
+        return False
+    
+#fetch followers
+def getFollowers(steamid):
+    cursor = get_db().execute(
+        "select followsID from followRel where steamid like ?;", [steamid]
+    )
+    followers = cursor.fetchall()
+    cursor.close()
+    if followers != []:
+        return followers
+    else:
+        return False
