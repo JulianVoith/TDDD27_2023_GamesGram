@@ -3,9 +3,9 @@ import json
 import os
 import sys
 from hashlib import sha256  # DOCU
-from os import environ
+##from os import environ
 from urllib.parse import urlencode
-from flask_cors import CORS,  cross_origin
+##from flask_cors import CORS,  cross_origin
 from os import environ
 from werkzeug.utils import secure_filename
 
@@ -127,14 +127,13 @@ class GetFollower(Resource):
         else:
             return "", 401
 
-
 @api.resource("/GetUserInfo", "/GetUserInfo/<string:steamid>")
 class GetUserInfo(Resource):
     def get(self, steamid=None):
         # Check if the request header contains a token
-        token = request.headers.get("token")
-        if not token:
-            return "", 401  # Unauthorized
+        token = request.headers.get("token") #MAYBE BACK TODO
+        ##if not token:
+        ##    return "", 401  # Unauthorized
 
         # Get steamid from the database if not provided as a parameter
         if steamid is None:
@@ -348,48 +347,48 @@ class GetPosts(Resource):
         print(steamid)
 
          #Fetch token from header and check if session is acrive
-        token = request.headers.get('token')
+        ##token = request.headers.get('token') MAYBE BACK TODO
 
         #Check if there is an active session
-        if database_helper.activeSession(token):
+       ##if database_helper.activeSession(token): TODO
             
-            #response init
-            postResponse = []
+        #response init
+        postResponse = []
 
-            #fetch posts by steamid
-            posts = database_helper.getUserPosts(steamid)
+        #fetch posts by steamid
+        posts = database_helper.getUserPosts(steamid)
 
-            #iterate through posts and creat dictionary and stream url and pass back to client
-            for post in posts:
+        #iterate through posts and creat dictionary and stream url and pass back to client
+        for post in posts:
 
-                typeOfMedia = database_helper.getMedia(post[4])
-                print(typeOfMedia);
-                if typeOfMedia[1] == "image":
-                    url = "/image_feed/" + post[4]
-                elif typeOfMedia[1] == "video":
-                    url = "/video_feed/" + post[4]
-                else:
-                    url = "/audio_feed/" + post[4]
-
-                postResponse.append({
-                    "steamid": post[0],
-                    "appid": post[1],
-                    "descr": post[2],
-                    "accessRuleID": post[3],
-                    "filenam": post[4],
-                    "timestamp": post[5],
-                    "url": url
-                })
-            
-            #if existing return json of table entries
-            if postResponse is not None:
-
-                return make_response(jsonify(postResponse), 200) #OK
-            
+            typeOfMedia = database_helper.getMedia(post[4])
+            print(typeOfMedia)
+            if typeOfMedia[1] == "image":
+                url = "/image_feed/" + post[4]
+            elif typeOfMedia[1] == "video":
+                url = "/video_feed/" + post[4]
             else:
-                return 404 #notfound
+                url = "/audio_feed/" + post[4]
+
+            postResponse.append({
+                "steamid": post[0],
+                "appid": post[1],
+                 "descr": post[2],
+                "accessRuleID": post[3],
+                "filenam": post[4],
+                "timestamp": post[5],
+                "url": url
+            })
+            
+        #if existing return json of table entries
+        if postResponse is not None:
+
+            return make_response(jsonify(postResponse), 200) #OK
+            
         else:
-            return "", 401 #unauthorized
+            return 404 #notfound
+        ##else:
+         ##   return "", 401 #unauthorized
 
 # function for streaming an image to the wall
 @app.route("/image_feed/<image>", methods=["GET"])
@@ -397,6 +396,8 @@ def image_feed(image):
     # partition for correct mimetype
     mime = image.rpartition(".")
     mimetype = "image/" + mime[2]
+
+    print(image)
 
     # method to stream image for Response
     def gen(imagename):
@@ -408,6 +409,24 @@ def image_feed(image):
 
     return Response(gen(image), status=200, mimetype=mimetype), 200       
 
+# API resource to get all users for server site rendering of dynamic route
+@api.resource("/getUsers")
+#@app.route("/getUsers", methods=["GET"])
+class GetUsers(Resource):
+    def get(self):
+#def getUsers():
+        print(database_helper.getAllUser())
+        if database_helper.getAllUser():
+            databaseUser = database_helper.getAllUser()
+            userResponse = []
+            for user in databaseUser:
+                print(user)
+                userResponse.append(str(user)[1:18]) #needs check why!!!!!! TODO:
+            print(userResponse)
+            return make_response(jsonify(userResponse), 200)
+        else:
+            return "", 404  #
+    
 if __name__ == '__main__':
     app.run(debug=True)
 

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import {Button,Modal,Form, Container, Row} from 'react-bootstrap';
@@ -8,20 +9,22 @@ import MediaCard from '@/components/Profile/MediaCard'
 //QUESTION: when const and when function?
 import styles from '@/styles/Profile.module.css';
 import RecentGame from './resentGame';
+import Post from '../Post';
+import steam from 'steam-web';
 
 export default function profile(props){
     const router = useRouter()
     const {nFriends,setFriends,userInfo} = useContext(Context);
     const [nFollower, setFollower] = useState(0);
-    
-
-    const amountFriends = async () => {
+   
+    const amountFriends = async () => { //still needed?
 
         let token = localStorage.getItem("token");
         let data = 0;
 
         //if(!props.userInfo && token !== null){
-            const JSONdata = JSON.stringify({'steamid': props.userInfo.steamid})
+        
+            const JSONdata = JSON.stringify({'steamid': props.userInfo[0].steamid})
             
                 // API endpoint where we send form data.
                 const endpoint = '/api/GetFriendList'
@@ -225,16 +228,16 @@ export default function profile(props){
                     <div className= "media row p-0 my-4 mx-auto">
                         <div className="col">
                             <Image 
-                            src={props.userInfo.avatarfull}
+                            src={props.userInfo[0].avatarfull}
                             width={250}
                             height={250}
-                            alt={props.userInfo.personaname}
+                            alt={props.userInfo[0].personaname}
                             className={"rounded-circle"}
                             />
                         </div>
                         
                         <div className="col media-body ml-5">
-                            <h4 className="font-weight-bold mb-4">{props.userInfo.personaname}</h4>
+                            <h4 className="font-weight-bold mb-4">{props.userInfo[0].personaname}</h4>
                             <div className="text-muted mb-4">
                                 {props.userInfo.description}
                             </div>
@@ -249,7 +252,7 @@ export default function profile(props){
                             </a>
                         </div>
                         <br />
-                        {userInfo.steamid!==props.userInfo.steamid ? <Follow />:<CreatePost /> }
+                        {props.userInfo[0].steamid!==props.userInfo[0].steamid ? <Follow />:<CreatePost />}
                         
                     </div>
                     
@@ -268,31 +271,81 @@ export default function profile(props){
         );
     }
 
-//fetching media of inspected user
+//fetching media of inspected user //work with get static props?
+/*<Modal
+                isOpen={!!router.query.postId}
+                onRequestClose={() => router.push(`/${props.userInfo.steamid}`, undefined, { scroll: false })}
+                contentLabel="Post modal">
+                <Modal.Header closeButton>
+                    <Modal.Title>Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Post id={router.query.postID} pathname={router.pathname} />
+                </Modal.Body>
+</Modal>*/
+//postjsx which is called in modal and shown there. with comments likes 
     const Media = () => {
         let medias = props.media;
-        console.log(medias);
+        let url = "http://localhost:5000";//+ props.media.url; 
+        
+
           return (
-            <Container fluid>
-               <Row md={4} >
-                {medias? medias.map((mediae) => (
-                    <MediaCard key={mediae.filenam} media={mediae} />
-                )): <p>Post some New</p>}
-                </Row> 
-            </Container>
+           <>
+           
+           
+
+           {medias? medias.map((mediae) => (
+                
+                //<MediaCard key={mediae.filenam} media={mediae} /> can be deleted at some point
+                <Link
+                    key={mediae.filenam.split(".")[0]}
+                    //href={`/?steamid=${props.userInfo.steamid}/?postID=${mediae.filenam.split(".")[0]}`}
+                    //as={`/${props.userInfo.steamid}/${mediae.filenam.split(".")[0]}`}
+                    href="/[steamid]/[postID]"
+                    as={`/${props.userInfo.steamid}/${mediae.filenam.split(".")[0]}`}
+                    scroll={false}
+                    >
+                     <Image 
+                     src={url + mediae.url} 
+                     width={400} 
+                     height={400} 
+                     className="transform rounded-lg brightness-90 transition group-hover:brightness-110"
+                     alt="Pricture" 
+                     sizes="(max-width: 640px) 100vw,
+                     (max-width: 1280px) 50vw,
+                     (max-width: 1536px) 33vw,
+                     25vw"
+                     style={{ transform: "translate3d(0, 0, 0)" }}
+                     /> 
+                 </Link>
+            )): <p>Post some New</p>}
+            
+            
+            
+            </>    
+            //<Container fluid> 
+             //  <Row md={4} >
+                //{medias? medias.map((mediae) => (
+                //    <MediaCard key={mediae.filenam} media={mediae} />
+                //)): <p>Post some New</p>}
+             //   </Row> 
+           // </Container>
           );
     };
 
+    
+//<div><Media/></div>
 
     return (
         <>
         <div> 
             <div><Header /></div>
-            <div><Media/></div>
+            
         </div>
         </>
     )
 }
+
 
 
 function Follow(){

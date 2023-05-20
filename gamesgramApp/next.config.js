@@ -38,6 +38,10 @@ module.exports = () => {
         destination: "http://127.0.0.1:5000/createPost/:path*",
       },
       {
+      source: "/api/getUsers/:path*",
+      destination: "http://127.0.0.1:5000/getUsers/:path*",
+      },
+      {
         source: "/api/getPosts/:path*",
         destination: "http://127.0.0.1:5000/getPosts/:path*",
       },
@@ -54,13 +58,14 @@ module.exports = () => {
 
   return {
     images: {
-      domains: ["steamcdn-a.akamaihd.net","avatars.akamai.steamstatic.com"],
+      domains: ["steamcdn-a.akamaihd.net","avatars.akamai.steamstatic.com","localhost"],
+      unoptimized: true,
       remotePatterns: [
         {
           protocol: 'http',
           hostname: 'localhost',
           port: '5000',
-          pathname: '/image_feed/**'
+          pathname: '/image_feed/**',
         }
       ],
     },

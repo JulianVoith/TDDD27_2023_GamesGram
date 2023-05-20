@@ -123,6 +123,17 @@ def getUser(steamid):
     else:
         return False 
 
+#get user information from database
+def getAllUser():
+   # fetch user by email
+    cursor = get_db().execute("select steamid from userInfo;")
+    users = cursor.fetchall()
+    cursor.close()
+    # check if user exists and return true or false
+    if users != []:
+        return users
+    else:
+        return False 
 
 #method to create follow entry
 def followUser(steamid, followid):
