@@ -52,6 +52,18 @@ module.exports = () => {
       {
         source: "/api/GetRecentlyPlayedGames/:path*",
         destination: "http://127.0.0.1:5000/GetRecentlyPlayedGames/:path*",
+      },
+      {
+        source: "/api/follow/:path*",
+        destination: "http://127.0.0.1:5000/follow/:path*",
+      },
+      {
+        source: "/api/unfollow/:path*",
+        destination: "http://127.0.0.1:5000/unfollow/:path*",
+      },
+      {
+        source: "/api/getFollowers/:path*",
+        destination: "http://127.0.0.1:5000/getFollowers/:path*",
       }
     ];
   };

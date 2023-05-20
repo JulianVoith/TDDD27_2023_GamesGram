@@ -343,8 +343,6 @@ class CreatePost(Resource):
 @api.resource("/getPosts/<string:steamid>")
 class GetPosts(Resource):
     def get(self, steamid):
-        
-        print(steamid)
 
          #Fetch token from header and check if session is acrive
         ##token = request.headers.get('token') MAYBE BACK TODO
@@ -427,6 +425,50 @@ class GetUsers(Resource):
         else:
             return "", 404  #
     
+# function for setting up follower
+@api.resource("/follow/<string:followid>")
+class Follow(Resource):
+    def get(self,followid):
+        token = request.headers.get('token')
+        if database_helper.activeSession(token):
+            steamid=database_helper.getSteamidByToken(token)
+            if database_helper.setFollow(steamid,followid):
+                return "", 201 #successfully followed
+            else:
+                return "", 500
+        else:
+            return "", 401 #unauthorized
+
+# function for unfollow
+@api.resource("/unfollow/<string:followid>")
+class Unfollow(Resource):
+    def delete(self,followid):
+        token = request.headers.get('token')
+        if database_helper.activeSession(token):
+            steamid=database_helper.getSteamidByToken(token)
+            if database_helper.deleteFollow(steamid,followid):
+                return "", 200 #successfully deleted
+            else:
+                return "", 500
+        else:
+            return "", 401 #unauthorized
+        
+# function for getting followers
+@api.resource("/getFollowers/<string:steamid>")
+class GetFollowers(Resource):
+    def get(self,steamid):
+        token = request.headers.get('token')
+        if database_helper.activeSession(token):
+             postResponse = database_helper.getFollowers(steamid)
+             if len(postResponse):
+                result_str = [(str(n),) for n in postResponse]
+                response_data = json.dumps(result_str)
+                return make_response(response_data, 200) #OK
+             else:
+                return "", 404
+        else:
+            return "", 401 #unauthorized
+
 if __name__ == '__main__':
     app.run(debug=True)
 
