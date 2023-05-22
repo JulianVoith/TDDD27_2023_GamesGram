@@ -120,7 +120,7 @@ export default function Sidebar(props){
               </a>
             </li>
             <li>
-              <Link href={`/${steamid}`} id="Profile" className={props.selection.profile} onClick={() => onClickNavbar(4)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+              <Link href={`/${steamid}`} as={`/${steamid}`} id="Profile" className={props.selection.profile} onClick={() => onClickNavbar(4)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 <Image 
                 src={avatar}
                 width={20}

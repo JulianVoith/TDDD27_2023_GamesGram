@@ -3,9 +3,7 @@ import json
 import os
 import sys
 from hashlib import sha256  # DOCU
-##from os import environ
 from urllib.parse import urlencode
-##from flask_cors import CORS,  cross_origin
 from os import environ
 from werkzeug.utils import secure_filename
 
@@ -91,42 +89,6 @@ class SignOut(Resource):
             # response if not signed in
             return "", 401  # UNAUTHORIZED
 
-
-# API resource to follow other user
-@api.resource("/follow")
-class FollowUser(Resource):
-    def post(self):
-        data = request.json
-        steamid = database_helper.getSteamidByToken(data["token"])
-        if steamid:
-            if database_helper.userExists(data["followid"]):
-                if database_helper.followUser(steamid, data["followid"]):
-                    return "", 201  # OK
-                else:
-                    return "", 500  # internal server error
-            else:
-                return "", 404  # NO FOUND
-
-        else:
-            return "", 404  # NO FOUND
-
-
-# API resource to follow other user
-@api.resource("/getFollower")
-class GetFollower(Resource):
-    def post(self):
-        data = request.json
-        steamid = data["steamid"]
-        if steamid:
-            if database_helper.userExists(steamid):
-                databaseData = database_helper.getFollower(steamid)
-                return make_response(jsonify(databaseData), 200)
-            else:
-                return "", 404  #
-
-        else:
-            return "", 401
-
 @api.resource("/GetUserInfo", "/GetUserInfo/<string:steamid>")
 class GetUserInfo(Resource):
     def get(self, steamid=None):
@@ -170,10 +132,10 @@ class GetRecentlyPlayedGames(Resource):
         return make_response(jsonify(result), 200)  # OK
 
 
-@api.resource("/GetFriendList")
+@api.resource("/GetFriendList/<string:steamid>")
 class GetFriendList(Resource):
-    def post(self):
-        steamid = request.json["steamid"]  # fetch steamid from client
+    def get(self, steamid):
+        #steamid = request.json["steamid"]  # fetch steamid from client
         params = {"key": api_key, "steamid": steamid, "relationship": "friend"}
         url = "https://api.steampowered.com/ISteamUser/GetFriendList/v0001/"
         response = requests.get(url, params)
@@ -457,17 +419,17 @@ class Unfollow(Resource):
 @api.resource("/getFollowers/<string:steamid>")
 class GetFollowers(Resource):
     def get(self,steamid):
-        token = request.headers.get('token')
-        if database_helper.activeSession(token):
-             postResponse = database_helper.getFollowers(steamid)
-             if len(postResponse):
-                result_str = [(str(n),) for n in postResponse]
-                response_data = json.dumps(result_str)
-                return make_response(response_data, 200) #OK
-             else:
-                return "", 404
-        else:
-            return "", 401 #unauthorized
+        #token = request.headers.get('token') MAYBE BACK TODO
+        #if database_helper.activeSession(token): MAYBE BACK TODO
+        postResponse = database_helper.getFollowers(steamid)
+        #if len(postResponse):
+        result_str = [(str(n),) for n in postResponse]
+        response_data = json.dumps(result_str)
+        return make_response(response_data, 200) #OK
+        #else:
+            #return "", 404
+        #else:
+        #    return "", 401 #unauthorized
 
 if __name__ == '__main__':
     app.run(debug=True)

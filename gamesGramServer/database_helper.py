@@ -223,10 +223,10 @@ def getUserPosts(steamid):
     )
     posts = cursor.fetchall()
     cursor.close()
-    if posts != []:
-        return posts
-    else:
-        return False
+    #if posts != []:
+    return posts
+    #else:
+    #    return False
     
 #fetch media for a post
 def getMedia(filenam):
@@ -235,10 +235,10 @@ def getMedia(filenam):
     )
     media = cursor.fetchall()
     cursor.close()
-    if media != []:
-        return media[0]
-    else:
-        return False
+    #if media != []:
+    return media[0]
+    #else:
+    #    return False
 
 def setFollow(steamid, followid):
     try:
@@ -263,7 +263,7 @@ def getFollowers(steamid):
     )
     followers = cursor.fetchall()
     cursor.close()
-    if followers != []:
-        return followers
-    else:
-        return False
+   # if followers != []:
+    return followers
+    #else:
+        #return False

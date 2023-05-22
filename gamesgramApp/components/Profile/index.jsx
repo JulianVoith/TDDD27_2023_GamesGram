@@ -4,26 +4,17 @@ import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import {Button,Modal,Form, Container, Row} from 'react-bootstrap';
 import Context from '@/context/Context';
-import MediaCard from '@/components/Profile/MediaCard'
 import Follow from '@/components/Profile/Follow';
-import GetUserInfo from '@/components/Tools/getUserInfo';
-
-//QUESTION: when const and when function?
-import styles from '@/styles/Profile.module.css';
-import RecentGame from './resentGame';
-import Post from '../Post';
-import steam from 'steam-web';
 
 export default function profile(props){
     const router = useRouter()
-    const {nFriends,setFriends,userInfo,setUserInfo,nFollower, setFollower} = useContext(Context);
-    
-    
+    const {nFriends,setFriends,userInfo,setuserInfo, nFollower, setFollower} = useContext(Context); //maybe not needed anymore at some point
 
-
+   //FIX NEEDED HERE!!!
+   /*
     const amountFollower = async () => {
 
-        const endpoint = `/api/getFollowers/${props.userInfo.steamid}`;
+        const endpoint = `/api/getFollowers/${props.userInfo[0].steamid}`;
           const options = {
             method: 'GET',
             headers: {
@@ -43,16 +34,16 @@ export default function profile(props){
                 }
             
         //}
-    }
+    }*/
 
-    const amountFriends = async () => {
+   /* const amountFriends = async () => {
 
         let token = localStorage.getItem("token");
-        let data = 0;
+        let data = 0;*/
 
         //if(!props.userInfo && token !== null){
         
-            const JSONdata = JSON.stringify({'steamid': props.userInfo[0].steamid})
+            /*const JSONdata = JSON.stringify({'steamid': props.userInfo[0].steamid})
             
                 // API endpoint where we send form data.
                 const endpoint = '/api/GetFriendList'
@@ -67,8 +58,15 @@ export default function profile(props){
                     },
                     // Body of the request is the JSON data we created above.
                     body: JSONdata,
-                }
-            
+                }*/
+              /*  const endpoint = `/api/GetFriendList/${props.userInfo[0].steamid}`;
+                const options = {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'token': window.localStorage.getItem("token"),
+                  },
+                };
                 // Send the form data to our forms API on Vercel and get a response.
                 const response = await fetch(endpoint, options); //, options)
                 data = await response.json();
@@ -80,12 +78,12 @@ export default function profile(props){
                 }
             
         //}
-    }
+    }*/
+
 
     function Header(){
 
-        //refreshing way to often --> issue solved --> for presentation maybe check why
-        useEffect(()=>{
+     /*   useEffect(()=>{
             amountFriends()
             
         }, [nFriends]);
@@ -95,15 +93,22 @@ export default function profile(props){
         useEffect(()=>{
             amountFollower()
             
-        }, [nFollower]);
+        }, [nFollower]);*/
+
 
         const routeToSteam_friends = () => {
             router.push({
               pathname: '/steam_friends',
             });
           };
+
         
-            
+            //BACKUPS
+            //props.myInfo.steamid!==props.userInfo.steamid ? <Follow userInfo={props.userInfo}/>:<CreatePost /> }
+            //{nFollower ? <strong>{props.follower.length}</strong> :<strong>Loading...</strong>}
+            //{nFriends ? <strong>{props.friends["friendslist"]["friends"].length}</strong> :<strong>Loading...</strong>}
+
+            //FIX FOLLOWBUTTON SHITZZLE
         return (
         
         <div >
@@ -113,31 +118,32 @@ export default function profile(props){
                     <div className= "media row p-0 my-4 mx-auto">
                         <div className="col">
                             <Image 
-                            src={props.userInfo.avatarfull}
+                            src={props.userInfo[0].avatarfull}
                             width={250}
                             height={250}
-                            alt={props.userInfo.personaname}
+                            alt={props.userInfo[0].personaname}
                             className={"rounded-circle"}
                             />
                         </div>
                         
                         <div className="col media-body ml-5">
-                            <h4 className="font-weight-bold mb-4">{props.userInfo.personaname}</h4>
+                            <h4 className="font-weight-bold mb-4">{props.userInfo[0].personaname}</h4>
                             <div className="text-muted mb-4">
-                                {props.userInfo.description}
+                                {props.userInfo[0].description}
                             </div>
                             <a href="/followers" className="d-inline-block text-dark">
-                            {nFollower ? <strong>{nFollower.length}</strong> :<strong>Loading...</strong>}
+                                <strong>{props.follower.length}</strong>
                             <span className="text-muted"> followers</span>
                             </a>
                             <br />
-                            <a onClick={routeToSteam_friends} className="d-inline-block text-dark ml-3" >
-                            {nFriends ? <strong>{nFriends.length}</strong> :<strong>Loading...</strong>}
+                            <a /*href="/steam_friends"*/ onClick={routeToSteam_friends} className="d-inline-block text-dark ml-3" >
+                                <strong>{props.friends["friendslist"]["friends"].length}</strong>
                             <span className="text-muted"> Steam friends</span>
                             </a>
                         </div>
                         <br />
-                        {userInfo.steamid!==props.userInfo.steamid ? <Follow userInfo={props.userInfo}/>:<CreatePost /> }
+                        {userInfo ? 
+                            (userInfo.steamid !==props.userInfo[0].steamid ? <Follow userInfo={props.userInfo[0]}/>:<CreatePost/>) : <CreatePost/> }
                         
                     </div>
                     
@@ -284,7 +290,7 @@ export default function profile(props){
                 </Modal.Footer>
             </Modal>
             </>
-        );4
+        );
     }
 
 //fetching media of inspected user //work with get static props?
@@ -356,10 +362,9 @@ export default function profile(props){
         <>
         <div> 
             <div><Header /></div>
-            
         </div>
         </>
-    )
+    );
 }
 
 

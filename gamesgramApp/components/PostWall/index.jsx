@@ -6,14 +6,16 @@ const PostWall = ( { userInfo, media } ) => {
 
    //let medias = media;
     let url = "http://localhost:5000";//+ props.media.url; 
-
+    
+    //{mediae.filenam.split(".")[0]}`}
       return (
        
     <div>
        {media.map((mediae) => (
             <Link
                 key={mediae.filenam.split(".")[0]}
-                href={`${userInfo[0].steamid}/?postID=${mediae.filenam.split(".")[0]}`}
+                href={`${userInfo[0].steamid}/?postID=${mediae.filenam}&urlPost=${url + mediae.url}`}
+                as={`/${userInfo[0].steamid}/?postID=${mediae.filenam}`}
                 //as={`/${userInfo[0].steamid}/${mediae.filenam.split(".")[0]}`}
                 //href="/[steamid]/[postID]"
                 //as={`/${userInfo.steamid}/${mediae.filenam.split(".")[0]}`}

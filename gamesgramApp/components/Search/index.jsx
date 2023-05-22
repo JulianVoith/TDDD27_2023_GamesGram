@@ -78,12 +78,13 @@ export function UserCard(props){
   );
 }
 
+//reason for not updateing
 export function Card(props){
   const userInfo = props.userInfo;
   return(
           <>
           <h1>{userInfo.personaname}</h1>
-          <Link href={`/${userInfo.steamid}`} shallow={true} >
+          <Link href={`search/${userInfo.steamid}`} shallow={true} >
           <Image 
           src={userInfo.avatarfull} 
           width={100}

@@ -46,18 +46,18 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
 
     fetchMyInfo();
   }, [myInfo]);
-  console.log(router);
+
   //change myinfo maybe at some point!! AND LAYOUT POST TODO
   return (
     <main>
      <div>
       <Modal
         show={!!router.query.postID}
-        //onRequestClose={() => router.push(`/${userinfo[0].steamid}`, undefined, { scroll: false })}
+        onRequestClose={() => router.push(`/${userinfo[0].steamid}`, undefined, { scroll: false })}
         //contentLabel="Post modal"
       >
       <Modal.Body>
-        <Post id={router.query.postID} urlPost={router.query.urlPost} pathname={router.pathname} />
+        <Post id={router.query.postID} pathname={router.pathname} />
       </Modal.Body>
       </Modal>
     </div> 
