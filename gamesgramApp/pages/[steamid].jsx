@@ -15,13 +15,11 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
   const [userViewInfo,setUserInfo] = useState(dataUserInfo); 
   const [follower,setFollower] = useState(userFollower); 
   const [friends,setFriends] = useState(userFriends); 
-  const [myInfo,setMyInfo] = useState(null);
+
   const [mediaPosts,setMediaPosts] = useState(userPosts); 
 
   const router = useRouter();
-  //const { steamid, postID } = router.query;
-  console.log(router);
-  console.log(dataUserInfo, follower, friends, mediaPosts);
+  
   //constant for the sidebar selection css which is passed as a prop
   const SidebarSelect = 
                         {home: "nav-link text-white",
@@ -31,23 +29,7 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
                         profile: "nav-link active",
                         signout: "nav-link text-white"};
 
-//fetch logged-in user information on login
-  useEffect(() => {
-
-    const fetchMyInfo = async () => {
-
-      if (myInfo === null) {
-        const data = await GetUserInfo();
-        if (data) {
-          setMyInfo(data[0]);
-        }
-      }
-    };
-
-    fetchMyInfo();
-  }, [myInfo]);
-  console.log(router);
-  //change myinfo maybe at some point!! AND LAYOUT POST TODO
+  //TODO change mediapost layout
   return (
     <main>
      <div>
@@ -63,11 +45,11 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
     </div> 
 
     <div className={styles.main}>
-      {myInfo &&  <div className={styles.one}><Sidebar selection={SidebarSelect} userInfo={myInfo}/></div>}
-        <div><Profile userInfo={userViewInfo} follower={follower} friends={friends}/></div>
+        <div className={styles.one}><Sidebar selection={SidebarSelect}/></div>
+        <div><Profile userInfo={userViewInfo[0]} follower={follower} friends={friends}/></div>
     </div>
     <div>
-      {mediaPosts&&userViewInfo ? <PostWall userInfo={userViewInfo} media={mediaPosts} />: "No posts available"}:
+      {mediaPosts&&userViewInfo ? <PostWall userInfo={userViewInfo[0]} media={mediaPosts} />: "No posts available"}:
     </div>
 </main>
   );
@@ -105,6 +87,7 @@ export async function getStaticProps( { params } ){
   
   return {
     props: {
+      key: params.steamid,
       dataUserInfo: dataUserInfo,
       userFollower: follower,
       userFriends: friends,

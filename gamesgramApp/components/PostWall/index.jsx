@@ -14,11 +14,8 @@ const PostWall = ( { userInfo, media } ) => {
        {media.map((mediae) => (
             <Link
                 key={mediae.filenam.split(".")[0]}
-                href={`${userInfo[0].steamid}/?postID=${mediae.filenam}&urlPost=${url + mediae.url}`}
-                as={`/${userInfo[0].steamid}/?postID=${mediae.filenam}`}
-                //as={`/${userInfo[0].steamid}/${mediae.filenam.split(".")[0]}`}
-                //href="/[steamid]/[postID]"
-                //as={`/${userInfo.steamid}/${mediae.filenam.split(".")[0]}`}
+                href={`${userInfo.steamid}/?postID=${mediae.filenam}`}
+                as={`/${userInfo.steamid}/?postID=${mediae.filenam}`}
                 shallow={true}
                 scroll={false}
                 >

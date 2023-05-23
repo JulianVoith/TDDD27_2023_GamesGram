@@ -107,6 +107,8 @@ useEffect(() => {
                           profile: "nav-link text-white",
                           signout: "nav-link text-white"};
 
+                      
+
     return(
         <div>
             <Head>

@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import {Button,Modal,Form, Container, Row} from 'react-bootstrap';
@@ -8,93 +7,10 @@ import Follow from '@/components/Profile/Follow';
 
 export default function profile(props){
     const router = useRouter()
-    const {nFriends,setFriends,userInfo,setuserInfo, nFollower, setFollower} = useContext(Context); //maybe not needed anymore at some point
-
-   //FIX NEEDED HERE!!!
-   /*
-    const amountFollower = async () => {
-
-        const endpoint = `/api/getFollowers/${props.userInfo[0].steamid}`;
-          const options = {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'token': window.localStorage.getItem("token"),
-            },
-          };
-            
-                // Send the form data to our forms API on Vercel and get a response.
-                const response = await fetch(endpoint, options); //, options)
-                const data = await response.json();
-                
-                if(data.length!=nFriends.length)
-                {
-                    
-                    setFollower(data);
-                }
-            
-        //}
-    }*/
-
-   /* const amountFriends = async () => {
-
-        let token = localStorage.getItem("token");
-        let data = 0;*/
-
-        //if(!props.userInfo && token !== null){
-        
-            /*const JSONdata = JSON.stringify({'steamid': props.userInfo[0].steamid})
-            
-                // API endpoint where we send form data.
-                const endpoint = '/api/GetFriendList'
-            
-                // Form the request for sending data to the server.
-                const options = {
-                    // The method is POST because we are sending data.
-                    method: 'POST',
-                    // Tell the server we're sending JSON.
-                    headers: {
-                    'Content-Type': 'application/json',
-                    },
-                    // Body of the request is the JSON data we created above.
-                    body: JSONdata,
-                }*/
-              /*  const endpoint = `/api/GetFriendList/${props.userInfo[0].steamid}`;
-                const options = {
-                  method: 'GET',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'token': window.localStorage.getItem("token"),
-                  },
-                };
-                // Send the form data to our forms API on Vercel and get a response.
-                const response = await fetch(endpoint, options); //, options)
-                data = await response.json();
-                
-                if(data["friendslist"]["friends"].length!=nFriends.length)
-                {
-                    
-                    setFriends(data["friendslist"]["friends"]);
-                }
-            
-        //}
-    }*/
-
+    const {userInfo} = useContext(Context); 
+    const [loggedInUser, setLoggedInUser] = useState(null);
 
     function Header(){
-
-     /*   useEffect(()=>{
-            amountFriends()
-            
-        }, [nFriends]);
-
-        
-
-        useEffect(()=>{
-            amountFollower()
-            
-        }, [nFollower]);*/
-
 
         const routeToSteam_friends = () => {
             router.push({
@@ -102,13 +18,17 @@ export default function profile(props){
             });
           };
 
+        //TODO: maybe google if there is a better way
+        useEffect(() => {
+            if(userInfo && !loggedInUser){
+            initFields();
+            }
+        },[userInfo]);
         
-            //BACKUPS
-            //props.myInfo.steamid!==props.userInfo.steamid ? <Follow userInfo={props.userInfo}/>:<CreatePost /> }
-            //{nFollower ? <strong>{props.follower.length}</strong> :<strong>Loading...</strong>}
-            //{nFriends ? <strong>{props.friends["friendslist"]["friends"].length}</strong> :<strong>Loading...</strong>}
+        const initFields = () => {
+            setLoggedInUser(userInfo.steamid);
+        };
 
-            //FIX FOLLOWBUTTON SHITZZLE
         return (
         
         <div >
@@ -118,18 +38,18 @@ export default function profile(props){
                     <div className= "media row p-0 my-4 mx-auto">
                         <div className="col">
                             <Image 
-                            src={props.userInfo[0].avatarfull}
+                            src={props.userInfo.avatarfull}
                             width={250}
                             height={250}
-                            alt={props.userInfo[0].personaname}
+                            alt={props.userInfo.personaname}
                             className={"rounded-circle"}
                             />
                         </div>
                         
                         <div className="col media-body ml-5">
-                            <h4 className="font-weight-bold mb-4">{props.userInfo[0].personaname}</h4>
+                            <h4 className="font-weight-bold mb-4">{props.userInfo.personaname}</h4>
                             <div className="text-muted mb-4">
-                                {props.userInfo[0].description}
+                                {props.userInfo.description}
                             </div>
                             <a href="/followers" className="d-inline-block text-dark">
                                 <strong>{props.follower.length}</strong>
@@ -142,8 +62,8 @@ export default function profile(props){
                             </a>
                         </div>
                         <br />
-                        {userInfo ? 
-                            (userInfo.steamid !==props.userInfo[0].steamid ? <Follow userInfo={props.userInfo[0]}/>:<CreatePost/>) : <CreatePost/> }
+                        {loggedInUser ? 
+                            (loggedInUser !==props.userInfo.steamid ? <Follow userInfo={props.userInfo}/>:<CreatePost/>) : null}
                         
                     </div>
                     
@@ -292,71 +212,6 @@ export default function profile(props){
             </>
         );
     }
-
-//fetching media of inspected user //work with get static props?
-/*<Modal
-                isOpen={!!router.query.postId}
-                onRequestClose={() => router.push(`/${props.userInfo.steamid}`, undefined, { scroll: false })}
-                contentLabel="Post modal">
-                <Modal.Header closeButton>
-                    <Modal.Title>Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Post id={router.query.postID} pathname={router.pathname} />
-                </Modal.Body>
-</Modal>*/
-//postjsx which is called in modal and shown there. with comments likes 
-    const Media = () => {
-        let medias = props.media;
-        let url = "http://localhost:5000";//+ props.media.url; 
-        
-
-          return (
-           <>
-           
-           
-
-           {medias? medias.map((mediae) => (
-                
-                //<MediaCard key={mediae.filenam} media={mediae} /> can be deleted at some point
-                <Link
-                    key={mediae.filenam.split(".")[0]}
-                    //href={`/?steamid=${props.userInfo.steamid}/?postID=${mediae.filenam.split(".")[0]}`}
-                    //as={`/${props.userInfo.steamid}/${mediae.filenam.split(".")[0]}`}
-                    href="/[steamid]/[postID]"
-                    as={`/${props.userInfo.steamid}/${mediae.filenam.split(".")[0]}`}
-                    scroll={false}
-                    >
-                     <Image 
-                     src={url + mediae.url} 
-                     width={400} 
-                     height={400} 
-                     className="transform rounded-lg brightness-90 transition group-hover:brightness-110"
-                     alt="Pricture" 
-                     sizes="(max-width: 640px) 100vw,
-                     (max-width: 1280px) 50vw,
-                     (max-width: 1536px) 33vw,
-                     25vw"
-                     style={{ transform: "translate3d(0, 0, 0)" }}
-                     /> 
-                 </Link>
-            )): <p>Post some New</p>}
-            
-            
-            
-            </>    
-            //<Container fluid> 
-             //  <Row md={4} >
-                //{medias? medias.map((mediae) => (
-                //    <MediaCard key={mediae.filenam} media={mediae} />
-                //)): <p>Post some New</p>}
-             //   </Row> 
-           // </Container>
-          );
-    };
-
-    
-//<div><Media/></div>
 
     return (
         <>

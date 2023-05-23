@@ -18,9 +18,23 @@ export default function Sidebar(props){
 
   //Fetch userContext
   const {userInfo} = useContext(Context); 
-  const steamid = window.localStorage.getItem("steamid");
-  const avatar = window.localStorage.getItem("avatar");
+  const[steamid, setSteamid] = useState();
+  const[avatar, setAvatar] = useState();
+
+
+  //TODO: maybe google if there is a better way
+  useEffect(() => {
+    if(userInfo && !steamid){
+      initFields();
+    }
+  },[userInfo]);
   
+  const initFields = () => {
+    setSteamid(userInfo.steamid);
+    setAvatar(userInfo.avatar);
+  };
+
+  //const[loggedInUser, setLoggedInUser] = useState(props.loggedInUser);
 
 //const for header of side bar
   const Header = () => {
@@ -121,13 +135,14 @@ export default function Sidebar(props){
             </li>
             <li>
               <Link href={`/${steamid}`} as={`/${steamid}`} id="Profile" className={props.selection.profile} onClick={() => onClickNavbar(4)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
-                <Image 
+                {avatar ? <Image 
+                //src={avatar}
                 src={avatar}
                 width={20}
                 height={20}
                 alt={steamid}
                 className={styles.avatar}
-                />
+                />: null}
                  Profile
               </Link>
               <hr/>
