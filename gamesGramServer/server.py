@@ -19,18 +19,20 @@ from flask import (
     send_from_directory,
     session,
 )
-#from flask_bcrypt import Bcrypt  # DOCU
+
+# from flask_bcrypt import Bcrypt  # DOCU
 from flask_cors import CORS, cross_origin
 from flask_restful import Api, Resource, fields, marshal_with, reqparse
-#from flask_sock import Sock  # DOCU
+
+# from flask_sock import Sock  # DOCU
 from pysteamsignin.steamsignin import SteamSignIn  # import for steam signin
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 api = Api(app)
-#sockets = Sock(app)
-#bcrypt = Bcrypt(app)
+# sockets = Sock(app)
+# bcrypt = Bcrypt(app)
 CORS(app, resources={r"/*": {"origins": "*"}})  # enable CORS on all routes
 
 # global dictionary for all active websockets
@@ -63,25 +65,25 @@ api.add_resource(Message, "/hello")
 
 
 # route for socket creation
-#@sockets.route("/")
-#def echo_socket(sockets):
-    # run websocket until it is closed down
+# @sockets.route("/")
+# def echo_socket(sockets):
+# run websocket until it is closed down
 #    print("CONNECTED")
 #    while True:
-        # receive email and hexcode of the token from client
+# receive email and hexcode of the token from client
 #        payload = json.loads(sockets.receive())
-        # split it up into variables
+# split it up into variables
 #        steamid = payload["steamid"]
-        # HEX = payload["HEX"]
+# HEX = payload["HEX"]
 
-        # check if there is an active session of the user
+# check if there is an active session of the user
 #        activeSession = database_helper.activeSessionSteamid(steamid)
-        # fetch the token from the database and hash it
-        # REHEX = sha256(activeSession.encode("utf-8")).hexdigest()
+# fetch the token from the database and hash it
+# REHEX = sha256(activeSession.encode("utf-8")).hexdigest()
 
-        # check if there is an active session and the transmitted and genereted hex code are the same
+# check if there is an active session and the transmitted and genereted hex code are the same
 #        if activeSession:
-            # replace users ws with new one after e.g. a refresh, if combination is new add it (stored by the hex)
+# replace users ws with new one after e.g. a refresh, if combination is new add it (stored by the hex)
 #            client_list[steamid] = sockets
 #            print(client_list)
 #        else:
@@ -400,9 +402,8 @@ class GetHome(Resource):
         followers = []
         followers.append(steamid)
         for follower in database_helper.getFollowers(steamid):
-            followers.append(follower)
+            followers.append(str(follower))
         for follow in followers:
-            print("!", follow)
             # fatch all post
             posts = database_helper.getUserPosts(follow)
             for post in posts:
@@ -417,13 +418,13 @@ class GetHome(Resource):
 
                 postResponse.append(
                     {
-                        "steamid": post[0],
-                        "appid": post[1],
-                        "descr": post[2],
-                        "accessRuleID": post[3],
-                        "filenam": post[4],
-                        "timestamp": post[5],
-                        "url": url,
+                        "steamid": str(post[0]),
+                        "appid": str(post[1]),
+                        "descr": str(post[2]),
+                        "accessRuleID": str(post[3]),
+                        "filenam": str(post[4]),
+                        "timestamp": str(post[5]),
+                        "url": str(url),
                     }
                 )
         # sort according timestamp
@@ -514,7 +515,7 @@ class GetFollowers(Resource):
 
         postResponse = []
         for follower in database_helper.getFollowers(steamid):
-            postResponse.append(follower)
+            postResponse.append(str(follower))
         # if len(postResponse):
         return make_response(jsonify(postResponse), 200)  # OK
         # else:

@@ -11,7 +11,7 @@ import PostWall from '@/components/PostWall';
 import Post from '@/components/Post';
 
 //function sha256(content) {
-  //return createHash('sha256').update(content).digest('hex')
+//return createHash('sha256').update(content).digest('hex')
 ///}
 
 //let socket
@@ -166,7 +166,7 @@ export default function Home() {
           <div className={styles.main}>
             <div className={styles.one}><Sidebar selection={SidebarSelect} /></div>
             <div className={styles.two}>
-              {mediaPosts ? <p>TODO</p> : <p>Here will be our home page by default</p>}
+              {mediaPosts ? <PostWall userInfo={null} media={mediaPosts} /> : <p>Here will be our home page by default</p>}
             </div>
           </div>
         }
