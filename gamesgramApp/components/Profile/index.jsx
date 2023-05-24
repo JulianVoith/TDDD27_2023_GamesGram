@@ -12,6 +12,7 @@ export default function profile(props){
 
     function Header(){
 
+        //TODO:small adjustment as link!
         const routeToSteam_friends = () => {
             router.push({
               pathname: '/steam_friends',

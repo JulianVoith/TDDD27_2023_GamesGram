@@ -5,14 +5,14 @@ import Sidebar from '@/components/Siderbar';
 import LoginWSteam from '@/components/Login&SignUp/loginWSteam';
 import { useRouter } from 'next/router';
 import Context from '@/context/Context';
-import { io } from 'socket.io-client';// import the socket
-import { createHash } from 'crypto'//Hash
+//import { io } from 'socket.io-client';// import the socket
+//import { createHash } from 'crypto'//Hash
 
-function sha256(content) {
-  return createHash('sha256').update(content).digest('hex')
-}
+//function sha256(content) {
+  //return createHash('sha256').update(content).digest('hex')
+///}
 
-let socket
+//let socket
 
 export default function Home() {
   const [hastoken, setToken] = useState(false); //Hook for generated token
