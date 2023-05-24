@@ -61,7 +61,7 @@ export default UserProfile;
 export async function getStaticPaths(){
 
 
-  const res = await fetch("http://127.0.0.1:5000/getUsers");
+  const res = await fetch("http://127.0.0.1:5001/getUsers");
   const users = await res.json();
  
   const paths = users.map((steamid) => ({
@@ -74,10 +74,10 @@ export async function getStaticPaths(){
 export async function getStaticProps( { params } ){
   
   //Notice: Don't fetch the server directly, use api interface
-  const resuserInfo = await fetch(`http://127.0.0.1:5000/GetUserInfo/${params.steamid}`);
-  const resposts = await fetch(`http://127.0.0.1:5000/getPosts/${params.steamid}`);
-  const refollows = await fetch(`http://127.0.0.1:5000/getFollowers/${params.steamid}`);
-  const refriends = await fetch(`http://127.0.0.1:5000/GetFriendList/${params.steamid}`);
+  const resuserInfo = await fetch(`http://127.0.0.1:5001/GetUserInfo/${params.steamid}`);
+  const resposts = await fetch(`http://127.0.0.1:5001/getPosts/${params.steamid}`);
+  const refollows = await fetch(`http://127.0.0.1:5001/getFollowers/${params.steamid}`);
+  const refriends = await fetch(`http://127.0.0.1:5001/GetFriendList/${params.steamid}`);
 
   const dataUserInfoJ = await resuserInfo.json();
   const posts = await resposts.json();

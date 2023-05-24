@@ -443,11 +443,10 @@ def image_feed(image):
     # partition for correct mimetype
     mime = image.rpartition(".")
     mimetype = "image/" + mime[2]
-
-    print(image)
-
+    print("!!",image)
     # method to stream image for Response
     def gen(imagename):
+        print("!",imagename)
         # get image and stream
         image = open(
             upload_path_img + imagename, "rb"
@@ -525,4 +524,4 @@ class GetFollowers(Resource):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,port=5001)

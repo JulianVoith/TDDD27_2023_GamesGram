@@ -5,7 +5,7 @@ import Link from 'next/link';
 const PostWall = ({ userInfo, media }) => {
 
   //let medias = media;
-  let url = "http://localhost:5000";//+ props.media.url; 
+  let url = "http://localhost:5001";//+ props.media.url; 
 
   //userInfo can be empty
   const steamid = userInfo ? userInfo.steamid : media.steamid;

@@ -24,9 +24,9 @@ const Post = ({ id }) => {
     };
 
   //General variables. Could be somwhere in the config files
-  let urlImgaes = "http://localhost:5000/image_feed/" + id;
-  //let urlVideos = "http://localhost:5000/video_feed/"; // not yet implemented for future use maybe
-  //let urlAUdios = "http://localhost:5000/audio_feed/"; // not yet implemented 
+  let urlImgaes = "http://localhost:5001/image_feed/" + id;
+  //let urlVideos = "http://localhost:5001/video_feed/"; // not yet implemented for future use maybe
+  //let urlAUdios = "http://localhost:5001/audio_feed/"; // not yet implemented 
 
 
   //STEP 1: Normal comments,
