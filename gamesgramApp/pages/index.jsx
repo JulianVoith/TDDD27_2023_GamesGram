@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import Context from '@/context/Context';
 import { io } from 'socket.io-client';// import the socket
 import { createHash } from 'crypto'//Hash
+import PostWall from '@/components/PostWall';
+import Post from '@/components/Post';
 
 function sha256(content) {
   return createHash('sha256').update(content).digest('hex')
@@ -19,6 +21,9 @@ export default function Home() {
   const { userInfo, setuserInfo } = useContext(Context); //Hook for feteched usert information
   const router = useRouter() //Variable for dynamic routing
 
+  const [mediaPosts, setMediaPosts] = useState(null);
+
+  //set token
   useEffect(() => {
     // Check if it is running in a browser environment
     if (typeof window !== "undefined") {
@@ -34,7 +39,38 @@ export default function Home() {
     }
   }, []);
 
+  //set HomePost
+  useEffect(() => {
+    //Now the post only fetch once, it should be a onlisten event 
+    //TODO: add onlisten event depend on Websocket
+    if (!mediaPosts) {
+      console.log("fatching");
+      GetPost();
+    }
+  }, []);
 
+  console.log("!", mediaPosts);
+
+  const GetPost = async () => {
+    if (window.localStorage.getItem("token") && userInfo) {
+      // API endpoint where we send form data.
+      const endpoint = `/api/getHome/${userInfo.steamid}`
+
+      // Form the request for sending data to the server.
+      const options = {
+        // The method is POST because we are sending data.
+        method: 'GET',
+        // Tell the server we're sending JSON.
+        headers: {
+          'Content-Type': 'application/json',
+          'token': window.localStorage.getItem("token"),
+        },
+      }
+      const response = await fetch(endpoint, options)
+      const data = await response.json();
+      setMediaPosts(data);
+    }
+  }
 
   const GetuserInfo = async () => {
 
@@ -117,7 +153,7 @@ export default function Home() {
     signout: "nav-link text-white"
   };
 
-                      
+
 
   return (
     <div>
@@ -129,7 +165,9 @@ export default function Home() {
         {!hastoken || !userInfo ? <LoginWSteam /> :
           <div className={styles.main}>
             <div className={styles.one}><Sidebar selection={SidebarSelect} /></div>
-            <div className={styles.two}>Here will be our home page by default</div>
+            <div className={styles.two}>
+              {mediaPosts ? <p>TODO</p> : <p>Here will be our home page by default</p>}
+            </div>
           </div>
         }
       </main>

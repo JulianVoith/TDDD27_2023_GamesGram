@@ -64,6 +64,10 @@ module.exports = () => {
       {
         source: "/api/getFollowers/:path*",
         destination: "http://127.0.0.1:5000/getFollowers/:path*",
+      },
+      {
+        source: "/api/getHome/:path*",
+        destination: "http://127.0.0.1:5000/getHome/:path*",
       }
     ];
   };

@@ -264,6 +264,6 @@ def getFollowers(steamid):
     followers = cursor.fetchall()
     cursor.close()
    # if followers != []:
-    return followers
+    return followers[0]
     #else:
         #return False

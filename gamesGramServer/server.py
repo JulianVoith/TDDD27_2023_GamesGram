@@ -392,6 +392,50 @@ class GetPosts(Resource):
         ##   return "", 401 #unauthorized
 
 
+# Interface for returning all message on Home page
+@api.resource("/getHome/<string:steamid>")
+class GetHome(Resource):
+    def get(self, steamid):
+        postResponse = []
+        followers = []
+        followers.append(steamid)
+        for follower in database_helper.getFollowers(steamid):
+            followers.append(follower)
+        for follow in followers:
+            print("!", follow)
+            # fatch all post
+            posts = database_helper.getUserPosts(follow)
+            for post in posts:
+                typeOfMedia = database_helper.getMedia(post[4])
+                print(typeOfMedia)
+                if typeOfMedia[1] == "image":
+                    url = "/image_feed/" + post[4]
+                elif typeOfMedia[1] == "video":
+                    url = "/video_feed/" + post[4]
+                else:
+                    url = "/audio_feed/" + post[4]
+
+                postResponse.append(
+                    {
+                        "steamid": post[0],
+                        "appid": post[1],
+                        "descr": post[2],
+                        "accessRuleID": post[3],
+                        "filenam": post[4],
+                        "timestamp": post[5],
+                        "url": url,
+                    }
+                )
+        # sort according timestamp
+        postResponse.sort(key=lambda x: x["timestamp"], reverse=True)
+        # if existing return json of table entries
+        if postResponse is not None:
+            return make_response(jsonify(postResponse), 200)  # OK
+
+        else:
+            return 404  # notfound
+
+
 # function for streaming an image to the wall
 @app.route("/image_feed/<image>", methods=["GET"])
 def image_feed(image):
@@ -467,11 +511,12 @@ class GetFollowers(Resource):
     def get(self, steamid):
         # token = request.headers.get('token') MAYBE BACK TODO
         # if database_helper.activeSession(token): MAYBE BACK TODO
-        postResponse = database_helper.getFollowers(steamid)
+
+        postResponse = []
+        for follower in database_helper.getFollowers(steamid):
+            postResponse.append(follower)
         # if len(postResponse):
-        result_str = [(str(n),) for n in postResponse]
-        response_data = json.dumps(result_str)
-        return make_response(response_data, 200)  # OK
+        return make_response(jsonify(postResponse), 200)  # OK
         # else:
         # return "", 404
         # else:
