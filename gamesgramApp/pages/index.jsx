@@ -44,23 +44,29 @@ export default function Home() {
 
 
   const GetPost = async () => {
-    if (window.localStorage.getItem("token") && userInfo) {
-      // API endpoint where we send form data.
-      const endpoint = `/api/getHome/${userInfo.steamid}`
 
-      // Form the request for sending data to the server.
-      const options = {
-        // The method is POST because we are sending data.
-        method: 'GET',
-        // Tell the server we're sending JSON.
-        headers: {
-          'Content-Type': 'application/json',
-          'token': window.localStorage.getItem("token"),
-        },
+    try {
+
+      if (window.localStorage.getItem("token") && userInfo) {
+        // API endpoint where we send form data.
+        const endpoint = `/api/getHome/${userInfo.steamid}`
+
+        // Form the request for sending data to the server.
+        const options = {
+          // The method is POST because we are sending data.
+          method: 'GET',
+          // Tell the server we're sending JSON.
+          headers: {
+            'Content-Type': 'application/json',
+            'token': window.localStorage.getItem("token"),
+          },
+        }
+        const response = await fetch(endpoint, options)
+        const data = await response.json();
+        setMediaPosts(data);
       }
-      const response = await fetch(endpoint, options)
-      const data = await response.json();
-      setMediaPosts(data);
+    } catch (error) {
+      console.error('Error:', error);
     }
   }
 
@@ -147,14 +153,16 @@ export default function Home() {
     signout: "nav-link text-white"
   };
 
+  //GetPost();
   //set HomePost
   useEffect(() => {
     //Now the post only fetch once, it should be a onlisten event 
     //TODO: add onlisten event depend on Websocket
     if (!mediaPosts) {
+
       GetPost();
     }
-  }, []);
+  }, [userInfo]);
 
 
   return (
@@ -168,7 +176,7 @@ export default function Home() {
           <div className={styles.main}>
             <div className={styles.one}><Sidebar selection={SidebarSelect} /></div>
             <div className={styles.two}>
-              {mediaPosts ? mediaPosts.map((mediaPost) => <HomeWall id={mediaPost.filenam} media={mediaPost} />) : <p>Here will be our home page by default</p>}
+              {mediaPosts ? mediaPosts.map((mediaPost) => <HomeWall key={mediaPost.filenam} id={mediaPost.filenam} media={mediaPost} />) : <p>Here will be our home page by default</p>}
             </div>
           </div>
         }
@@ -189,7 +197,6 @@ function HomeWall(props) {
 
   const fetchPosterInfo = async () => {
     const data = await GetUserInfo(media.steamid);
-
     setPosterInfo(data[0]);
   };
   return (
