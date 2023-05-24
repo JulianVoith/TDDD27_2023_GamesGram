@@ -1,15 +1,14 @@
 import { useRouter } from 'next/router';
 
 import { useEffect, useState, useContext } from 'react';
-import { GetUserInfo } from '@/components/Tools/getUserInfo'
-import { GetUserMedia } from '@/components/Tools/getUsermedia'
+import {GetUserInfo} from '@/components/Tools/getUserInfo'
+import {GetUserMedia} from '@/components/Tools/getUsermedia'
 import Sidebar from '@/components/Siderbar';
 import Profile from '@/components/Profile';
 import styles from '@/styles/Home.module.css';
 import PostWall from '@/components/PostWall';
 import Post from '@/components/Post';
 import { Modal } from 'react-bootstrap';
-import Context from '@/context/Context';
 
 
 const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => {
@@ -35,17 +34,21 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
   //TODO change mediapost layout
   return (
     <main>
-      <div>
-        <Modal
-          show={!!router.query.postID}
-        //onRequestClose={() => router.push(`/${userinfo[0].steamid}`, undefined, { scroll: false })}
+     <div>
+      <Modal
+        show={!!router.query.postID}
+        size="lg"
+        onHide={() => router.push(`/${userViewInfo[0].steamid}`, undefined, { scroll: false })}
         //contentLabel="Post modal"
-        >
-          <Modal.Body>
-            <Post id={router.query.postID} urlPost={router.query.urlPost} pathname={router.pathname} />
-          </Modal.Body>
-        </Modal>
-      </div>
+      >
+      <Modal.Header>Details</Modal.Header>  
+      <Modal.Body>
+
+          <Post id={router.query.postID} urlPost={router.query.urlPost} pathname={router.pathname} />
+        
+      </Modal.Body>
+      </Modal>
+    </div> 
 
       <div className={styles.main}>
         <div className={styles.one}><Sidebar selection={SidebarSelect} /></div>

@@ -46,6 +46,3 @@ Follow -> steamID followSteamID
 
 
 
-
-tomorrow:
--show media on page
