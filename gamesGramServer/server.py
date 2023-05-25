@@ -166,8 +166,11 @@ class GetRecentlyPlayedGames(Resource):
         params = {"key": api_key, "steamid": steamid, "count": 0}
         url = "https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/"
         response = requests.get(url, params)
-        result = json.loads(response.content)["response"]["games"]
-        return make_response(jsonify(result), 200)  # OK
+        if "games" in json.loads(response.content)["response"]:
+            result = json.loads(response.content)["response"]["games"]
+            return make_response(jsonify(result), 200)  # OK
+        else:
+            return 404  # NO FOUND
 
 
 @api.resource("/GetFriendList/<string:steamid>")
@@ -443,10 +446,11 @@ def image_feed(image):
     # partition for correct mimetype
     mime = image.rpartition(".")
     mimetype = "image/" + mime[2]
-    print("!!",image)
+    print("!!", image)
+
     # method to stream image for Response
     def gen(imagename):
-        print("!",imagename)
+        print("!", imagename)
         # get image and stream
         image = open(
             upload_path_img + imagename, "rb"
@@ -524,4 +528,4 @@ class GetFollowers(Resource):
 
 
 if __name__ == "__main__":
-    app.run(debug=True,port=5001)
+    app.run(debug=True, port=5001)

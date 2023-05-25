@@ -153,7 +153,6 @@ export default function Home() {
     signout: "nav-link text-white"
   };
 
-  //GetPost();
   //set HomePost
   useEffect(() => {
     //Now the post only fetch once, it should be a onlisten event 
