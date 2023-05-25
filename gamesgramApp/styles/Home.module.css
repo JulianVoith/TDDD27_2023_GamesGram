@@ -12,6 +12,43 @@
   grid-column-start: 2;
   grid-column-end: 2;
 }
+
+
+.homeWall {
+  max-width: 600px;
+  border: 1px solid #dbdbdb;
+  border-radius: 3px;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: white;
+}
+
+.posterInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.posterInfo .rounded-circle {
+  width: 32px;
+  height: 32px;
+  margin-right: 10px;
+}
+
+.posterInfo p {
+  margin: 0 0 0 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.timestamp {
+  color: #999;
+  font-size: 0.8rem;
+  margin-top: -5px;
+  margin-bottom: 10px;
+}
+
+
 /*.main {
   display: flex;
   flex-direction: column;

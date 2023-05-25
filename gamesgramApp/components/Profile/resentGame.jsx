@@ -32,7 +32,7 @@ export default function RecentGame(props) {
     if (recentGame) {  // Only call onGameSet if recentGame is not null
       props.onGameSet(recentGame);
     }
-  }, [recentGame]);
+  }, [recentGame, props.onGameSet]);
   return (
     <div className={styles.gameContainer}>
       {recentGame ? recentGame.map((gameInfo) => <Game key={gameInfo.appid} gameInfo={gameInfo} />) : <p>Loading...</p>}
