@@ -72,7 +72,7 @@ const Post = ({ id }) => {
         },
       }
       const response = await fetch(endpoint, options)
-      if (response.status === 201) setLiked(true);
+      if (response.status === 201 || 200) setLiked(true);
     }
   };
 
@@ -147,7 +147,10 @@ const Post = ({ id }) => {
 
       <div>
         {likesCount ? <p>{likesCount} {likesCount === 1 ? 'player' : 'players'} liked</p> : <br />}
-        {liked ? <button type="button" onClick={deleteLike} className="btn btn-primary">Liked</button> : <button type="button" onClick={createLike} className="btn btn-primary">Like</button>}
+        {liked
+          ? <button type="button" onClick={deleteLike} className="btn btn-outline-primary">Liked</button>
+          : <button type="button" onClick={createLike} className="btn btn-primary">Like</button>
+        }
         <span> </span>
         <button type="button" className="btn btn-primary" onClick={handleComments}>Comment</button>
       </div>
