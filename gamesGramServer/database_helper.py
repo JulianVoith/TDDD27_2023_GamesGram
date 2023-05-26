@@ -299,6 +299,7 @@ def isPostLiked(steamid, postID):
     )
     liked = cursor.fetchone()
     cursor.close()
+
     return False if liked[0] == 0 else True
 
 

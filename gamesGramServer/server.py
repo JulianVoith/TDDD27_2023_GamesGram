@@ -360,9 +360,9 @@ class PostLike(Resource):
         if database_helper.activeSession(token):
             steamid = database_helper.getSteamidByToken(token)
             if database_helper.isPostLiked(steamid, postID):
-                return 200  # ok
+                return "", 200  # ok
             else:
-                return 404  # no found
+                return "", 404  # no found
         else:
             return "", 401  # Unauthorized
 
@@ -372,9 +372,9 @@ class PostLike(Resource):
         if database_helper.activeSession(token):
             steamid = database_helper.getSteamidByToken(token)
             if database_helper.deletePostLiked(steamid, postID):
-                return 200  # ok
+                return "", 200  # ok
             else:
-                return 404  # no found
+                return "", 404  # no found
         else:
             return "", 401  # Unauthorized
 
@@ -384,9 +384,9 @@ class PostLike(Resource):
         if database_helper.activeSession(token):
             steamid = database_helper.getSteamidByToken(token)
             if database_helper.addPostLiked(steamid, postID):
-                return 201  # created
+                return "", 201  # created
             else:
-                return 404  # no found
+                return "", 404  # no found
         else:
             return "", 401  # Unauthorized
 

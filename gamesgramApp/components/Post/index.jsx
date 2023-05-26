@@ -29,7 +29,9 @@ const Post = ({ id }) => {
     checkLiked();
   }, [id]);
 
-  useEffect(() => { getLikeCount(); }), [liked];
+  useEffect(() => {
+    getLikeCount(); 
+  }), [liked];
 
   const checkLiked = async () => {
     if (window.localStorage.getItem("token")) {

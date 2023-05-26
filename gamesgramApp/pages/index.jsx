@@ -209,7 +209,7 @@ function HomeWall(props) {
               <p>{posterInfo.personaname}</p>
             </div>
             <p className={styles.timestamp}>{media.timestamp}</p>
-            <Post id={media.filenam} />
+            <Post key={media.filenam} id={media.filenam} />
           </>
         )
         : <p>Loading</p>
