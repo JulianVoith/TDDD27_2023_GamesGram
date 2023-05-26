@@ -348,6 +348,57 @@ class CreatePost(Resource):
             return "", 401  # Unauthorized
 
 
+# Interface about post like system
+# @head -> # Check if a user has liked a specific post
+# @delete ->  # Handling user unlikes of posts
+# @post ->  # Handle users adding new likes
+@api.resource("/PostLike/<string:postID>")
+class PostLike(Resource):
+    def head(self, postID):
+        # Check if a user has liked a specific post
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.isPostLiked(steamid, postID):
+                return 200  # ok
+            else:
+                return 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def delete(self, postID):
+        # Handling user unlikes of posts
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.deletePostLiked(steamid, postID):
+                return 200  # ok
+            else:
+                return 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def post(self, postID):
+        # Handle users adding new likes
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.addPostLiked(steamid, postID):
+                return 201  # created
+            else:
+                return 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def get(self, postID):
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            result = database_helper.countPostLiked(postID)
+            return make_response(jsonify({"likesCount": result}), 200)  # ok
+        else:
+            return "", 401  # Unauthorized
+
+
 # Interface for creating a post with media
 @api.resource("/getPosts/<string:steamid>")
 class GetPosts(Resource):

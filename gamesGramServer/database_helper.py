@@ -73,7 +73,7 @@ def deleteSession(token):
 
 # get steamid of user by the token
 def getSteamidByToken(token):
-    #print("database,token",token)
+    # print("database,token",token)
     cursor = get_db().execute(
         "select steamid from userSessions where token like ?;", [token]
     )
@@ -82,10 +82,13 @@ def getSteamidByToken(token):
 
     return userSteamid[0][0]
 
+
 # method to check existence of user
 def userExists(steamid):
     # fetch user by email
-    cursor = get_db().execute("select steamid from userInfo where steamid like ?;", [steamid])
+    cursor = get_db().execute(
+        "select steamid from userInfo where steamid like ?;", [steamid]
+    )
     user = cursor.fetchall()
     cursor.close()
     # check if user exists and return true or false
@@ -93,7 +96,8 @@ def userExists(steamid):
         return True
     else:
         return False
-        
+
+
 # create user with platform specific information
 def createUser(userInformation):
     # insert passed dictionary and create user in database
@@ -103,7 +107,7 @@ def createUser(userInformation):
             [
                 userInformation["steamid"],
                 userInformation["personname"],
-                userInformation["aboutProfile"]
+                userInformation["aboutProfile"],
             ],
         )
         get_db().commit()
@@ -111,9 +115,10 @@ def createUser(userInformation):
     except:
         return False
 
-#get user information from database
+
+# get user information from database
 def getUser(steamid):
-   # fetch user by email
+    # fetch user by email
     cursor = get_db().execute("select * from userInfo where steamid like ?;", [steamid])
     userInfo = cursor.fetchall()
     cursor.close()
@@ -121,11 +126,12 @@ def getUser(steamid):
     if userInfo != []:
         return userInfo[0]
     else:
-        return False 
+        return False
 
-#get user information from database
+
+# get user information from database
 def getAllUser():
-   # fetch user by email
+    # fetch user by email
     cursor = get_db().execute("select steamid from userInfo;")
     users = cursor.fetchall()
     cursor.close()
@@ -133,9 +139,10 @@ def getAllUser():
     if users != []:
         return users
     else:
-        return False 
+        return False
 
-#method to create follow entry
+
+# method to create follow entry
 def followUser(steamid, followid):
     # insert user's steamid and token
     try:
@@ -145,10 +152,13 @@ def followUser(steamid, followid):
     except:
         return False
 
-#method to create follow entry
+
+# method to create follow entry
 def getFollower(steamid):
     # get a users followers
-    cursor = get_db().execute("select steamid from userInfo where followid like ?;", [steamid])
+    cursor = get_db().execute(
+        "select steamid from userInfo where followid like ?;", [steamid]
+    )
     user = cursor.fetchall()
     cursor.close()
     # check if user exists and return true or false
@@ -156,8 +166,9 @@ def getFollower(steamid):
         return True
     else:
         return False
-    
-#method to fuzzy search User 
+
+
+# method to fuzzy search User
 def searchUser(searchTerm):
     cursor = get_db().execute(
         "select steamid from userInfo where personname like ?;", (f"%{searchTerm}%",)
@@ -166,7 +177,8 @@ def searchUser(searchTerm):
     cursor.close()
     return userSteamid
 
-#method to reate post in database
+
+# method to reate post in database
 def createPost(steamid, appid, descr, accessRuleID, postMedia):
     try:
         print(steamid, appid, descr, accessRuleID, postMedia)
@@ -174,14 +186,15 @@ def createPost(steamid, appid, descr, accessRuleID, postMedia):
             "insert into userPost (steamid, appid, descr, accessRuleID, postMedia, ts) values (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);",
             [steamid, appid, descr, accessRuleID, postMedia],
         )
-        
+
         get_db().commit()
         cursor.close()
         return True
     except:
         return False
 
-#method to fetch id for media filename (based on last id)
+
+# method to fetch id for media filename (based on last id)
 def getLastUsedID():
     cursor = get_db().execute("select max(rowid) from userMedia;")
 
@@ -190,7 +203,8 @@ def getLastUsedID():
 
     return lastId[0][0]
 
-#create database entry for media
+
+# create database entry for media
 def uploadMedia(filenam, typeofm):
     try:
         cursor = get_db().execute(
@@ -202,8 +216,9 @@ def uploadMedia(filenam, typeofm):
         return True
     except:
         return False
-    
-#delete database entry for media
+
+
+# delete database entry for media
 def deleteMedia(filenam):
     try:
         cursor = get_db().execute(
@@ -215,30 +230,31 @@ def deleteMedia(filenam):
         return True
     except:
         return False
-    
-#fetch posts of user
+
+
+# fetch posts of user
 def getUserPosts(steamid):
-    cursor = get_db().execute(
-        "select * from userPost where steamid like ?;", [steamid]
-    )
+    cursor = get_db().execute("select * from userPost where steamid like ?;", [steamid])
     posts = cursor.fetchall()
     cursor.close()
-    #if posts != []:
+    # if posts != []:
     return posts
-    #else:
+    # else:
     #    return False
-    
-#fetch media for a post
+
+
+# fetch media for a post
 def getMedia(filenam):
     cursor = get_db().execute(
         "select * from userMedia where filenam like ?;", [filenam]
     )
     media = cursor.fetchall()
     cursor.close()
-    #if media != []:
+    # if media != []:
     return media[0]
-    #else:
+    # else:
     #    return False
+
 
 def setFollow(steamid, followid):
     try:
@@ -247,23 +263,77 @@ def setFollow(steamid, followid):
         return True
     except:
         return False
-    
+
+
 def deleteFollow(steamid, followid):
     try:
-        get_db().execute("delete from followRel where steamid like (?) and followsID like (?);", [steamid, followid])
+        get_db().execute(
+            "delete from followRel where steamid like (?) and followsID like (?);",
+            [steamid, followid],
+        )
         get_db().commit()
         return True
     except:
         return False
-    
-#fetch followers
+
+
+# fetch followers
 def getFollowers(steamid):
     cursor = get_db().execute(
         "select followsID from followRel where steamid like ?;", [steamid]
     )
     followers = cursor.fetchall()
     cursor.close()
-   # if followers != []:
+    # if followers != []:
     return followers[0]
-    #else:
-        #return False
+    # else:
+    # return False
+
+
+# LIKE part
+# Check if a user has liked a specific post
+def isPostLiked(steamid, postID):
+    cursor = get_db().execute(
+        "select count(*) from postLikes where steamid = ? AND postID = ?;",
+        [steamid, postID],
+    )
+    liked = cursor.fetchone()
+    cursor.close()
+    return False if liked[0] == 0 else True
+
+
+# Handling user unlikes of posts
+def deletePostLiked(steamid, postID):
+    try:
+        get_db().execute(
+            "delete from postLikes where steamid like (?) and postID like (?);",
+            [steamid, postID],
+        )
+        get_db().commit()
+        return True
+    except:
+        return False
+
+
+# Handle users adding new likes
+def addPostLiked(steamid, postID):
+    try:
+        get_db().execute("insert into postLikes values (?,?);", [steamid, postID])
+        get_db().commit()
+        return True
+    except:
+        return False
+
+
+def countPostLiked(postID):
+    cursor = get_db().execute(
+        "select count(*) from postLikes where postID = ?;",
+        [postID],
+    )
+    liked = cursor.fetchone()
+    cursor.close()
+    # Check if liked is None before trying to access it
+    if liked is not None:
+        return liked[0]
+    else:
+        return 0  # Or whatever value is appropriate in your case
