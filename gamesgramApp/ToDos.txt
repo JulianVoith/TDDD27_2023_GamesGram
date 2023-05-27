@@ -1,8 +1,9 @@
 ToDo/NextSteps:
 ----- TODOS AFTER SAT 27
 
--int issue friends, follow button, and show home only if i follow or something
--change links to API LINKS
+-int issue friends, follow button, and show home only if i follow or something (Wilson)
+-change links to API LINKS (Julian)
+
 -Cleaning up Server side and commenting
 -check other commentings which need to be DONE
 - work on the chatroom functionality
