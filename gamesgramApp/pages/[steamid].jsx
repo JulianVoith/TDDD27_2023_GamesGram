@@ -39,7 +39,7 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
       <Modal.Header>Details</Modal.Header>  
       <Modal.Body>
 
-          <Post id={router.query.postID} urlPost={router.query.urlPost} pathname={router.pathname} />
+          <Post postID={router.query.postID} urlPost={router.query.urlPost} pathname={router.pathname} />
         
       </Modal.Body>
       </Modal>
@@ -68,7 +68,7 @@ export async function getStaticPaths(){
       params: { steamid: steamid.toString()},
   }));
 
-  return {paths, fallback: false};
+  return {paths, fallback: false}; //fallback true in case the page never has been rendered
 }
 
 export async function getStaticProps( { params } ){

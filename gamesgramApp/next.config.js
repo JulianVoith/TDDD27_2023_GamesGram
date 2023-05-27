@@ -68,6 +68,14 @@ module.exports = () => {
       {
         source: "/api/getHome/:path*",
         destination: "http://127.0.0.1:5001/getHome/:path*",
+      },
+      {
+        source: "/api/sendComment/:path*",
+        destination: "http://127.0.0.1:5001/sendComment/:path*",
+      },
+      {
+        source: "/api/getComments/:path*",
+        destination: "http://127.0.0.1:5001/getComments/:path*",
       }
     ];
   };

@@ -443,7 +443,6 @@ def image_feed(image):
     # partition for correct mimetype
     mime = image.rpartition(".")
     mimetype = "image/" + mime[2]
-    print("!!",image)
     # method to stream image for Response
     def gen(imagename):
         print("!",imagename)
@@ -522,6 +521,50 @@ class GetFollowers(Resource):
         # else:
         #    return "", 401 #unauthorized
 
+#function to create a comment on a post
+@api.resource("/sendComment")
+class SendComment(Resource):
+    def post(self):
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            commentData = request.json
+            if database_helper.createComment(commentData["commentID"], commentData["likes"], commentData["authorSteamID"], commentData["postID"], commentData["content"]):
+                return "", 201  # successfully created
+            else:
+                return "", 500 # internal server error
+        else:
+            return "", 401  # unauthorized
+
+#function to get comments of a post
+@api.resource("/getComments/<string:postID>","/getComments/<string:postID>/<string:commentID>" )
+class GetComments(Resource):
+    def get(self, postID, commentID=None):
+#        token = request.headers.get("token")
+ #       if database_helper.activeSession(token):
+        commentsResponse = []
+
+        if commentID is None:
+            comments = database_helper.getComments(postID)
+        else:
+            comments = database_helper.getSubComments(postID, commentID)
+        
+        for comment in comments:
+            commentsResponse.append(
+                    {   
+                        "id": str(comment[0]),
+                        "commentID": str(comment[1]),
+                        "likes": str(comment[2]),
+                        "content": str(comment[3]),
+                        "authorSteamID": str(comment[4]),
+                        "postID": str(comment[5]),
+                        "timestamp": str(comment[6]),
+                    }
+                )
+
+        return make_response(jsonify(commentsResponse), 200)  # OK
+#        else:
+#            return "", 401  # unauthorized
+        
 
 if __name__ == "__main__":
     app.run(debug=True,port=5001)

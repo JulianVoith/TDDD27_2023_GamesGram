@@ -2,43 +2,29 @@ import Image from 'next/image';
 import Context from '@/context/Context';
 import { useState, useEffect,useContext } from 'react';
 
-const Post = ({ id }) => {
+import useSWR from 'swr';
+import CommentBox from './commentBox';
+import { useRouter } from 'next/router';
+import CommentSubmit from './commentSubmit';
 
-    //Fetch userContext
-    const {userInfo} = useContext(Context); 
-    const [steamid, setSteamid] = useState(null);
-    const [avatar, setAvatar] = useState(null);
-    const [commentsEnabled, setCommentsEnabled] = useState(false);
-  
-  
-    //TODO: maybe google if there is a better way
-    useEffect(() => {
-      if(userInfo && !steamid){
-        initFields();
-      }
-    },[userInfo]);
+
+
+const Post = ({ postID }) => {
+
     
-    const initFields = () => {
-      setSteamid(userInfo.steamid);
-      setAvatar(userInfo.avatar);
-    };
+    const [commentsEnabled, setCommentsEnabled] = useState(false);
+
+    //test of different data fetching
+    const fetcher = (...args) => fetch(...args).then((res) => res.json());
+    const { data: comments } = useSWR(commentsEnabled ? `/api/getComments/${postID}`: null, fetcher, { refreshInterval: 1000 }); //can fetch with token and preload on hover or whatever, allows subscribing to real-time data source or websocket
+
+ 
+
 
   //General variables. Could be somwhere in the config files
-  let urlImgaes = "http://localhost:5001/image_feed/" + id;
+  let urlImgaes = "http://localhost:5001/image_feed/" + postID;
   //let urlVideos = "http://localhost:5001/video_feed/"; // not yet implemented for future use maybe
   //let urlAUdios = "http://localhost:5001/audio_feed/"; // not yet implemented 
-
-
-  //STEP 1: Normal comments,
-  //Step 2: replys and likes of comments, replys in replies?
-
-  //change styling stuff
-
-  // Data structure for comments
-  //Function to send a comment
-  //show only limited number
-  //expand if necesssary
-  
 
   //Show and hide comment section
   const handleComments = () => {
@@ -77,59 +63,19 @@ const Post = ({ id }) => {
       {commentsEnabled ? 
       <div className="container mt-5 mb-5" id="commentSection">
         <div className="row height d-flex justify-content-center align-items-center">
-          <div className="col-md-7">  
+          <div className="col-xl-7">  
             <div className="card">
               <div className="p-3">
                 <h6>Comments</h6>
               </div>
 
-              <div className="mt-3 d-flex flex-row align-items-center p-3 form-color">
+              <CommentSubmit key={"post"} postID = {postID} commentID = {0} />
 
-                {avatar ? <Image src={avatar} width={50} height={50} className="rounded-circle mr-2" alt={steamid} />: null}
-                <input type="text" className="form-control" placeholder="Enter your comment..."/>
-
-              </div>
-              <div className="mt-2">
-
-                <div className="d-flex flex-row p-3">
-
-                  <img src="https://i.imgur.com/zQZSWrt.jpg" width="40" height="40" className="rounded-circle mr-3"/>
-
-                  <div className="w-100">
-
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex flex-row align-items-center">
-                        <span className="mr-2">Brian selter</span>
-                        <small className="c-badge">Top Comment</small>
-                      </div>
-                    <small>12h ago</small>
-                    </div>
-                    <p className="text-justify comment-text mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam</p>
-                    <div className="d-flex flex-row user-feed">
-                      <span className="wish"><i className="fa fa-heartbeat mr-2"></i>24</span>
-                      <span className="ml-3"><i className="fa fa-comments-o mr-2"></i>Reply</span>
-                    </div>
-                  </div>
+                <div className="mt-2">
+                {comments ? comments.map((comment) => (
+                  <CommentBox key={comment.id} comment={comment} subComment={false}/>
+                )) : null}
                 </div>
-
-                <div className="d-flex flex-row p-3">
-                  <img src="https://i.imgur.com/3J8lTLm.jpg" width="40" height="40" className="rounded-circle mr-3"/>
-                  <div className="w-100">
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div className="d-flex flex-row align-items-center">
-                        <span className="mr-2">Seltos Majito</span>
-                        <small className="c-badge">Top Comment</small>
-                      </div>
-                      <small>2h ago</small>
-                    </div>
-                    <p className="text-justify comment-text mb-0">Tellus in hac habitasse platea dictumst vestibulum. Lectus nulla at volutpat diam ut venenatis tellus. Aliquam etiam erat velit scelerisque in dictum non consectetur. Sagittis nisl rhoncus mattis rhoncus urna neque viverra justo nec. Tellus cras adipiscing enim eu turpis egestas pretium aenean pharetra. Aliquam faucibus purus in massa.</p>
-                    <div className="d-flex flex-row user-feed">
-                      <span className="wish"><i className="fa fa-heartbeat mr-2"></i>14</span>
-                      <span className="ml-3"><i className="fa fa-comments-o mr-2"></i>Reply</span>
-                    </div>  
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -144,3 +90,63 @@ const Post = ({ id }) => {
 
 export default Post
 
+//FOR PRESENTATION
+//incremental stati regeneration
+//serverside probs video https://www.youtube.com/watch?v=Hb3Mo4kaI7E
+//Check client side data fetching as well
+
+/*export async function getServerSideProps(context) {
+
+  console.log("HALLO?")
+  context.res.setHeader('Chache-Control', 's-maxage=20,  stale-while-revalidate=60' );
+
+  const resComments = await fetch(`http://127.0.0.1:5001/getComments/${context.query.postID}`);
+  const postComments = await resComments.json();
+
+
+  return {
+    props: { postComments },
+  };
+
+}*/
+
+
+/*export async function getStaticPaths(){
+
+
+  const res = await fetch("http://127.0.0.1:5001/getComments/%");
+  const comments = await res.json();
+  
+  console.log(comments);
+
+  const paths = comments.map((comment) => ({
+      params: { postID: comment.postID.toString()},
+  }));
+
+  return {paths, fallback: 'blocking'}; //fallback true in case the page never has been rendered
+}
+
+export async function getStaticProps( { params } ){
+  
+  //Notice: Don't fetch the server directly, use api interface
+  const resComments = await fetch(`http://127.0.0.1:5001/getComments/${params.postID}`);
+  const comments = await resComments.json();
+  
+  return {
+    props: {
+      key: params.postID,
+      postID: params.postID,
+      postComments: comments,
+    },
+    revalidate: 10,
+  };
+}*/
+
+
+/*              <div className="mt-3 d-flex flex-row align-items-center p-3 form-color">
+
+                {avatar ? <Image src={avatar} width={50} height={50} className="rounded-circle mr-2" alt={steamid} /> : null}
+                <form id="commentInputForm" onSubmit={handleCommentSubmit}>
+                  <input required onChange={(e) => setCommentBox(e.target.value)} type="text" className="form-control" placeholder="Enter your comment..." id="commentBox"/>
+                </form>
+              </div>*/

@@ -200,7 +200,7 @@ function HomeWall(props) {
             <p>{posterInfo.personaname}</p>
             <Image src={posterInfo.avatarfull} width={50} height={50} className="rounded-circle mr-2" alt={posterInfo.personaname} />
             <p>{media.timestamp}</p>
-            <Post id={media.filenam} />
+            <Post postID={media.filenam} />
           </>
         )
         : <p>Loading</p>

@@ -21,7 +21,8 @@
     "react-dom": "18.2.0",
     "reactstrap": "^9.1.9",
     "socket.io-client": "^4.6.1",
-    "steam-web": "^0.7.0"
+    "steam-web": "^0.7.0",
+    "swr": "^2.1.5"
   },
   "proxy": "http://localhost:5000/"
 }

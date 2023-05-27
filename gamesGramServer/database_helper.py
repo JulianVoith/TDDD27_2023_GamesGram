@@ -267,3 +267,36 @@ def getFollowers(steamid):
     return followers[0]
     #else:
         #return False
+
+#create comment in a post on the database
+def createComment(commentID, likes, authorSteamID, postID, content):
+    try:
+    
+        cursor = get_db().execute(
+            "insert into postComments (commentID, likes, content, authorSteamID, postID, ts) values (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);", [commentID, likes, content, authorSteamID, postID],
+        )
+        get_db().commit()
+        cursor.close()
+        return True
+    except:
+        return False
+
+#get comments of a post from database
+def getComments(postID):
+    cursor = get_db().execute(
+        "select rowid, commentID, likes, content, authorSteamID, postID, ts from postComments where postID like ? and commentID like ? ORDER BY ts DESC;", [postID, 0]
+    )
+    comments = cursor.fetchall()
+    cursor.close()
+   # if followers != []:
+    return comments
+
+#get comments of a comment on a post from database
+def getSubComments(postID, commentID):
+    cursor = get_db().execute(
+        "select rowid, commentID, likes, content, authorSteamID, postID, ts from postComments where postID like ? AND commentID like ? ORDER BY ts DESC;", [postID, commentID]
+    )
+    comments = cursor.fetchall()
+    cursor.close()
+   # if followers != []:
+    return comments
