@@ -1,18 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-
+//Component for displaying post on a profile
 const PostWall = ({ userInfo, media }) => {
 
-  //let medias = media;
-  let url = "http://localhost:5001";//+ props.media.url; 
+  //TODO change to api
+  let url = "http://localhost:5001";
 
-  //userInfo can be empty
+  //get steamid of inspected user
   const steamid = userInfo ? userInfo.steamid : media.steamid;
 
-  //{mediae.filenam.split(".")[0]}`}
+  //Posts link back to [steamid]. once router query changes and postID is added, Modal is popping up and shows the image
   return (
-
     <div>
       {media.map((mediae) => (
         <Link

@@ -284,10 +284,10 @@ def getFollowers(steamid):
     )
     followers = cursor.fetchall()
     cursor.close()
-    # if followers != []:
-    return followers[0]
-    # else:
-    # return False
+    if followers != []:
+        return followers[0]
+    else:
+        return []
 
 
 # LIKE part
@@ -299,7 +299,6 @@ def isPostLiked(steamid, postID):
     )
     liked = cursor.fetchone()
     cursor.close()
-
     return False if liked[0] == 0 else True
 
 
@@ -338,14 +337,65 @@ def countPostLiked(postID):
         return liked[0]
     else:
         return 0  # Or whatever value is appropriate in your case
+    
+## commontLike
+# Check if a user has liked a specific comment
+def isCommentLiked(steamid, commentID):
+    cursor = get_db().execute(
+        "select count(*) from commentLikes where steamid = ? AND commentID = ?;",
+        [steamid, commentID],
+    )
+    liked = cursor.fetchone()
+    cursor.close()
+    return False if liked[0] == 0 else True
+
+
+# Handling user unlikes of comment
+def deleteCommentLiked(steamid, commentID):
+    try:
+        get_db().execute(
+            "delete from commentLikes where steamid like (?) and commentID like (?);",
+            [steamid, commentID],
+        )
+        get_db().commit()
+        return True
+    except:
+        return False
+
+
+# Handle users adding new likes to a comment
+def addCommentLiked(steamid, commentID):
+    try:
+        get_db().execute("insert into commentLikes values (?,?);", [steamid, commentID])
+        get_db().commit()
+        return True
+    except:
+        return False
+
+#get count of likes of a comment
+def countCommentLiked(commentID):
+    cursor = get_db().execute(
+        "select count(*) from commentLikes where commentID = ?;",
+        [commentID],
+    )
+    liked = cursor.fetchone()
+    cursor.close()
+    # Check if liked is None before trying to access it
+    if liked is not None:
+        return liked[0]
+    else:
+        return 0  # Or whatever value is appropriate in your case
+
+
+
 
 
 #create comment in a post on the database
-def createComment(commentID, likes, authorSteamID, postID, content):
+def createComment(commentID, authorSteamID, postID, content):
     try:
     
         cursor = get_db().execute(
-            "insert into postComments (commentID, likes, content, authorSteamID, postID, ts) values (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);", [commentID, likes, content, authorSteamID, postID],
+            "insert into postComments (commentID, content, authorSteamID, postID, ts) values (?, ?, ?, ?, CURRENT_TIMESTAMP);", [commentID, content, authorSteamID, postID],
         )
         get_db().commit()
         cursor.close()
@@ -356,7 +406,7 @@ def createComment(commentID, likes, authorSteamID, postID, content):
 #get comments of a post from database
 def getComments(postID):
     cursor = get_db().execute(
-        "select rowid, commentID, likes, content, authorSteamID, postID, ts from postComments where postID like ? and commentID like ? ORDER BY ts DESC;", [postID, 0]
+        "select rowid, commentID, content, authorSteamID, postID, ts from postComments where postID like ? and commentID like ? ORDER BY ts DESC;", [postID, 0]
     )
     comments = cursor.fetchall()
     cursor.close()
@@ -366,7 +416,7 @@ def getComments(postID):
 #get comments of a comment on a post from database
 def getSubComments(postID, commentID):
     cursor = get_db().execute(
-        "select rowid, commentID, likes, content, authorSteamID, postID, ts from postComments where postID like ? AND commentID like ? ORDER BY ts DESC;", [postID, commentID]
+        "select rowid, commentID, content, authorSteamID, postID, ts from postComments where postID like ? AND commentID like ? ORDER BY ts DESC;", [postID, commentID]
     )
     comments = cursor.fetchall()
     cursor.close()

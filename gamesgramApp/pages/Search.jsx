@@ -1,12 +1,15 @@
 
 import Sidebar from '@/components/Siderbar';
-import { useEffect, useState, useCallback,useContext } from 'react';
+import { useEffect, useState, useCallback, useContext } from 'react';
 import styles from '@/styles/Search.module.css';
 import {SearchBar,UserCard,Card} from '@/components/Search';
 
 export default function Search(){
 
+    //Hook for preserving search results
     const [searchResults, setSearchResults] = useState([]);
+
+    //Callback method to fetch results from child component
     const handlesearchResults = useCallback(
         (searchResults) => {
           // get searchResults from searchBar
@@ -15,7 +18,7 @@ export default function Search(){
         [searchResults]
     );
     
-    //constant for the sidebar selection css which is passed as a prop
+    //Constant for the sidebar selection highlight which is passed as a prop to child components
     const SidebarSelect = 
                           {home: "nav-link text-white",
                           search: "nav-link active",

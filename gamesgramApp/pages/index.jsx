@@ -1,60 +1,45 @@
 import styles from '../styles/Home.module.css';
 import { useEffect, useState, useContext } from 'react';
 import Head from 'next/head';
-import Image from 'next/image';
 import Sidebar from '@/components/Siderbar';
 import LoginWSteam from '@/components/Login&SignUp/loginWSteam';
+import HomeWall from '@/components/HomeWall';
 import { useRouter } from 'next/router';
 import Context from '@/context/Context';
-//import { io } from 'socket.io-client';// import the socket
-//import { createHash } from 'crypto'//Hash
-import Post from '@/components/Post';
-import { GetUserInfo } from '@/components/Tools/getUserInfo'
 
-//function sha256(content) {
-//return createHash('sha256').update(content).digest('hex')
-///}
-
-//let socket
-
+//Start page of GamesGram app
 export default function Home() {
-  const [hastoken, setToken] = useState(false); //Hook for generated token
+
+  //Hooks for data handling (token, user, posts)
+  const [hastoken, setToken] = useState(false);          //Hook for generated token
   const { userInfo, setuserInfo } = useContext(Context); //Hook for feteched usert information
-  const router = useRouter() //Variable for dynamic routing
-
-  const [mediaPosts, setMediaPosts] = useState(null);
-
-  //set token
+  const router = useRouter()                             //Router for variable for dynamic routing
+  const [mediaPosts, setMediaPosts] = useState(null);    //Hook for Posts
+  //On mount of index page check if token is (Signed in) in local storage
+  //Forward to home page of the platform
   useEffect(() => {
     // Check if it is running in a browser environment
     if (typeof window !== "undefined") {
-      // Find the value with token as key in localStorage
+      //Check token in local storage and set token hook
       if (window.localStorage.getItem("token")) {
         setToken(true);
-
       }
       else {
         setToken(false);
       }
-
     }
   }, []);
 
-
-
+//Method: Fetch posts from server and store in state mediaPosts
   const GetPost = async () => {
-
     try {
-
       if (window.localStorage.getItem("token") && userInfo) {
         // API endpoint where we send form data.
         const endpoint = `/api/getHome/${userInfo.steamid}`
 
         // Form the request for sending data to the server.
         const options = {
-          // The method is POST because we are sending data.
           method: 'GET',
-          // Tell the server we're sending JSON.
           headers: {
             'Content-Type': 'application/json',
             'token': window.localStorage.getItem("token"),
@@ -69,18 +54,16 @@ export default function Home() {
     }
   }
 
+  //TODO:replace with swr and user hook
   const GetuserInfo = async () => {
 
     if (!userInfo && window.localStorage.getItem("token")) {
 
       // API endpoint where we send form data.
       const endpoint = '/api/GetUserInfo'
-
       // Form the request for sending data to the server.
       const options = {
-        // The method is POST because we are sending data.
         method: 'GET',
-        // Tell the server we're sending JSON.
         headers: {
           'Content-Type': 'application/json',
           'token': window.localStorage.getItem("token"),
@@ -95,13 +78,9 @@ export default function Home() {
       window.localStorage.setItem("avatar", data.response.players[0].avatar);
     }
   }
+  useEffect(() => {GetuserInfo();}, [hastoken]);
 
-  useEffect(() => {
-    GetuserInfo();
-  }, [hastoken]);
-
-
-
+//Method: If authentification with steam servers were successful, token will be set and main page is called
   const handleLogin = (token) => {
     if (typeof window !== 'undefined' && typeof token !== 'undefined') {
       localStorage.setItem("token", token);
@@ -110,38 +89,35 @@ export default function Home() {
     }
   };
 
+  // Send the information to server once reciverd steam server information
+  // and handleLogin
+  useEffect(() => {postData();}, [router.query]);
+  const postData = async () => {
+    if (Object.keys(router.query).length !== 0 && !hastoken) {
+      const JSONdata = JSON.stringify(router.query);
+      // API endpoint where we send form data.
+      const endpoint = '/processSteamLogin';
+      // Form the request for sending data to the server.
+      const options = {
+        // The method is POST because we are sending data.
+        method: 'POST',
+        // Tell the server we're sending JSON.
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Body of the request is the JSON data we created above.
+        body: JSONdata,
+      };
 
-  useEffect(() => {
-    const postData = async () => {
-      if (Object.keys(router.query).length !== 0 && !hastoken) {
-        const JSONdata = JSON.stringify(router.query);
+      // Send the form data to our forms API on Vercel and get a response.
+      const response = await fetch(endpoint, options);
+      const data = await response.json();
+      handleLogin(data.token);
+    }
+  };
 
-        // API endpoint where we send form data.
-        const endpoint = '/processSteamLogin';
 
-        // Form the request for sending data to the server.
-        const options = {
-          // The method is POST because we are sending data.
-          method: 'POST',
-          // Tell the server we're sending JSON.
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          // Body of the request is the JSON data we created above.
-          body: JSONdata,
-        };
-
-        // Send the form data to our forms API on Vercel and get a response.
-        const response = await fetch(endpoint, options);
-        const data = await response.json();
-        handleLogin(data.token);
-      }
-    };
-    postData();
-
-  }, [router.query]);
-
-  //constant for the sidebar selection css which is passed as a prop
+  //Constant for the sidebar selection highlight which is passed as a prop to child components
   const SidebarSelect =
   {
     home: "nav-link active",
@@ -152,15 +128,12 @@ export default function Home() {
     signout: "nav-link text-white"
   };
 
+  //TODO: replace with swr
   //set HomePost
   useEffect(() => {
     //Now the post only fetch once, it should be a onlisten event 
     //TODO: add onlisten event depend on Websocket
-    if (!mediaPosts) {
-
-      GetPost();
-    }
-  }, [userInfo]);
+    if (!mediaPosts) { GetPost();}}, [userInfo]);
 
 
   return (
@@ -181,40 +154,4 @@ export default function Home() {
       </main>
     </div>
   )
-}
-
-function HomeWall(props) {
-  const media = props.media
-  const [posterInfo, setPosterInfo] = useState(null);
-
-  useEffect(() => {
-    if (!posterInfo) {
-      fetchPosterInfo();
-    }
-  }, [])
-
-  const fetchPosterInfo = async () => {
-    const data = await GetUserInfo(media.steamid);
-    setPosterInfo(data[0]);
-  };
-
-
-  return (
-    <div className={styles.homeWall}>
-      {posterInfo ?
-        (
-          <>
-            <div className={styles.posterInfo}>
-              <Image src={posterInfo.avatarfull} width={50} height={50} className="rounded-circle mr-2" alt={posterInfo.personaname} />
-              <p>{posterInfo.personaname}</p>
-            </div>
-            <p className={styles.timestamp}>{media.timestamp}</p>
-            <Post key={media.filenam} postID={media.filenam} />
-          </>
-        )
-        : <p>Loading</p>
-      }
-    </div>
-  )
-
 }

@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router';
-
 import { useEffect, useState, useContext } from 'react';
 import Sidebar from '@/components/Siderbar';
 import Profile from '@/components/Profile';
@@ -8,16 +7,22 @@ import PostWall from '@/components/PostWall';
 import Post from '@/components/Post';
 import { Modal } from 'react-bootstrap';
 
+
+//MODAL FOR STEAM FRIENDS?????
+//TODO change mediapost layout
+
 const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => { 
-  const [userViewInfo,setUserInfo] = useState(dataUserInfo); 
-  const [follower,setFollower] = useState(userFollower); 
-  const [friends,setFriends] = useState(userFriends); 
 
-  const [mediaPosts,setMediaPosts] = useState(userPosts); 
+  //Data hooks for user profile information
+  const [userViewInfo,setUserInfo] = useState(dataUserInfo); //Information about inspected user
+  const [follower,setFollower] = useState(userFollower);     //Follower of inspected user
+  const [friends,setFriends] = useState(userFriends);        //Firends of inspected user
+  const [mediaPosts,setMediaPosts] = useState(userPosts);    //Posts of inspected user
 
+  //React router variable
   const router = useRouter();
   
-  //constant for the sidebar selection css which is passed as a prop
+  //Constant for the sidebar selection highlight which is passed as a prop to child components
   const SidebarSelect = 
                         {home: "nav-link text-white",
                         search: "nav-link text-white",
@@ -26,21 +31,16 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
                         profile: "nav-link active",
                         signout: "nav-link text-white"};
 
-  //TODO change mediapost layout
   return (
     <main>
      <div>
       <Modal
         show={!!router.query.postID}
         size="lg"
-        onHide={() => router.push(`/${userViewInfo[0].steamid}`, undefined, { scroll: false })}
-        //contentLabel="Post modal"
-      >
+        onHide={() => router.push(`/${userViewInfo[0].steamid}`, undefined, { scroll: false })}>
       <Modal.Header>Details</Modal.Header>  
       <Modal.Body>
-
           <Post postID={router.query.postID} urlPost={router.query.urlPost} pathname={router.pathname} />
-        
       </Modal.Body>
       </Modal>
     </div> 
@@ -49,7 +49,7 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
         <div className={styles.one}><Sidebar selection={SidebarSelect}/></div>
         <div><Profile userInfo={userViewInfo[0]} follower={follower} friends={friends}/></div>
     </div>
-    <div>
+    <div className={styles.two}>
       {mediaPosts&&userViewInfo ? <PostWall userInfo={userViewInfo[0]} media={mediaPosts} />: "No posts available"}:
     </div>
 </main>
@@ -58,8 +58,9 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
 
 export default UserProfile;
 
+//Server side prerendering of all profile routes (existing database users)
+//In case friends are getting inspected which do not have a profile, it will be generated (fallback:blocking)
 export async function getStaticPaths(){
-
 
   const res = await fetch("http://127.0.0.1:5001/getUsers");
   const users = await res.json();
@@ -68,17 +69,20 @@ export async function getStaticPaths(){
       params: { steamid: steamid.toString()},
   }));
 
-  return {paths, fallback: false}; //fallback true in case the page never has been rendered
+  return {paths, fallback: 'blocking'}; 
 }
 
+//Generating props for profile. Includes use information (posts, follower, and friends)
 export async function getStaticProps( { params } ){
   
   //Notice: Don't fetch the server directly, use api interface
+  //Fetching data from server
   const resuserInfo = await fetch(`http://127.0.0.1:5001/GetUserInfo/${params.steamid}`);
   const resposts = await fetch(`http://127.0.0.1:5001/getPosts/${params.steamid}`);
   const refollows = await fetch(`http://127.0.0.1:5001/getFollowers/${params.steamid}`);
   const refriends = await fetch(`http://127.0.0.1:5001/GetFriendList/${params.steamid}`);
 
+  //Generate variables from response JSON
   const dataUserInfoJ = await resuserInfo.json();
   const posts = await resposts.json();
   const follower = await refollows.json();

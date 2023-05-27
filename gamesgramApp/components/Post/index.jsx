@@ -1,14 +1,12 @@
 import Image from 'next/image';
-import Context from '@/context/Context';
 import { useState, useEffect, useContext } from 'react';
 
 import useSWR from 'swr';
 import CommentBox from './commentBox';
-import { useRouter } from 'next/router';
 import CommentSubmit from './commentSubmit';
 
 
-
+//TODO adjust and comment
 const Post = ({ postID }) => {
 
     const [liked, setLiked] = useState(undefined);
@@ -20,16 +18,14 @@ const Post = ({ postID }) => {
     const { data: comments } = useSWR(commentsEnabled ? `/api/getComments/${postID}`: null, fetcher, { refreshInterval: 1000 }); //can fetch with token and preload on hover or whatever, allows subscribing to real-time data source or websocket
 
  
+  //Check if the post is liked
+  useEffect(() => {checkLiked();}, [postID]);
+
+  //Get like count once [liked] state changes
+  useEffect(() => {getLikeCount();}), [liked];
 
 
-  useEffect(() => {
-    checkLiked();
-  }, [id]);
-
-  useEffect(() => {
-    getLikeCount();
-  }), [liked];
-
+  //Get like count every second
   useEffect(() => {
     const interval = setInterval(() => {
       getLikeCount();
@@ -41,7 +37,7 @@ const Post = ({ postID }) => {
 
   const checkLiked = async () => {
     if (window.localStorage.getItem("token")) {
-      const endpoint = `/api/PostLike/${id}`
+      const endpoint = `/api/PostLike/${postID}`
       const options = {
         method: 'HEAD',
         headers: {
@@ -56,7 +52,7 @@ const Post = ({ postID }) => {
   };
   const deleteLike = async () => {
     if (window.localStorage.getItem("token")) {
-      const endpoint = `/api/PostLike/${id}`
+      const endpoint = `/api/PostLike/${postID}`
 
       const options = {
         method: 'DELETE',
@@ -71,7 +67,7 @@ const Post = ({ postID }) => {
   };
   const createLike = async () => {
     if (window.localStorage.getItem("token")) {
-      const endpoint = `/api/PostLike/${id}`
+      const endpoint = `/api/PostLike/${postID}`
       const options = {
         method: 'POST',
         headers: {
@@ -86,7 +82,7 @@ const Post = ({ postID }) => {
 
   const getLikeCount = async () => {
     if (window.localStorage.getItem("token")) {
-      const endpoint = `/api/PostLike/${id}`
+      const endpoint = `/api/PostLike/${postID}`
       const options = {
         method: 'GET',
         headers: {

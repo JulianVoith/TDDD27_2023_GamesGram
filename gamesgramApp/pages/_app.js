@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }) {
     // Check if we're in a browser environment
     if (typeof window !== "undefined") {
       // Establish the WebSocket connection
-      const ws = new WebSocket("ws://127.0.0.1:5000/");
+      const ws = new WebSocket("ws://127.0.0.1:5001/");
       setSocket(ws);
 
       ws.onopen = function (event) {

@@ -1,21 +1,14 @@
-import { useEffect, useState, useContext } from 'react';
-import { useRouter } from 'next/router';
-import {Button,Modal,Form, Container, Row} from 'react-bootstrap';
-import Context from '@/context/Context';
+import { useEffect, useState } from 'react';
+import {Button} from 'react-bootstrap';
 
-//TODO: Implementation of follow
+
+//Component for following fucntionality 
 export default function  Follow(props){
-    //different display depending on profile
-    //your own profile? maybe disapear
-    //others depending on follow or not follow. possibility to unfollow
-
-    //TODO: Implementation of follow
-    //check if has followed
-
 
     //Followed  -> True means has followed, False means has not followed
     const [Followed, updateFollowed] = useState(undefined);
 
+    
     useEffect(() => {
       const checkAndSetFollowed = async () => {
         const followers = await checkFollowed();
@@ -66,7 +59,7 @@ export default function  Follow(props){
     }
 
     const unFollow = async() => {
-        const endpoint = `/api/unfollow/${props.userInfo.steamid}`;
+        const endpoint = `/api/follow/${props.userInfo.steamid}`;
           const options = {
             method: 'DELETE',
             headers: {

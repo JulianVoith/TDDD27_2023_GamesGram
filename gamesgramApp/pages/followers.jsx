@@ -5,6 +5,7 @@ import {Card} from '@/components/Search';
 import styles from '@/styles/Home.module.css';
 import Sidebar from '@/components/Siderbar';
 
+//Now follower page yet might be there in the futur
 export default function Followers(){
 
 }

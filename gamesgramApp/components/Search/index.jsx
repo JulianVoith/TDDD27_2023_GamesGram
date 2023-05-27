@@ -6,17 +6,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 export function SearchBar(props){
-    const [searchTerm, setSearchTerm] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
+
+  //Data hooks for user search
+    const [searchTerm, setSearchTerm] = useState('');       //Hook for modifying the search bar
+    const [searchResults, setSearchResults] = useState([]); //Hook to display the results of the search
   
+    //TODO: replace with swr
     useEffect(() => {
       const fetchData = async () => {
         if (typeof searchTerm !== '') {
           const endpoint =`/api/search/${searchTerm}`;
           const options = {
-            // The method is POST because we are sending data.
             method: 'GET',
-            // Tell the server we're sending JSON.
             headers: {
               'Content-Type': 'application/json',
             },};
@@ -33,7 +34,8 @@ export function SearchBar(props){
   
       fetchData();
     }, [searchTerm]);
-
+    
+    //Method: Communicate search result back to father component
     useEffect(()=>{
       props.onSearch(searchResults);
     },[searchResults]);
@@ -52,6 +54,7 @@ export function SearchBar(props){
       );
 }
 
+//TODO: export to own files and commenting
 export function UserCard(props){
   const [usersInfo, setUsersInfo] = useState(null);
 

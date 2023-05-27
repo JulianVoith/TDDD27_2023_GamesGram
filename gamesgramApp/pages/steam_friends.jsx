@@ -6,12 +6,15 @@ import {Card} from '@/components/Search';
 import styles from '@/styles/Home.module.css';
 import Sidebar from '@/components/Siderbar';
 
+
+//TODO commenting and check if it works!
 const SteamFriends = () => {
+
   const [FriendsInfo,setFriendsInfo] = useState(null)
   const [myInfo,setMyInfo] = useState(null);
   const { nFriends } = useContext(Context);
 
-  //constant for the sidebar selection css which is passed as a prop
+  //Constant for the sidebar selection highlight which is passed as a prop to child components
   const SidebarSelect = 
       {home: "nav-link text-white",
       search: "nav-link text-white",

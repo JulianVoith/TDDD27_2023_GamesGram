@@ -1,16 +1,22 @@
 import Image from 'next/image';
 import { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
-import { Button, Modal, Form, Container, Row } from 'react-bootstrap';
 import Context from '@/context/Context';
-import Follow from '@/components/Profile/Follow';
-import RecentGame from "@/components/Profile/resentGame";
+import Follow from './Follow';
+import RecentGame from "./recentGame";
+import CreatePost from "./createPost";
 
+//Component for the profile header which is ng informatione like follower etc.
 export default function profile(props) {
+
+    //react router variable
     const router = useRouter()
+
+    //Data Hooks for user context, logged in user and recent games
     const { userInfo } = useContext(Context);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [Game, setGame] = useState(null);
+
 
     //TODO:small adjustment as link!
     const routeToSteam_friends = () => {
@@ -19,7 +25,7 @@ export default function profile(props) {
         });
     };
 
-    //TODO: maybe google if there is a better way
+    //TODO: change by useUser hook
     useEffect(() => {
         if (userInfo && !loggedInUser) {
             initFields();
@@ -36,6 +42,7 @@ export default function profile(props) {
     const initFields = () => {
         setLoggedInUser(userInfo.steamid);
     };
+
 
     return (
 
@@ -64,7 +71,7 @@ export default function profile(props) {
                                     <span className="text-muted"> followers</span>
                                 </a>
                                 <br />
-                                <a /*href="/steam_friends"*/ onClick={routeToSteam_friends} className="d-inline-block text-dark ml-3" >
+                                <a onClick={routeToSteam_friends} className="d-inline-block text-dark ml-3" >
                                     <strong>{props.friends["friendslist"]["friends"].length}</strong>
                                     <span className="text-muted"> Steam friends</span>
                                 </a>
@@ -72,13 +79,9 @@ export default function profile(props) {
                             <br />
                             {loggedInUser ?
                                 (loggedInUser !== props.userInfo.steamid ? <Follow userInfo={props.userInfo} /> : <CreatePost gameCategory={Game} />) : null}
-
                         </div>
-
                     </div>
-
                     <div>
-
                         {<RecentGame onGameSet={handleGameSet} steamid={props.userInfo.steamid} />}
                     </div>
                     <ul className="nav nav-tabs tabs-alt justify-content-center">
@@ -94,138 +97,4 @@ export default function profile(props) {
     );
 
 }
-
-//function to create a post
-function CreatePost(props) {
-    const [show, setShow] = useState(false);
-    const Games = props.gameCategory;
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    //hook for form data
-    const [formData, setFormData] = useState({
-        descr: "",
-        file: null,
-        access: 1,
-        category: 111
-    });
-
-
-
-    //handleinput to save current states into hook
-    const handleInput = (e) => {
-        const fieldName = e.target.name;
-        const fieldValue = e.target.value;
-
-        //fileupload needs different handling then others
-        if (fieldName == "file") {
-            setFormData((prevState) => ({
-                ...prevState,
-                [fieldName]: e.target.files[0]
-            }));
-        } else {
-            setFormData((prevState) => ({
-                ...prevState,
-                [fieldName]: fieldValue
-            }));
-        }
-
-    }
-
-    //sending form data to backend
-    const handleSubmit = async (event) => {
-        //preventing auto refresh
-        event.preventDefault();
-
-        //creation of formdata for post
-        let postData = new FormData();
-
-        //append postData for request
-        postData.append("descr", formData.descr);
-        postData.append("file", formData.file);
-        postData.append("access", formData.access);
-        postData.append("category", formData.category);
-
-
-        // API endpoint where we send form data.
-        const endpoint = '/api/createPost'
-
-        // Form the request for sending data to the server.
-        const options = {
-            // The method is POST because we are sending data.
-            method: 'POST',
-            // Tell the server we're sending JSON.
-            headers: {
-                //'Content-Type': 'multipart/form-data',
-                'token': localStorage.getItem("token"),//window.localStorage.getItem("token"),
-            },
-            // Body of the request is the JSON data we created above.
-            body: postData,
-        }
-
-        // Send the form data to our forms API on Vercel and get a response.
-        const response = await fetch(endpoint, options); //, options)
-
-        if (!response.ok) {
-            console.log("error");
-        } else {
-            console.log("success");
-        }
-
-        //close modal
-        setShow(false);
-        //return false;
-    };
-
-    //create post modal with all components
-    return (
-        <>
-            <Button variant="primary" onClick={handleShow}>
-                Create Post
-            </Button>
-
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Create Post</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form id="uploadForm">
-                        <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control as="textarea" rows={3} name="descr" onChange={handleInput} required />
-                        </Form.Group>
-                        <Form.Group controlId="formFile" className="mb-3">
-                            <Form.Label>Select file</Form.Label>
-                            <Form.Control type="file" accept="image/*, video/*, audio/*" name="file" onChange={handleInput} required />
-                        </Form.Group>
-                        <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>Who should see your post?</Form.Label>
-                            <Form.Select aria-label="Default select example" name="access" onChange={handleInput}>
-                                <option value="1">Everyone</option>
-                                <option value="2">Followers</option>
-                                <option value="3">Steam friends</option>
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group controlId="formFile" className="mb-3">
-                            <Form.Label>Category/Game</Form.Label>
-                            <Form.Select aria-label="Default select example" name="categroy" onChange={handleInput}>
-                                {Games ? Games.map((gameInfo) => (<option key={gameInfo.appid} value={gameInfo.appid}>{gameInfo.name}</option>)) : <p>Loading</p>}
-
-                            </Form.Select>
-                        </Form.Group>
-
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button type="submit" form="uploadForm" variant="primary" onClick={handleSubmit}>
-                        Upload
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
-    );
-}
-
 

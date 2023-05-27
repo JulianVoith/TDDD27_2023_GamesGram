@@ -79,6 +79,10 @@ module.exports = () => {
       {
         source: "/api/PostLike/:path*",
         destination: "http://127.0.0.1:5001/PostLike/:path*",
+      },
+      {
+        source: "/api/CommentLike/:path*",
+        destination: "http://127.0.0.1:5001/CommentLike/:path*",
       }
           ];
   };

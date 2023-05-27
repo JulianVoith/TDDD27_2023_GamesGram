@@ -19,18 +19,18 @@ from flask import (
     send_from_directory,
     session,
 )
-from flask_bcrypt import Bcrypt  # DOCU
+#from flask_bcrypt import Bcrypt  # DOCU
 from flask_cors import CORS, cross_origin
 from flask_restful import Api, Resource, fields, marshal_with, reqparse
-from flask_sock import Sock  # DOCU
+#from flask_sock import Sock  # DOCU
 from pysteamsignin.steamsignin import SteamSignIn  # import for steam signin
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 api = Api(app)
-sockets = Sock(app)
-bcrypt = Bcrypt(app)
+#sockets = Sock(app)
+#bcrypt = Bcrypt(app)
 CORS(app, resources={r"/*": {"origins": "*"}})  # enable CORS on all routes
 
 # global dictionary for all active websockets
@@ -63,29 +63,29 @@ api.add_resource(Message, "/hello")
 
 
 # route for socket creation
-@sockets.route("/")
-def echo_socket(sockets):
+#@sockets.route("/")
+#def echo_socket(sockets):
     # run websocket until it is closed down
-    print("CONNECTED")
-    while True:
+#    print("CONNECTED")
+#    while True:
         # receive email and hexcode of the token from client
-        payload = json.loads(sockets.receive())
+#        payload = json.loads(sockets.receive())
         # split it up into variables
-        steamid = payload["steamid"]
+#        steamid = payload["steamid"]
         # HEX = payload["HEX"]
 
         # check if there is an active session of the user
-        activeSession = database_helper.activeSessionSteamid(steamid)
+#        activeSession = database_helper.activeSessionSteamid(steamid)
         # fetch the token from the database and hash it
         # REHEX = sha256(activeSession.encode("utf-8")).hexdigest()
 
         # check if there is an active session and the transmitted and genereted hex code are the same
-        if activeSession:
+#        if activeSession:
             # replace users ws with new one after e.g. a refresh, if combination is new add it (stored by the hex)
-            client_list[steamid] = sockets
-            print(client_list)
-        else:
-            sockets.close(1000, "signOut")
+#            client_list[steamid] = sockets
+#ß            print(client_list)
+#        else:
+#            sockets.close(1000, "signOut")
 
 
 @api.resource("/login")  # Not in use now
@@ -357,7 +357,7 @@ class PostLike(Resource):
         token = request.headers.get("token")
         if database_helper.activeSession(token):
             steamid = database_helper.getSteamidByToken(token)
-            if database_helper.isPostLiked(steamid, postID):
+            if database_helper.isCommentLiked(steamid, postID):
                 return "", 200  # ok
             else:
                 return "", 404  # no found
@@ -369,7 +369,7 @@ class PostLike(Resource):
         token = request.headers.get("token")
         if database_helper.activeSession(token):
             steamid = database_helper.getSteamidByToken(token)
-            if database_helper.deletePostLiked(steamid, postID):
+            if database_helper.deleteCommentLiked(steamid, postID):
                 return "", 200  # ok
             else:
                 return "", 404  # no found
@@ -381,7 +381,7 @@ class PostLike(Resource):
         token = request.headers.get("token")
         if database_helper.activeSession(token):
             steamid = database_helper.getSteamidByToken(token)
-            if database_helper.addPostLiked(steamid, postID):
+            if database_helper.addCommentLiked(steamid, postID):
                 return "", 201  # created
             else:
                 return "", 404  # no found
@@ -391,7 +391,59 @@ class PostLike(Resource):
     def get(self, postID):
         token = request.headers.get("token")
         if database_helper.activeSession(token):
-            result = database_helper.countPostLiked(postID)
+            result = database_helper.countCommentLiked(postID)
+            return make_response(jsonify({"likesCount": result}), 200)  # ok
+        else:
+            return "", 401  # Unauthorized
+
+
+
+# Interface about comment like system
+# @head -> # Check if a user has liked a specific comment
+# @delete ->  # Handling user unlikes of comment
+# @post ->  # Handle users adding new likes of a comment
+@api.resource("/CommentLike/<string:commentID>")
+class CommentLike(Resource):
+    def head(self, commentID):
+        # Check if a user has liked a specific post
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.isPostLiked(steamid, commentID):
+                return "", 200  # ok
+            else:
+                return "", 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def delete(self, commentID):
+        # Handling user unlikes of posts
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.deletePostLiked(steamid, commentID):
+                return "", 200  # ok
+            else:
+                return "", 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def post(self, commentID):
+        # Handle users adding new likes
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.addPostLiked(steamid, commentID):
+                return "", 201  # created
+            else:
+                return "", 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def get(self, commentID):
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            result = database_helper.countPostLiked(commentID)
             return make_response(jsonify({"likesCount": result}), 200)  # ok
         else:
             return "", 401  # Unauthorized
@@ -455,6 +507,7 @@ class GetHome(Resource):
         followers.append(steamid)
         for follower in database_helper.getFollowers(steamid):
             followers.append(str(follower))
+            print("!!!",followers)
         for follow in followers:
             # fatch all post
             posts = database_helper.getUserPosts(follow)
@@ -529,6 +582,7 @@ class GetUsers(Resource):
 # function for setting up follower
 @api.resource("/follow/<string:followid>")
 class Follow(Resource):
+    # function for following
     def get(self, followid):
         token = request.headers.get("token")
         if database_helper.activeSession(token):
@@ -539,11 +593,7 @@ class Follow(Resource):
                 return "", 500
         else:
             return "", 401  # unauthorized
-
-
-# function for unfollow
-@api.resource("/unfollow/<string:followid>")
-class Unfollow(Resource):
+    # function for unfollowing
     def delete(self, followid):
         token = request.headers.get("token")
         if database_helper.activeSession(token):
@@ -580,7 +630,7 @@ class SendComment(Resource):
         token = request.headers.get("token")
         if database_helper.activeSession(token):
             commentData = request.json
-            if database_helper.createComment(commentData["commentID"], commentData["likes"], commentData["authorSteamID"], commentData["postID"], commentData["content"]):
+            if database_helper.createComment(commentData["commentID"], commentData["authorSteamID"], commentData["postID"], commentData["content"]):
                 return "", 201  # successfully created
             else:
                 return "", 500 # internal server error
