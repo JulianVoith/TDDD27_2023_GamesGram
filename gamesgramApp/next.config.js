@@ -2,7 +2,6 @@
 
 // next.config.js
 module.exports = () => {
-
   const rewrites = () => {
     return [
       {
@@ -38,8 +37,8 @@ module.exports = () => {
         destination: "http://127.0.0.1:5001/createPost/:path*",
       },
       {
-      source: "/api/getUsers/:path*",
-      destination: "http://127.0.0.1:5001/getUsers/:path*",
+        source: "/api/getUsers/:path*",
+        destination: "http://127.0.0.1:5001/getUsers/:path*",
       },
       {
         source: "/api/getPosts/:path*",
@@ -76,24 +75,31 @@ module.exports = () => {
       {
         source: "/api/getComments/:path*",
         destination: "http://127.0.0.1:5001/getComments/:path*",
+      },
+      {
+        source: "/api/PostLike/:path*",
+        destination: "http://127.0.0.1:5001/PostLike/:path*",
       }
-    ];
+          ];
   };
 
   return {
     images: {
-      domains: ["steamcdn-a.akamaihd.net","avatars.akamai.steamstatic.com","localhost"],
+      domains: [
+        "steamcdn-a.akamaihd.net",
+        "avatars.akamai.steamstatic.com",
+        "localhost",
+      ],
       unoptimized: true,
       remotePatterns: [
         {
-          protocol: 'http',
-          hostname: 'localhost',
-          port: '5001',
-          pathname: '/image_feed/**',
-        }
+          protocol: "http",
+          hostname: "localhost",
+          port: "5001",
+          pathname: "/image_feed/**",
+        },
       ],
     },
     rewrites,
   };
-
 };

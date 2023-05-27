@@ -19,20 +19,18 @@ from flask import (
     send_from_directory,
     session,
 )
-
-# from flask_bcrypt import Bcrypt  # DOCU
+from flask_bcrypt import Bcrypt  # DOCU
 from flask_cors import CORS, cross_origin
 from flask_restful import Api, Resource, fields, marshal_with, reqparse
-
-# from flask_sock import Sock  # DOCU
+from flask_sock import Sock  # DOCU
 from pysteamsignin.steamsignin import SteamSignIn  # import for steam signin
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 api = Api(app)
-# sockets = Sock(app)
-# bcrypt = Bcrypt(app)
+sockets = Sock(app)
+bcrypt = Bcrypt(app)
 CORS(app, resources={r"/*": {"origins": "*"}})  # enable CORS on all routes
 
 # global dictionary for all active websockets
@@ -65,29 +63,29 @@ api.add_resource(Message, "/hello")
 
 
 # route for socket creation
-# @sockets.route("/")
-# def echo_socket(sockets):
-# run websocket until it is closed down
-#    print("CONNECTED")
-#    while True:
-# receive email and hexcode of the token from client
-#        payload = json.loads(sockets.receive())
-# split it up into variables
-#        steamid = payload["steamid"]
-# HEX = payload["HEX"]
+@sockets.route("/")
+def echo_socket(sockets):
+    # run websocket until it is closed down
+    print("CONNECTED")
+    while True:
+        # receive email and hexcode of the token from client
+        payload = json.loads(sockets.receive())
+        # split it up into variables
+        steamid = payload["steamid"]
+        # HEX = payload["HEX"]
 
-# check if there is an active session of the user
-#        activeSession = database_helper.activeSessionSteamid(steamid)
-# fetch the token from the database and hash it
-# REHEX = sha256(activeSession.encode("utf-8")).hexdigest()
+        # check if there is an active session of the user
+        activeSession = database_helper.activeSessionSteamid(steamid)
+        # fetch the token from the database and hash it
+        # REHEX = sha256(activeSession.encode("utf-8")).hexdigest()
 
-# check if there is an active session and the transmitted and genereted hex code are the same
-#        if activeSession:
-# replace users ws with new one after e.g. a refresh, if combination is new add it (stored by the hex)
-#            client_list[steamid] = sockets
-#            print(client_list)
-#        else:
-#            sockets.close(1000, "signOut")
+        # check if there is an active session and the transmitted and genereted hex code are the same
+        if activeSession:
+            # replace users ws with new one after e.g. a refresh, if combination is new add it (stored by the hex)
+            client_list[steamid] = sockets
+            print(client_list)
+        else:
+            sockets.close(1000, "signOut")
 
 
 @api.resource("/login")  # Not in use now
@@ -166,8 +164,11 @@ class GetRecentlyPlayedGames(Resource):
         params = {"key": api_key, "steamid": steamid, "count": 0}
         url = "https://api.steampowered.com/IPlayerService/GetRecentlyPlayedGames/v1/"
         response = requests.get(url, params)
-        result = json.loads(response.content)["response"]["games"]
-        return make_response(jsonify(result), 200)  # OK
+        if "games" in json.loads(response.content)["response"]:
+            result = json.loads(response.content)["response"]["games"]
+            return make_response(jsonify(result), 200)  # OK
+        else:
+            return 404  # NO FOUND
 
 
 @api.resource("/GetFriendList/<string:steamid>")
@@ -345,6 +346,57 @@ class CreatePost(Resource):
             return "", 401  # Unauthorized
 
 
+# Interface about post like system
+# @head -> # Check if a user has liked a specific post
+# @delete ->  # Handling user unlikes of posts
+# @post ->  # Handle users adding new likes
+@api.resource("/PostLike/<string:postID>")
+class PostLike(Resource):
+    def head(self, postID):
+        # Check if a user has liked a specific post
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.isPostLiked(steamid, postID):
+                return "", 200  # ok
+            else:
+                return "", 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def delete(self, postID):
+        # Handling user unlikes of posts
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.deletePostLiked(steamid, postID):
+                return "", 200  # ok
+            else:
+                return "", 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def post(self, postID):
+        # Handle users adding new likes
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            steamid = database_helper.getSteamidByToken(token)
+            if database_helper.addPostLiked(steamid, postID):
+                return "", 201  # created
+            else:
+                return "", 404  # no found
+        else:
+            return "", 401  # Unauthorized
+
+    def get(self, postID):
+        token = request.headers.get("token")
+        if database_helper.activeSession(token):
+            result = database_helper.countPostLiked(postID)
+            return make_response(jsonify({"likesCount": result}), 200)  # ok
+        else:
+            return "", 401  # Unauthorized
+
+
 # Interface for creating a post with media
 @api.resource("/getPosts/<string:steamid>")
 class GetPosts(Resource):
@@ -445,7 +497,7 @@ def image_feed(image):
     mimetype = "image/" + mime[2]
     # method to stream image for Response
     def gen(imagename):
-        print("!",imagename)
+        print("!", imagename)
         # get image and stream
         image = open(
             upload_path_img + imagename, "rb"
@@ -567,4 +619,4 @@ class GetComments(Resource):
         
 
 if __name__ == "__main__":
-    app.run(debug=True,port=5001)
+    app.run(debug=True, port=5001)

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Context from '@/context/Context';
-import { useState, useEffect,useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 
 import useSWR from 'swr';
 import CommentBox from './commentBox';
@@ -11,7 +11,8 @@ import CommentSubmit from './commentSubmit';
 
 const Post = ({ postID }) => {
 
-    
+    const [liked, setLiked] = useState(undefined);
+    const [likesCount, setLikesCount] = useState(undefined);
     const [commentsEnabled, setCommentsEnabled] = useState(false);
 
     //test of different data fetching
@@ -21,6 +22,90 @@ const Post = ({ postID }) => {
  
 
 
+  useEffect(() => {
+    checkLiked();
+  }, [id]);
+
+  useEffect(() => {
+    getLikeCount();
+  }), [liked];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getLikeCount();
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  const checkLiked = async () => {
+    if (window.localStorage.getItem("token")) {
+      const endpoint = `/api/PostLike/${id}`
+      const options = {
+        method: 'HEAD',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': window.localStorage.getItem("token"),
+        },
+      }
+      const response = await fetch(endpoint, options)
+      if (response.status === 200) setLiked(true);
+      else if (response.status === 404) setLiked(false);
+    }
+  };
+  const deleteLike = async () => {
+    if (window.localStorage.getItem("token")) {
+      const endpoint = `/api/PostLike/${id}`
+
+      const options = {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': window.localStorage.getItem("token"),
+        },
+      }
+      const response = await fetch(endpoint, options)
+      if (response.status === 200) setLiked(false);
+    }
+  };
+  const createLike = async () => {
+    if (window.localStorage.getItem("token")) {
+      const endpoint = `/api/PostLike/${id}`
+      const options = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': window.localStorage.getItem("token"),
+        },
+      }
+      const response = await fetch(endpoint, options)
+      if (response.status === 201) setLiked(true);
+    }
+  };
+
+  const getLikeCount = async () => {
+    if (window.localStorage.getItem("token")) {
+      const endpoint = `/api/PostLike/${id}`
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'token': window.localStorage.getItem("token"),
+        },
+      }
+      const response = await fetch(endpoint, options);
+      const data = await response.json();
+      // Update likes count based on the response
+      if (response.ok) {
+        setLikesCount(data.likesCount);
+      } else {
+        // Handle error here
+        console.error(`Error: ${data}`);
+      }
+    }
+  };
+
   //General variables. Could be somwhere in the config files
   let urlImgaes = "http://localhost:5001/image_feed/" + postID;
   //let urlVideos = "http://localhost:5001/video_feed/"; // not yet implemented for future use maybe
@@ -29,35 +114,41 @@ const Post = ({ postID }) => {
   //Show and hide comment section
   const handleComments = () => {
 
-    if (!commentsEnabled){
+    if (!commentsEnabled) {
       setCommentsEnabled(true);
-    }else {
+    } else {
       setCommentsEnabled(false);
     }
 
   }
 
+
+
   return (
     <>
       <div>
-        <Image 
-        src={urlImgaes} 
-        width={450} //standrad size of mdoal 
-        height={450} 
-        className="transform rounded-lg brightness-90 transition group-hover:brightness-110"
-        alt="Pricture" 
-        sizes="(max-width: 640px) 100vw,
+        <Image
+          src={urlImgaes}
+          width={450} //standrad size of mdoal 
+          height={450}
+          className="transform rounded-lg brightness-90 transition group-hover:brightness-110"
+          alt="Pricture"
+          sizes="(max-width: 640px) 100vw,
         (max-width: 1280px) 50vw,
         (max-width: 1536px) 33vw,
         25vw"
-        style={{ transform: "translate3d(0, 0, 0)" }}
-        /> 
+          style={{ transform: "translate3d(0, 0, 0)" }}
+        />
       </div>
 
       <div>
-          <button type="button" className="btn btn-primary">Like</button>
-          <span> </span>
-          <button type="button" className="btn btn-primary" onClick={handleComments}>Comment</button>
+        {likesCount ? <p>{likesCount} {likesCount === 1 ? 'player' : 'players'} liked</p> : <br />}
+        {liked
+          ? <button type="button" onClick={deleteLike} className="btn btn-outline-primary">Liked</button>
+          : <button type="button" onClick={createLike} className="btn btn-primary">Like</button>
+        }
+        <span> </span>
+        <button type="button" className="btn btn-primary" onClick={handleComments}>Comment</button>
       </div>
 
       {commentsEnabled ? 

@@ -8,7 +8,6 @@ import { useRouter } from 'next/router';
 import Context from '@/context/Context';
 //import { io } from 'socket.io-client';// import the socket
 //import { createHash } from 'crypto'//Hash
-import PostWall from '@/components/PostWall';
 import Post from '@/components/Post';
 import { GetUserInfo } from '@/components/Tools/getUserInfo'
 
@@ -44,23 +43,29 @@ export default function Home() {
 
 
   const GetPost = async () => {
-    if (window.localStorage.getItem("token") && userInfo) {
-      // API endpoint where we send form data.
-      const endpoint = `/api/getHome/${userInfo.steamid}`
 
-      // Form the request for sending data to the server.
-      const options = {
-        // The method is POST because we are sending data.
-        method: 'GET',
-        // Tell the server we're sending JSON.
-        headers: {
-          'Content-Type': 'application/json',
-          'token': window.localStorage.getItem("token"),
-        },
+    try {
+
+      if (window.localStorage.getItem("token") && userInfo) {
+        // API endpoint where we send form data.
+        const endpoint = `/api/getHome/${userInfo.steamid}`
+
+        // Form the request for sending data to the server.
+        const options = {
+          // The method is POST because we are sending data.
+          method: 'GET',
+          // Tell the server we're sending JSON.
+          headers: {
+            'Content-Type': 'application/json',
+            'token': window.localStorage.getItem("token"),
+          },
+        }
+        const response = await fetch(endpoint, options)
+        const data = await response.json();
+        setMediaPosts(data);
       }
-      const response = await fetch(endpoint, options)
-      const data = await response.json();
-      setMediaPosts(data);
+    } catch (error) {
+      console.error('Error:', error);
     }
   }
 
@@ -152,9 +157,10 @@ export default function Home() {
     //Now the post only fetch once, it should be a onlisten event 
     //TODO: add onlisten event depend on Websocket
     if (!mediaPosts) {
+
       GetPost();
     }
-  }, []);
+  }, [userInfo]);
 
 
   return (
@@ -168,7 +174,7 @@ export default function Home() {
           <div className={styles.main}>
             <div className={styles.one}><Sidebar selection={SidebarSelect} /></div>
             <div className={styles.two}>
-              {mediaPosts ? mediaPosts.map((mediaPost) => <HomeWall id={mediaPost.filenam} media={mediaPost} />) : <p>Here will be our home page by default</p>}
+              {mediaPosts ? mediaPosts.map((mediaPost) => <HomeWall key={mediaPost.filenam} id={mediaPost.filenam} media={mediaPost} />) : <p>Here will be our home page by default</p>}
             </div>
           </div>
         }
@@ -189,18 +195,21 @@ function HomeWall(props) {
 
   const fetchPosterInfo = async () => {
     const data = await GetUserInfo(media.steamid);
-
     setPosterInfo(data[0]);
   };
+
+
   return (
-    <div>
+    <div className={styles.homeWall}>
       {posterInfo ?
         (
           <>
-            <p>{posterInfo.personaname}</p>
-            <Image src={posterInfo.avatarfull} width={50} height={50} className="rounded-circle mr-2" alt={posterInfo.personaname} />
-            <p>{media.timestamp}</p>
-            <Post postID={media.filenam} />
+            <div className={styles.posterInfo}>
+              <Image src={posterInfo.avatarfull} width={50} height={50} className="rounded-circle mr-2" alt={posterInfo.personaname} />
+              <p>{posterInfo.personaname}</p>
+            </div>
+            <p className={styles.timestamp}>{media.timestamp}</p>
+            <Post key={media.filenam} postID={media.filenam} />
           </>
         )
         : <p>Loading</p>

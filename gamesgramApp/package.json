@@ -24,5 +24,5 @@
     "steam-web": "^0.7.0",
     "swr": "^2.1.5"
   },
-  "proxy": "http://localhost:5000/"
+  "proxy": "http://localhost:5001/"
 }

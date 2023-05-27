@@ -9,4 +9,17 @@ create table userMedia (filenam varchar(120), typeofm varchar(20), primary key(f
 create table accessRules (accessID int(16), descr varchar(120), primary key(accessID));
 
 create table postComments(commentID int, likes int, content varchar(500), authorSteamID int(64), postID varchar(120), ts TIMESTAMP);
-create table likeRel(postID varchar(120), commentID int, steamid int(64));
+
+CREATE TABLE postLikes (
+    steamid BIGINT UNSIGNED,
+    postID VARCHAR(120),
+    PRIMARY KEY(steamid, postID),
+    FOREIGN KEY(postID) REFERENCES userPost(postMedia)
+);
+
+CREATE TABLE commentLikes (
+    steamid BIGINT UNSIGNED,
+    commentID INT,
+    PRIMARY KEY(steamid, commentID),
+    FOREIGN KEY(commentID) REFERENCES postComments(commentID)
+);
