@@ -178,14 +178,19 @@ class GetFriendList(Resource):
         params = {"key": api_key, "steamid": steamid, "relationship": "friend"}
         url = "https://api.steampowered.com/ISteamUser/GetFriendList/v0001/"
         response = requests.get(url, params)
+        result = json.loads(response.content)["friendslist"]["friends"]
+        steamids=[]
+        for i in result:
+            steamids.append(i["steamid"])
+        steamids = ', '.join(map(str, steamids))
 
-        # url='http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/'
-        # params={
-        #     "key": api_key,
-        #     "steamids":steamids
-        # }
-        # DetailFriendList=requests.get(url, params)
-        return make_response(response.content, 200)  # OK
+        # Request user details from the Steam API
+        url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
+        params = {"key": api_key, "steamids": steamids}
+
+        # fetch information from stem api
+        details = requests.get(url, params).json()
+        return make_response(details["response"]["players"], 200)  # OK
 
 
 # build method for fetching details of users. only when needed!
@@ -507,7 +512,6 @@ class GetHome(Resource):
         followers.append(steamid)
         for follower in database_helper.getFollowers(steamid):
             followers.append(str(follower))
-            print("!!!",followers)
         for follow in followers:
             # fatch all post
             posts = database_helper.getUserPosts(follow)
@@ -612,16 +616,20 @@ class GetFollowers(Resource):
     def get(self, steamid):
         # token = request.headers.get('token') MAYBE BACK TODO
         # if database_helper.activeSession(token): MAYBE BACK TODO
-
         postResponse = []
         for follower in database_helper.getFollowers(steamid):
             postResponse.append(str(follower))
-        # if len(postResponse):
-        return make_response(jsonify(postResponse), 200)  # OK
-        # else:
-        # return "", 404
-        # else:
-        #    return "", 401 #unauthorized
+        postResponse = ', '.join(map(str, postResponse))
+
+        # Request user details from the Steam API
+        url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
+        params = {"key": api_key, "steamids": postResponse}
+
+        print("!ayyyyyy",postResponse)
+
+        # fetch information from stem api
+        details = requests.get(url, params).json()
+        return make_response(details["response"]["players"], 200)  # OK
 
 #function to create a comment on a post
 @api.resource("/sendComment")
@@ -655,11 +663,10 @@ class GetComments(Resource):
                     {   
                         "id": str(comment[0]),
                         "commentID": str(comment[1]),
-                        "likes": str(comment[2]),
-                        "content": str(comment[3]),
-                        "authorSteamID": str(comment[4]),
-                        "postID": str(comment[5]),
-                        "timestamp": str(comment[6]),
+                        "content": str(comment[2]),
+                        "authorSteamID": str(comment[3]),
+                        "postID": str(comment[4]),
+                        "timestamp": str(comment[5]),
                     }
                 )
 

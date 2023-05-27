@@ -2,7 +2,8 @@
 import Sidebar from '@/components/Siderbar';
 import { useEffect, useState, useCallback, useContext } from 'react';
 import styles from '@/styles/Search.module.css';
-import {SearchBar,UserCard,Card} from '@/components/Search';
+import SearchBar from '@/components/Search';
+import UserCard from '@/components/Search/usercard';
 
 export default function Search(){
 

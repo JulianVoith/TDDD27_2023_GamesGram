@@ -141,33 +141,6 @@ def getAllUser():
     else:
         return False
 
-
-# method to create follow entry
-def followUser(steamid, followid):
-    # insert user's steamid and token
-    try:
-        get_db().execute("insert into followRel values (?,?);", [steamid, followid])
-        get_db().commit()
-        return True
-    except:
-        return False
-
-
-# method to create follow entry
-def getFollower(steamid):
-    # get a users followers
-    cursor = get_db().execute(
-        "select steamid from userInfo where followid like ?;", [steamid]
-    )
-    user = cursor.fetchall()
-    cursor.close()
-    # check if user exists and return true or false
-    if user != []:
-        return True
-    else:
-        return False
-
-
 # method to fuzzy search User
 def searchUser(searchTerm):
     cursor = get_db().execute(
@@ -280,7 +253,7 @@ def deleteFollow(steamid, followid):
 # fetch followers
 def getFollowers(steamid):
     cursor = get_db().execute(
-        "select followsID from followRel where steamid like ?;", [steamid]
+        "select steamid from followRel where followsID like ?;", [steamid]
     )
     followers = cursor.fetchall()
     cursor.close()

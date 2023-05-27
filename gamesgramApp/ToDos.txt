@@ -1,48 +1,16 @@
 ToDo/NextSteps:
+----- TODOS AFTER SAT 27
 
-Current ToDos:
-
-1st Prio:
--Create user in database based on steam (Create table with steam id and profile description)//DONE
-
--Component for userInfo in card style, which can be reused for followers, search and steamfriends
--Data structure for following
--Make it possivble to search for someone and follow his profile
--uploading media with restriction to friends or all
--component to click on media where you can create comments, likes, ratings, polls or whatever
--fix navigation after search
--check getfriendlist frequency -> related to the form problem an blinking buttons
-
-2st Prio
--revise backend with return codes etc
--Uploading with categories or something? to make search possible
--page for games ? and statistics from steam ?
--First time login welcome page: add self about profile text
--token handling
--post/get stuff (Requests)
+-int issue friends, follow button, and show home only if i follow or something
+-change links to API LINKS
+-Cleaning up Server side and commenting
+-check other commentings which need to be DONE
+- work on the chatroom functionality
 
 
-Notice:
-- use component replace instad page routes
-
-
----------------------------------------
-
-Restructering (This weeken 29-30.04):
-- Integrated Home component into index
-- Create pages for search and profile and link to them --> reduces the amount of components(only stuff which is reused)
-
-Focus:
-- finish profile (upload, component to comment on picture, follow etc.) 
-- Feeding home
-
-Roguh databse outline for media and post (simmilar to previous course):
- (UserPost (category, description, timestamp, MEDIA) 
-    -> userMedia 
-    -> CommentTable( LIKE, text, userid, postid, commentID; query with POSTID ->) 
-    -> Liketable(postid, commentID, steamid))
-
-Follow -> steamID followSteamID 
+-restrict view?
+-script for screencast
+-record and handin screencast and code
 
 
 

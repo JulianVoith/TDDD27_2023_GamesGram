@@ -5,6 +5,7 @@ import Context from '@/context/Context';
 import Follow from './Follow';
 import RecentGame from "./recentGame";
 import CreatePost from "./createPost";
+import ShowFriendsAndFollower from "./showFriendsAndFollower";
 
 //Component for the profile header which is ng informatione like follower etc.
 export default function profile(props) {
@@ -16,6 +17,7 @@ export default function profile(props) {
     const { userInfo } = useContext(Context);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [Game, setGame] = useState(null);
+    const [showFriendsAndFollower, setShowFriendsAndFollower] = useState(false);
 
 
     //TODO:small adjustment as link!
@@ -43,6 +45,11 @@ export default function profile(props) {
         setLoggedInUser(userInfo.steamid);
     };
 
+    const handleFriendsAndFollower = (content) => {
+        if (content) {  // Only update if newState is not null
+            setShowFriendsAndFollower(true);
+        }
+    };
 
     return (
 
@@ -66,15 +73,10 @@ export default function profile(props) {
                                 <div className="text-muted mb-4">
                                     {props.userInfo.description}
                                 </div>
-                                <a href="/followers" className="d-inline-block text-dark">
-                                    <strong>{props.follower.length}</strong>
-                                    <span className="text-muted"> followers</span>
-                                </a>
-                                <br />
-                                <a onClick={routeToSteam_friends} className="d-inline-block text-dark ml-3" >
-                                    <strong>{props.friends["friendslist"]["friends"].length}</strong>
-                                    <span className="text-muted"> Steam friends</span>
-                                </a>
+                                <div>
+                                    <ShowFriendsAndFollower friends={props.friends} follower={props.follower}/>
+                                </div>
+                                
                             </div>
                             <br />
                             {loggedInUser ?

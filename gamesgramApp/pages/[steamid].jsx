@@ -75,7 +75,7 @@ export async function getStaticPaths(){
 //Generating props for profile. Includes use information (posts, follower, and friends)
 export async function getStaticProps( { params } ){
   
-  //Notice: Don't fetch the server directly, use api interface
+
   //Fetching data from server
   const resuserInfo = await fetch(`http://127.0.0.1:5001/GetUserInfo/${params.steamid}`);
   const resposts = await fetch(`http://127.0.0.1:5001/getPosts/${params.steamid}`);
@@ -87,7 +87,6 @@ export async function getStaticProps( { params } ){
   const posts = await resposts.json();
   const follower = await refollows.json();
   const friends = await refriends.json();
-
   const dataUserInfo = dataUserInfoJ.response.players;
   
   return {

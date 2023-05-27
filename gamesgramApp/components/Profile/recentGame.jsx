@@ -40,7 +40,7 @@ export default function RecentGame(props) {
   }, [recentGame, props.onGameSet]);
   return (
     <div className={styles.gameContainer}>
-      {recentGame ? recentGame.map((gameInfo) => <Game key={gameInfo.appid} gameInfo={gameInfo} />) : <p>Loading...</p>}
+      {recentGame ? recentGame.map((gameInfo) => <Game key={gameInfo.appid} gameInfo={gameInfo} />) : <p>No recent games available</p>}
     </div>
   )
 }

@@ -121,7 +121,7 @@ const CommentBox = ({comment, subComment}) => {
                     </div>
                     <p className="text-justify comment-text mb-0">{comment.content}</p>
                     <div className="d-flex flex-row user-feed">
-                        <span className="wish"><i className="fa fa-heartbeat mr-2"></i>{likesCount ? <p>{likesCount} {likesCount === 1 ? 'player' : 'players'} liked</p> : <br />}</span>
+                        <div className="wish"><i className="fa fa-heartbeat mr-2"></i>{likesCount ? <p>{likesCount} {likesCount === 1 ? 'player' : 'players'} liked</p> : null}<br /></div>
                         {liked
                         ? <button type="button" onClick={deleteLike} className="btn btn-outline-primary">Liked</button>
                         : <button type="button" onClick={createLike} className="btn btn-primary">Like</button>

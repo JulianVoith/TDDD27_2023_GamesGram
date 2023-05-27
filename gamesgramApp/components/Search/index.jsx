@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import styles from '@/styles/Search.module.css';
-import {GetUserInfo} from '@/components/Tools/getUserInfo'
-import Image from 'next/image';
-import Link from 'next/link';
 
-export function SearchBar(props){
+
+export default function SearchBar(props){
 
   //Data hooks for user search
     const [searchTerm, setSearchTerm] = useState('');       //Hook for modifying the search bar
@@ -52,50 +50,4 @@ export function SearchBar(props){
           />
         </div>
       );
-}
-
-//TODO: export to own files and commenting
-export function UserCard(props){
-  const [usersInfo, setUsersInfo] = useState(null);
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      if(props.steamid)
-      {const data = await GetUserInfo(props.steamid);
-      setUsersInfo(data);
-  }
-    };
-
-    fetchUserInfo();
-  }, [props.steamid]);
-  
-  // Render the component
-  return (
-    <div className={styles.resultItem}>
-      {usersInfo !==null ? 
-          usersInfo.map((userInfo)=><Card key={userInfo.steamid} userInfo={userInfo}/>)
-       : (
-        <p>Loading...</p>
-      )}
-    </div>
-  );
-}
-
-//reason for not updateing
-export function Card(props){
-  const userInfo = props.userInfo;
-  return(
-          <>
-          <h1>{userInfo.personaname}</h1>
-          <Link href={`/${userInfo.steamid}`} as = {`/${userInfo.steamid}`} 
-           shallow={true} >
-            <Image 
-            src={userInfo.avatarfull} 
-            width={100}
-            height={100}
-            alt={`${userInfo.personaname}'s avatar`}
-            />
-          </Link>
-        </>
-  );
 }

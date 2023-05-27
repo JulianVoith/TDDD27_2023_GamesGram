@@ -1,6 +1,8 @@
 import { useEffect, useState, useContext } from 'react';
 import Image from 'next/image';
 import Post from '@/components/Post';
+import styles from '@/styles/Home.module.css';
+import { GetUserInfo } from '../Tools/getUserInfo';
 
 //Component for the post wall of the home section of the platform
 const HomeWall = (props) => {

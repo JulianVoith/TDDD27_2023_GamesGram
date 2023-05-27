@@ -43,8 +43,8 @@ export default function Sidebar(props){
         <Link className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none" href="/">
           <Image 
             src={"/images/Gpic.jpg"} 
-            height={60} // Desired size with correct aspect ratio
-            width={60} // Desired size with correct aspect ratio
+            height={60} 
+            width={60} 
             alt="GGramLogo"
             className ="rounded-circle"
             />
@@ -132,7 +132,7 @@ export default function Sidebar(props){
               </a>
             </li>
             <li>
-              <Link href={`/${steamid}`} as={`/${steamid}`} id="Profile" className={props.selection.profile} onClick={() => onClickNavbar(4)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+              <Link href={`/${steamid}`} as={`/${steamid}`} id="Profile" className={props.selection.profile} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 {avatar ? <Image 
                 src={avatar}
                 width={20}
