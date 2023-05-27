@@ -30,8 +30,17 @@ const Post = ({ id }) => {
   }, [id]);
 
   useEffect(() => {
-    getLikeCount(); 
+    getLikeCount();
   }), [liked];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getLikeCount();
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   const checkLiked = async () => {
     if (window.localStorage.getItem("token")) {
@@ -74,7 +83,7 @@ const Post = ({ id }) => {
         },
       }
       const response = await fetch(endpoint, options)
-      if (response.status === 201 || 200) setLiked(true);
+      if (response.status === 201) setLiked(true);
     }
   };
 
