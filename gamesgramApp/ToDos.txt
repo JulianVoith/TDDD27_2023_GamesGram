@@ -1,25 +1,17 @@
 ToDo/NextSteps:
+----- TODOS AFTER SAT 27
 
-Current ToDos:
+-int issue friends, follow button, and show home only if i follow or something (Wilson)
+-change links to API LINKS (Julian)
 
-1st Prio:
--Create user in database based on steam (Create table with steam id and profile description)//DONE
-
--Component for userInfo in card style, which can be reused for followers, search and steamfriends
--Data structure for following
--Make it possivble to search for someone and follow his profile
--uploading media with restriction to friends or all
--component to click on media where you can create comments, likes, ratings, polls or whatever
--fix navigation after search
--check getfriendlist frequency
-
-2st Prio
--revise backend with return codes etc
--Uploading with categories or something? to make search possible
--page for games ? and statistics from steam ?
--First time login welcome page: add self about profile text
--token handling
+-Cleaning up Server side and commenting
+-check other commentings which need to be DONE
+- work on the chatroom functionality
 
 
-Notice:
-- use component replace instad page routes
+-restrict view?
+-script for screencast
+-record and handin screencast and code
+
+
+

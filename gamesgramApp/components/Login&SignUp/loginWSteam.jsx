@@ -1,25 +1,24 @@
 import styles from '@/styles/Login.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
-
-
-
+//Component for log-in page
+//TODO: MAYBE SOME BASIC CSS
 export default function LoginWSteam(){
-    const [message, setMessage] = useState("");
-    const [loading, setLoading] = useState(true);
+
+    //Image for login button
     const imgURL = 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/steamworks_docs/english/sits_large_border.png';
+
+    //Link variable for authentification
     const LoginWSteamL = () => (
       <>
-        
         <Link 
         href='/authWSteam2'
         >
           <Image
-          src= {imgURL}// Route of the image file
-          height={43} // Desired size with correct aspect ratio
-          width={114} // Desired size with correct aspect ratio
+          src= {imgURL}
+          height={43} 
+          width={114} 
           alt="LogoSteam"
           />
         </Link>
@@ -28,14 +27,10 @@ export default function LoginWSteam(){
 
     return (
         <>
-        
         <main className={"text-center"}>
-
             <div>
                 <LoginWSteamL  />
             </div>
-
-
         </main>
         </>
     )

@@ -2,18 +2,40 @@ import styles from '@/styles/Sidebar.module.css'
 import cx from 'classnames';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useContext } from 'react';
+import Context from '@/context/Context';
 
 export default function Sidebar(props){
+
 //Hooks for css states of each sidebar component
-  const[cssStates, setState] = useState({
+/*  const[cssStates, setState] = useState({
     home: "nav-link active",
     search: "nav-link text-white",
     reels: "nav-link text-white",
     teamMates: "nav-link text-white",
     profile: "nav-link text-white",
     signout: "nav-link text-white",
-  });
+  });*/
+
+  //Fetch userContext
+  const {userInfo} = useContext(Context); 
+  const[steamid, setSteamid] = useState();
+  const[avatar, setAvatar] = useState();
+
+
+  //TODO: maybe google if there is a better way
+  useEffect(() => {
+    if(userInfo && !steamid){
+      initFields();
+    }
+  },[userInfo]);
+  
+  const initFields = () => {
+    setSteamid(userInfo.steamid);
+    setAvatar(userInfo.avatar);
+  };
+
+  //const[loggedInUser, setLoggedInUser] = useState(props.loggedInUser);
 
 //const for header of side bar
   const Header = () => {
@@ -21,8 +43,8 @@ export default function Sidebar(props){
         <Link className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none" href="/">
           <Image 
             src={"/images/Gpic.jpg"} 
-            height={60} // Desired size with correct aspect ratio
-            width={60} // Desired size with correct aspect ratio
+            height={60} 
+            width={60} 
             alt="GGramLogo"
             className ="rounded-circle"
             />
@@ -30,23 +52,20 @@ export default function Sidebar(props){
         </Link>
       );
     };
+
+    //Function for user signout. Deletes local storage and token from database
     const handleSignout = async ()=>{
+
       const endpoint = '/api/SignOut'
-        
-            // Form the request for sending data to the server.
             const options = {
-                // The method is POST because we are sending data.
                 method: 'DELETE',
-                // Tell the server we're sending JSON.
                 headers: {
                 'Content-Type': 'application/json',
                 'token':window.localStorage.getItem("token"),
                 },
-                // Body of the request is the JSON data we created above.
             }
-        
-            // Send the form data to our forms API on Vercel and get a response.
             const response = await fetch(endpoint, options)
+            
             if (response.status===200){
               localStorage.clear();
               window.localStorage.clear();
@@ -54,7 +73,7 @@ export default function Sidebar(props){
             if (typeof window !== "undefined") {window.location.reload()}
     }
 
-//const for navigation bar and events
+//Function for hovering functionality of navigation bar
     const NavigationBar = () => {
 
       //hover over sidebar event changes background color
@@ -66,7 +85,7 @@ export default function Sidebar(props){
         e.target.style.background = '';
       }
 
-      //onclick funmction which changes styling and returns the selected value back to main login page
+      /*//onclick funmction which changes styling and returns the selected value back to main login page
       function onClickNavbar(item) {
 
         //contents of sidebar
@@ -83,46 +102,48 @@ export default function Sidebar(props){
         );
         
         //sends back the selected value to logged-in main page
-        props.navigate(items[item]);
-        return false; 
-      }
 
+        //props.navigate(items[item]);
+        return false; 
+      }*/
+      
       return (
         <div >
           <ul role="button" className="nav nav-pills flex-column mb-auto">
             <li className="nav-item">
-              <a id="Home" className={cssStates.home} onClick={() => onClickNavbar(0)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+              
+              <Link href="/" id="Home" className={props.selection.home} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a id="Search" className={cssStates.search} onClick={() => onClickNavbar(1)} onMouseOver={mouseOver} onMouseLeave={hoverLeave} >
-                Search
-              </a>
+                <Link href="/Search" id="Search" className={props.selection.search} onMouseOver={mouseOver} onMouseLeave={hoverLeave} >
+                  Search
+                </Link>
             </li>
             <li>
-              <a id="Reels" className={cssStates.reels} onClick={() => onClickNavbar(2)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+              <a id="Reels" className={props.selection.reels} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 Galaries/Reels
               </a>
             </li>
             <li>
-              <a id="TeamMates" className={cssStates.teamMates}  onClick={() => onClickNavbar(3)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+              <a id="TeamMates" className={props.selection.teamMates} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 TeamMates
               </a>
             </li>
             <li>
-              <a id="Profile" className={cssStates.profile} onClick={() => onClickNavbar(4)} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
-                <Image 
-                src={props.userInfo.avatar}
+              <Link href={`/${steamid}`} as={`/${steamid}`} id="Profile" className={props.selection.profile} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+                {avatar ? <Image 
+                src={avatar}
                 width={20}
                 height={20}
-                alt={props.userInfo.personaname}
+                alt={steamid}
                 className={styles.avatar}
-                />
+                />: null}
                  Profile
-              </a>
+              </Link>
               <hr/>
-              <a id="Signout" className={cssStates.signout}  onClick={handleSignout} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+              <a id="Signout" className={props.selection.signout}  onClick={handleSignout} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 SignOut
               </a>
             </li>
@@ -131,40 +152,6 @@ export default function Sidebar(props){
       );
 
     };
-
-    //should be later on the profile display instead of list item 
-    //once page is there#
-    const ProfileBar = () => {
-      return (
-        <div className="dropdown">
-          <a id="dropwdownUser" className="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" 
-            data-bs-toggle="dropdown" aria-expanded="false">
-              <Image 
-                src={"/images/Gpic.jpg"} 
-                height={60} 
-                width={60} 
-                alt="GGramLogo"
-                className ="rounded-circle"
-              />
-              <strong className = "text-white"> testUser </strong>
-              ::after
-          </a>
-          <ul className = "dropdown-menu text-small shadow" aria-aria-labelledby='dropdownUser'>
-            <li>
-              <a class ="dropdown-item">
-                Dummy 1
-              </a>
-            </li>
-            <li>
-              <a class ="dropdown-item">
-                Dummy 2
-              </a>
-            </li>
-          </ul>
-        </div>
-      );
-    };
-
 
 //return of the sidebar
       return (

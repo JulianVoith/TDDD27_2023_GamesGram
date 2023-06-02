@@ -1,3 +1,4 @@
+//TODO REPLACE WITH SWR
 export async function GetUserInfo(steamid = null) {
     // Default options are marked with *
     const endpoint = steamid ? `/api/GetUserInfo/${steamid}` : '/api/GetUserInfo';
