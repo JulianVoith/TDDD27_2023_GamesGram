@@ -15,14 +15,13 @@ const CreatePost = (props) => {
 
     //Fetch games of user
     const Games = props.gameCategory;   
-
+    
     //Methods to close and open modal
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     //Function to handle the form input and save into data hook
     const handleInput = (e) => {
-
         //Fetch the altered field name and value
         const fieldName = e.target.name;
         const fieldValue = e.target.value;
@@ -40,7 +39,7 @@ const CreatePost = (props) => {
             }));
         }
     }
-
+    
     //Submit function of form in modal
     const handleSubmit = async (event) => {
         //preventing auto refresh
@@ -48,7 +47,6 @@ const CreatePost = (props) => {
 
         //Variable for upload form data
         let postData = new FormData();
-
         //Fill form data
         postData.append("descr", formData.descr);
         postData.append("file", formData.file);
@@ -57,6 +55,7 @@ const CreatePost = (props) => {
 
         const endpoint = '/api/createPost'
 
+        
         const options = {
             method: 'POST',
             headers: {
@@ -107,7 +106,7 @@ const CreatePost = (props) => {
                         </Form.Group>
                         <Form.Group controlId="formFile" className="mb-3">
                             <Form.Label>Category/Game</Form.Label>
-                            <Form.Select aria-label="Default select example" name="categroy" onChange={handleInput}>
+                            <Form.Select aria-label="Default select example" name="category" onChange={handleInput}>
                                 {Games ? Games.map((gameInfo) => (<option key={gameInfo.appid} value={gameInfo.appid}>{gameInfo.name}</option>)) : <p>Loading</p>}
 
                             </Form.Select>

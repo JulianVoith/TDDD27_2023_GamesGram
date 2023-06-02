@@ -141,6 +141,7 @@ def getAllUser():
     else:
         return False
 
+
 # method to fuzzy search User
 def searchUser(searchTerm):
     cursor = get_db().execute(
@@ -207,13 +208,25 @@ def deleteMedia(filenam):
 
 # fetch posts of user
 def getUserPosts(steamid):
-    cursor = get_db().execute("select * from userPost where steamid like ?;", [steamid])
+    cursor = get_db().execute(
+        "select * from userPost where steamid like ?ORDER BY ts DESC;", [steamid]
+    )
     posts = cursor.fetchall()
     cursor.close()
     # if posts != []:
     return posts
     # else:
     #    return False
+
+
+# fetch posts of game
+def getGamePosts(appid):
+    cursor = get_db().execute(
+        "SELECT * FROM userPost WHERE appid LIKE ? ORDER BY ts DESC;", [appid]
+    )
+    posts = cursor.fetchall()
+    cursor.close()
+    return posts
 
 
 # fetch media for a post
@@ -310,7 +323,8 @@ def countPostLiked(postID):
         return liked[0]
     else:
         return 0  # Or whatever value is appropriate in your case
-    
+
+
 ## commontLike
 # Check if a user has liked a specific comment
 def isCommentLiked(steamid, commentID):
@@ -345,7 +359,8 @@ def addCommentLiked(steamid, commentID):
     except:
         return False
 
-#get count of likes of a comment
+
+# get count of likes of a comment
 def countCommentLiked(commentID):
     cursor = get_db().execute(
         "select count(*) from commentLikes where commentID = ?;",
@@ -360,15 +375,12 @@ def countCommentLiked(commentID):
         return 0  # Or whatever value is appropriate in your case
 
 
-
-
-
-#create comment in a post on the database
+# create comment in a post on the database
 def createComment(commentID, authorSteamID, postID, content):
     try:
-    
         cursor = get_db().execute(
-            "insert into postComments (commentID, content, authorSteamID, postID, ts) values (?, ?, ?, ?, CURRENT_TIMESTAMP);", [commentID, content, authorSteamID, postID],
+            "insert into postComments (commentID, content, authorSteamID, postID, ts) values (?, ?, ?, ?, CURRENT_TIMESTAMP);",
+            [commentID, content, authorSteamID, postID],
         )
         get_db().commit()
         cursor.close()
@@ -376,22 +388,26 @@ def createComment(commentID, authorSteamID, postID, content):
     except:
         return False
 
-#get comments of a post from database
+
+# get comments of a post from database
 def getComments(postID):
     cursor = get_db().execute(
-        "select rowid, commentID, content, authorSteamID, postID, ts from postComments where postID like ? and commentID like ? ORDER BY ts DESC;", [postID, 0]
+        "select rowid, commentID, content, authorSteamID, postID, ts from postComments where postID like ? and commentID like ? ORDER BY ts DESC;",
+        [postID, 0],
     )
     comments = cursor.fetchall()
     cursor.close()
-   # if followers != []:
+    # if followers != []:
     return comments
 
-#get comments of a comment on a post from database
+
+# get comments of a comment on a post from database
 def getSubComments(postID, commentID):
     cursor = get_db().execute(
-        "select rowid, commentID, content, authorSteamID, postID, ts from postComments where postID like ? AND commentID like ? ORDER BY ts DESC;", [postID, commentID]
+        "select rowid, commentID, content, authorSteamID, postID, ts from postComments where postID like ? AND commentID like ? ORDER BY ts DESC;",
+        [postID, commentID],
     )
     comments = cursor.fetchall()
     cursor.close()
-   # if followers != []:
+    # if followers != []:
     return comments

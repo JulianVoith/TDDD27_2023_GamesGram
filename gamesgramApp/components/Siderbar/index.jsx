@@ -127,9 +127,9 @@ export default function Sidebar(props){
               </a>
             </li>
             <li>
-              <a id="TeamMates" className={props.selection.teamMates} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
+              <Link href={`/teamMates/?steamid=${steamid}`} as={"/teamMates"} id="TeamMates" className={props.selection.teamMates} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>
                 TeamMates
-              </a>
+              </Link>
             </li>
             <li>
               <Link href={`/${steamid}`} as={`/${steamid}`} id="Profile" className={props.selection.profile} onMouseOver={mouseOver} onMouseLeave={hoverLeave}>

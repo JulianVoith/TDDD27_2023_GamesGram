@@ -1,5 +1,7 @@
 import Context from '@/context/Context';
 import Image from 'next/image';
+import Link from 'next/link';
+import useSWR from 'swr';
 import { useEffect, useState, useContext } from 'react';
 import styles from '@/styles/Profile.module.css';
 
@@ -7,10 +9,13 @@ import styles from '@/styles/Profile.module.css';
 //TODO commenting!
 export default function RecentGame(props) {
   const { userInfo } = useContext(Context);
-  const [recentGame, setRecentGame] = useState(null);
+  //const [recentGame, setRecentGame] = useState(null);
   const steamid = props.steamid || userInfo.steamid;
 
-  //get recent games of a user
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const { data: recentGame } = useSWR(`/api/GetRecentlyPlayedGames/${steamid}`, fetcher);
+
+  /*//get recent games of a user
   const getGame = async () => {
     const endpoint = `/api/GetRecentlyPlayedGames/${steamid}`;
     const options = {
@@ -30,7 +35,7 @@ export default function RecentGame(props) {
   //fetch game once page loads, not supported as real time
   useEffect(() => {
     if (!recentGame) { getGame(); }
-  }, [recentGame, steamid]);
+  }, [recentGame, steamid]);*/
 
   //transmit Game to farther component => profile
   useEffect(() => {
@@ -50,8 +55,10 @@ function Game(props) {
   const gameInfo = props.gameInfo;
   return (
     <div className={styles.gameIterm}>
-      <Image src={url} alt={gameInfo.name} width={50} height={50} className={"rounded-circle"} />
-      <div className={styles.name}>{gameInfo.name} </div>
+      <Link href={`/game/${gameInfo.appid}`}>
+        <Image src={url} alt={gameInfo.name} width={50} height={50} className={"rounded-circle"} />
+        <div className={styles.name}>{gameInfo.name} </div>
+      </Link>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useState, useEffect,useContext } from 'react';
 import Image from 'next/image';
 import useSWR from 'swr';
 import CommentSubmit from './commentSubmit';
+import Link from 'next/link';
 
 const CommentBox = ({comment, subComment}) => {
 
@@ -110,7 +111,9 @@ const CommentBox = ({comment, subComment}) => {
     return (
         <> {commenter ? 
             <div className="d-flex flex-row p-3">
-                <Image src={commenter.response.players[0].avatar} width={50} height={50} className="rounded-circle mr-2" alt={comment.authorSteamID}/> 
+              <Link href={`http://localhost:3000/${commenter.response.players[0].steamid}`}>
+                <Image src={commenter.response.players[0].avatarfull} width={50} height={50} className="rounded-circle mr-2" alt={comment.authorSteamID} /> 
+                </Link>
                 <div className="w-100">
                     <div className="d-flex justify-content-between align-items-center">
                         <div className="d-flex flex-row align-items-center">

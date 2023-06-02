@@ -83,6 +83,14 @@ module.exports = () => {
       {
         source: "/api/CommentLike/:path*",
         destination: "http://127.0.0.1:5001/CommentLike/:path*",
+      },
+      {
+        source: "/api/getGame/:path*",
+        destination: "http://127.0.0.1:5001/getGame/:path*",
+      },
+      {
+        source: "/api/getGameNews/:path*",
+        destination: "http://127.0.0.1:5001/getGameNews/:path*",
       }
           ];
   };

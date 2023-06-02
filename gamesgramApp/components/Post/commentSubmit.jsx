@@ -1,6 +1,7 @@
 import Context from '@/context/Context';
 import { useState, useEffect,useContext } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const CommentSubmit = ({postID, commentID}) => {
 
@@ -18,7 +19,7 @@ const CommentSubmit = ({postID, commentID}) => {
     },[userInfo]);
     const initFields = () => {
         setSteamid(userInfo.steamid);
-        setAvatar(userInfo.avatar);
+        setAvatar(userInfo.avatarfull);
     };
 
     //Submit function of comment form
@@ -65,7 +66,7 @@ const CommentSubmit = ({postID, commentID}) => {
     return (
         <>
             <div className="mt-3 d-flex flex-row align-items-center p-3 form-color">
-                {avatar ? <Image src={avatar} width={50} height={50} className="rounded-circle mr-2" alt={steamid} /> : null}
+                {avatar ? <Link href={`/${userInfo.steamid}`}><Image src={avatar} width={50} height={50} className="rounded-circle mr-2" alt={steamid} /></Link> : null}
                 <form id="commentInputForm" onSubmit={handleCommentSubmit}>
                         <input required onChange={(e) => setCommentBox(e.target.value)} value={commentBox} type="text" className="form-control" placeholder="Enter your comment..." id="commentBox"/>
                 </form>

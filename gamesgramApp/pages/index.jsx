@@ -7,8 +7,11 @@ import HomeWall from '@/components/HomeWall';
 import { useRouter } from 'next/router';
 import Context from '@/context/Context';
 
+
 //Start page of GamesGram app
 export default function Home() {
+
+  //VERCEL probides useSession??
 
   //Hooks for data handling (token, user, posts)
   const [hastoken, setToken] = useState(false);          //Hook for generated token

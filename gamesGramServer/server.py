@@ -19,19 +19,24 @@ from flask import (
     send_from_directory,
     session,
 )
-#from flask_bcrypt import Bcrypt  # DOCU
+from flask_socketio import SocketIO, emit
+
+
+# from flask_bcrypt import Bcrypt  # DOCU
 from flask_cors import CORS, cross_origin
 from flask_restful import Api, Resource, fields, marshal_with, reqparse
-#from flask_sock import Sock  # DOCU
+
+# from flask_sock import Sock  # DOCU
 from pysteamsignin.steamsignin import SteamSignIn  # import for steam signin
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
 api = Api(app)
-#sockets = Sock(app)
-#bcrypt = Bcrypt(app)
+# sockets = Sock(app)
+# bcrypt = Bcrypt(app)
 CORS(app, resources={r"/*": {"origins": "*"}})  # enable CORS on all routes
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # global dictionary for all active websockets
 client_list = {}
@@ -62,28 +67,57 @@ class Message(Resource):
 api.add_resource(Message, "/hello")
 
 
+@app.route("/http-call")
+def http_call():
+    """return JSON with string data as the value"""
+    data = {"data": "This text was fetched using an HTTP call to server on render"}
+    return jsonify(data)
+
+
+@socketio.on("connect")
+def connected():
+    """event listener when client connects to the server"""
+    # print(request.sid)
+    # print("client has connected")
+    emit("connect", {"data": f"id: {request.sid} is connected"})
+
+
+@socketio.on("data")
+def handle_message(data):
+    """event listener when client types a message"""
+    print("data from the front end: ", str(data))
+    emit("data", {"data": data, "id": request.sid}, broadcast=True)
+
+
+@socketio.on("disconnect")
+def disconnected():
+    """event listener when client disconnects to the server"""
+    # print("user disconnected")
+    emit("disconnect", f"user {request.sid} disconnected", broadcast=True)
+
+
 # route for socket creation
-#@sockets.route("/")
-#def echo_socket(sockets):
-    # run websocket until it is closed down
+# @sockets.route("/")
+# def echo_socket(sockets):
+# run websocket until it is closed down
 #    print("CONNECTED")
 #    while True:
-        # receive email and hexcode of the token from client
+# receive email and hexcode of the token from client
 #        payload = json.loads(sockets.receive())
-        # split it up into variables
+# split it up into variables
 #        steamid = payload["steamid"]
-        # HEX = payload["HEX"]
+# HEX = payload["HEX"]
 
-        # check if there is an active session of the user
+# check if there is an active session of the user
 #        activeSession = database_helper.activeSessionSteamid(steamid)
-        # fetch the token from the database and hash it
-        # REHEX = sha256(activeSession.encode("utf-8")).hexdigest()
+# fetch the token from the database and hash it
+# REHEX = sha256(activeSession.encode("utf-8")).hexdigest()
 
-        # check if there is an active session and the transmitted and genereted hex code are the same
+# check if there is an active session and the transmitted and genereted hex code are the same
 #        if activeSession:
-            # replace users ws with new one after e.g. a refresh, if combination is new add it (stored by the hex)
+# replace users ws with new one after e.g. a refresh, if combination is new add it (stored by the hex)
 #            client_list[steamid] = sockets
-#ß            print(client_list)
+# ß            print(client_list)
 #        else:
 #            sockets.close(1000, "signOut")
 
@@ -179,10 +213,10 @@ class GetFriendList(Resource):
         url = "https://api.steampowered.com/ISteamUser/GetFriendList/v0001/"
         response = requests.get(url, params)
         result = json.loads(response.content)["friendslist"]["friends"]
-        steamids=[]
+        steamids = []
         for i in result:
             steamids.append(i["steamid"])
-        steamids = ', '.join(map(str, steamids))
+        steamids = ", ".join(map(str, steamids))
 
         # Request user details from the Steam API
         url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
@@ -278,7 +312,6 @@ class CreatePost(Resource):
     def post(self):
         # Fetch token from header and check if session is acrive
         token = request.headers.get("token")
-
         if database_helper.activeSession(token):
             # get media data
             media = request.files.get("file")
@@ -402,7 +435,6 @@ class PostLike(Resource):
             return "", 401  # Unauthorized
 
 
-
 # Interface about comment like system
 # @head -> # Check if a user has liked a specific comment
 # @delete ->  # Handling user unlikes of comment
@@ -473,7 +505,7 @@ class GetPosts(Resource):
         # iterate through posts and creat dictionary and stream url and pass back to client
         for post in posts:
             typeOfMedia = database_helper.getMedia(post[4])
-            print(typeOfMedia)
+
             if typeOfMedia[1] == "image":
                 url = "/image_feed/" + post[4]
             elif typeOfMedia[1] == "video":
@@ -517,7 +549,7 @@ class GetHome(Resource):
             posts = database_helper.getUserPosts(follow)
             for post in posts:
                 typeOfMedia = database_helper.getMedia(post[4])
-                print(typeOfMedia)
+
                 if typeOfMedia[1] == "image":
                     url = "/image_feed/" + post[4]
                 elif typeOfMedia[1] == "video":
@@ -546,15 +578,66 @@ class GetHome(Resource):
             return 404  # notfound
 
 
+# Interface for returning all message on Home page
+@api.resource("/getGame/<string:appid>")
+class GetGame(Resource):
+    def get(self, appid):
+        postResponse = []
+        # fatch all post
+        posts = database_helper.getGamePosts(appid)
+        print(posts)
+        for post in posts:
+            typeOfMedia = database_helper.getMedia(post[4])
+
+            if typeOfMedia[1] == "image":
+                url = "/image_feed/" + post[4]
+            elif typeOfMedia[1] == "video":
+                url = "/video_feed/" + post[4]
+            else:
+                url = "/audio_feed/" + post[4]
+
+            postResponse.append(
+                {
+                    "steamid": str(post[0]),
+                    "appid": str(post[1]),
+                    "descr": str(post[2]),
+                    "accessRuleID": str(post[3]),
+                    "filenam": str(post[4]),
+                    "timestamp": str(post[5]),
+                    "url": str(url),
+                }
+            )
+        # if existing return json of table entries
+        if postResponse is not None:
+            return make_response(jsonify(postResponse), 200)  # OK
+
+        else:
+            return 404  # notfound
+
+
+@api.resource("/getGameNews/<string:appid>")
+class GetGameNews(Resource):
+    def get(self, appid):
+        params = {"appid": appid}
+        url = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2"
+        response = requests.get(url, params)
+        postResponse = json.loads(response.content)["appnews"]["newsitems"]
+        if response.status_code == 200:
+            return make_response(jsonify(postResponse), 200)  # OK
+        else:
+            # steam server is not available
+            return "", 502  # Bad Gateway
+
+
 # function for streaming an image to the wall
 @app.route("/image_feed/<image>", methods=["GET"])
 def image_feed(image):
     # partition for correct mimetype
     mime = image.rpartition(".")
     mimetype = "image/" + mime[2]
+
     # method to stream image for Response
     def gen(imagename):
-        print("!", imagename)
         # get image and stream
         image = open(
             upload_path_img + imagename, "rb"
@@ -597,6 +680,7 @@ class Follow(Resource):
                 return "", 500
         else:
             return "", 401  # unauthorized
+
     # function for unfollowing
     def delete(self, followid):
         token = request.headers.get("token")
@@ -619,61 +703,71 @@ class GetFollowers(Resource):
         postResponse = []
         for follower in database_helper.getFollowers(steamid):
             postResponse.append(str(follower))
-        postResponse = ', '.join(map(str, postResponse))
+        postResponse = ", ".join(map(str, postResponse))
 
         # Request user details from the Steam API
         url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
         params = {"key": api_key, "steamids": postResponse}
 
-        print("!ayyyyyy",postResponse)
-
         # fetch information from stem api
         details = requests.get(url, params).json()
         return make_response(details["response"]["players"], 200)  # OK
 
-#function to create a comment on a post
+
+# function to create a comment on a post
 @api.resource("/sendComment")
 class SendComment(Resource):
     def post(self):
         token = request.headers.get("token")
         if database_helper.activeSession(token):
             commentData = request.json
-            if database_helper.createComment(commentData["commentID"], commentData["authorSteamID"], commentData["postID"], commentData["content"]):
+            if database_helper.createComment(
+                commentData["commentID"],
+                commentData["authorSteamID"],
+                commentData["postID"],
+                commentData["content"],
+            ):
                 return "", 201  # successfully created
             else:
-                return "", 500 # internal server error
+                return "", 500  # internal server error
         else:
             return "", 401  # unauthorized
 
-#function to get comments of a post
-@api.resource("/getComments/<string:postID>","/getComments/<string:postID>/<string:commentID>" )
+
+# function to get comments of a post
+@api.resource(
+    "/getComments/<string:postID>", "/getComments/<string:postID>/<string:commentID>"
+)
 class GetComments(Resource):
     def get(self, postID, commentID=None):
-#        token = request.headers.get("token")
- #       if database_helper.activeSession(token):
+        #        token = request.headers.get("token")
+        #       if database_helper.activeSession(token):
         commentsResponse = []
 
         if commentID is None:
             comments = database_helper.getComments(postID)
         else:
             comments = database_helper.getSubComments(postID, commentID)
-        
+
         for comment in comments:
             commentsResponse.append(
-                    {   
-                        "id": str(comment[0]),
-                        "commentID": str(comment[1]),
-                        "content": str(comment[2]),
-                        "authorSteamID": str(comment[3]),
-                        "postID": str(comment[4]),
-                        "timestamp": str(comment[5]),
-                    }
-                )
+                {
+                    "id": str(comment[0]),
+                    "commentID": str(comment[1]),
+                    "content": str(comment[2]),
+                    "authorSteamID": str(comment[3]),
+                    "postID": str(comment[4]),
+                    "timestamp": str(comment[5]),
+                }
+            )
 
         return make_response(jsonify(commentsResponse), 200)  # OK
+
+
 #        else:
 #            return "", 401  # unauthorized
-        
+
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    # app.run(debug=True, port=5001)
+    socketio.run(app, debug=True, port=5001)

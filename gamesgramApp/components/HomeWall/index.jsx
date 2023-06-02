@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import Post from '@/components/Post';
 import styles from '@/styles/Home.module.css';
 import { GetUserInfo } from '../Tools/getUserInfo';
@@ -30,7 +31,9 @@ const HomeWall = (props) => {
           (
             <>
               <div className={styles.posterInfo}>
+                <Link href={`http://localhost:3000/${posterInfo.steamid}`}>
                 <Image src={posterInfo.avatarfull} width={50} height={50} className="rounded-circle mr-2" alt={posterInfo.personaname} />
+                </Link>
                 <p>{posterInfo.personaname}</p>
               </div>
               <p className={styles.timestamp}>{media.timestamp}</p>
