@@ -2,6 +2,7 @@
 
 ## Updates
 
+- [2023.06.02] Version 0.3 with working profile and image upload. Possibility to interact with posts and profiles. Adding a home feed page for post of users
 - [2023.04.26] Version 0.2 with overall mock-up of the platform GamesGram including user profile outline and user search.
 - [2023.04.06] We updated a readme document.
 
