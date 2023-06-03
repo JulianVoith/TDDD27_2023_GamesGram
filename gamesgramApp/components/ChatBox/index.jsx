@@ -4,31 +4,29 @@ import Pusher from "pusher-js";
 //Component for real-time chat on the Game Page
 const ChatBox = (props) => {
 
-  //
+  //Data hooks for sent messages, written, nessage, chatroom and username
   const [messages, setMessages] = useState(null);
   const [message, setMessage] = useState(null);
   const [username] = useState(props.userName);
   const [appid] = useState(props.appid);
   let allMessages = [];
 
-
-  console.log(username);
-  console.log(appid);
+  //Pusherlistener for incoming messages
   useEffect( () => {
-        // Enable pusher logging - don't include this in production
-        Pusher.logToConsole = true;
 
         var pusher = new Pusher('eb86425f6a7666bc669d', {
           cluster: 'eu'
         });
     
         var channel = pusher.subscribe("GamesGram");
+
         channel.bind(appid, function(data) {
           allMessages.push(data);
           setMessages(allMessages);
         });
   });
 
+  //submit function for chat message
   const submit = async (e) => {
     e.preventDefault();
 
@@ -75,75 +73,3 @@ const ChatBox = (props) => {
 };
 
 export default ChatBox;
-
-
-/*    /*useEffect(() => {
-        socketInitializer();
-    
-        return () => {
-          socket.disconnect();
-        };
-      }, []);
-    
-      async function socketInitializer() {
-        await fetch("http://localhost:3000/api/socket"); ////"proxy": "http://localhost:5001/"
-    
-        socket = io();
-
-        socket.on('connect', () => {
-          console.log("connected");
-        })
-    
-        socket.on("receive-message", (data) => {
-            setAllMessages((pre) => [...pre, data]);
-        });
-      }
-    
-      function handleSubmit(e) {
-        e.preventDefault();
-
-        console.log("emitted");
-    
-        socket.emit("send-message", {
-          username,
-          message
-        });
-    
-        setMessage("");
-      }
-    */
-
-
-
-
-      /*       return (
-      <div>
-        <h1>Chat app</h1>
-        <h1>Enter a username</h1>
-  
-        <input value={username} onChange={(e) => setUsername(e.target.value)} />
-  
-        <br />
-        <br />
-  
-        <div>
-          {allMessages.map(({ username, message }, index) => (
-            <div key={index}>
-              {username}: {message}
-            </div>
-          ))}
-  
-          <br />
-  
-          <form onSubmit={handleSubmit}>
-            <input
-              name="message"
-              placeholder="enter your message"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              autoComplete={"off"}
-            />
-          </form>
-        </div>
-      </div>
-    );*/

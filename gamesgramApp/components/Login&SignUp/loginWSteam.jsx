@@ -3,8 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import cx from 'classnames';
 
-//Component for log-in page
-//TODO: MAYBE SOME BASIC CSS
+//Component for Log-In page (logging in with steam)
 export default function LoginWSteam(){
 
     //Image for login button
@@ -25,7 +24,8 @@ export default function LoginWSteam(){
         </Link>
         </>
       );
-
+  
+      //Decription header for page
   const Header = () => {
     return (
       <>

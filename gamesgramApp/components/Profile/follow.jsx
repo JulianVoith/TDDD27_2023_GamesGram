@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import {Button} from 'react-bootstrap';
 
-
 //Component for following fucntionality 
 export default function  Follow(props){
 
@@ -9,6 +8,7 @@ export default function  Follow(props){
     const [Followed, updateFollowed] = useState(undefined);
 
     
+    //on load check if user has already been followed by logged-in follower. adjust button depending on state
     useEffect(() => {
       const checkAndSetFollowed = async () => {
         const followers = await checkFollowed();
@@ -30,6 +30,7 @@ export default function  Follow(props){
       }
     }, [props.userInfo.steamid]);
 
+    //Function to cheack follow data base
     const checkFollowed = async() => {
         const endpoint = `/api/getFollowers/${window.localStorage.getItem("steamid")}`;
           const options = {
@@ -43,6 +44,8 @@ export default function  Follow(props){
           const data = await response.json();
           return data;
     }
+
+    //Function to follow a user
     const setFollow = async() => {
         const endpoint = `/api/follow/${props.userInfo.steamid}`;
           const options = {
@@ -58,6 +61,7 @@ export default function  Follow(props){
           }
     }
 
+    //Function to unfollow
     const unFollow = async() => {
         const endpoint = `/api/follow/${props.userInfo.steamid}`;
           const options = {

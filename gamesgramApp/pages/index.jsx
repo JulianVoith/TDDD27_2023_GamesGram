@@ -9,13 +9,14 @@ import Context from "@/context/Context";
 
 //Start page of GamesGram app
 export default function Home() {
-  //VERCEL probides useSession??
+  //VERCEL provides useSession??
 
   //Hooks for data handling (token, user, posts)
   const [hastoken, setToken] = useState(false); //Hook for generated token
   const { userInfo, setuserInfo } = useContext(Context); //Hook for feteched usert information
   const router = useRouter(); //Router for variable for dynamic routing
   const [mediaPosts, setMediaPosts] = useState(null); //Hook for Posts
+
   //On mount of index page check if token is (Signed in) in local storage
   //Forward to home page of the platform
   useEffect(() => {
@@ -54,12 +55,13 @@ export default function Home() {
     }
   };
 
-  //TODO:replace with swr and user hook
+//Function to get user infomation from backend and place in context
   const GetuserInfo = async () => {
     if (!userInfo && window.localStorage.getItem("token")) {
-      // API endpoint where we send form data.
+      
+      //TODO: CHANGE TO our method
       const endpoint = "/api/GetUserInfo";
-      // Form the request for sending data to the server.
+      
       const options = {
         method: "GET",
         headers: {
@@ -68,12 +70,10 @@ export default function Home() {
         },
       };
 
-      // Send the form data to our forms API on Vercel and get a response.
+      
       const response = await fetch(endpoint, options);
       const data = await response.json();
       setuserInfo(data.response.players[0]);
-      window.localStorage.setItem("steamid", data.response.players[0].steamid);
-      window.localStorage.setItem("avatar", data.response.players[0].avatar);
     }
   };
   useEffect(() => {
@@ -90,10 +90,11 @@ export default function Home() {
   };
 
   // Send the information to server once reciverd steam server information
-  // and handleLogin
+  // and call handleLogin
   useEffect(() => {
     postData();
   }, [router.query]);
+
   const postData = async () => {
     if (Object.keys(router.query).length !== 0 && !hastoken) {
       const JSONdata = JSON.stringify(router.query);
@@ -128,11 +129,8 @@ export default function Home() {
     signout: "nav-link text-white",
   };
 
-  //TODO: replace with swr
-  //set HomePost
+  //Effect to fetch media post for the home wall
   useEffect(() => {
-    //Now the post only fetch once, it should be a onlisten event
-    //TODO: add onlisten event depend on Websocket
     if (!mediaPosts) {
       GetPost();
     }

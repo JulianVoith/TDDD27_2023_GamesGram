@@ -18,35 +18,13 @@ export default function RecentGame(props) {
     fetcher
   );
 
-  /*//get recent games of a user
-  const getGame = async () => {
-    const endpoint = `/api/GetRecentlyPlayedGames/${steamid}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'token': window.localStorage.getItem("token"),
-      },
-    };
-    const response = await fetch(endpoint, options);
-    const data = await response.json();
-    if (data && data !== 404) {  // Check if data is valid before setting state
-      setRecentGame(data);
-    }
-  };
-
-  //fetch game once page loads, not supported as real time
-  useEffect(() => {
-    if (!recentGame) { getGame(); }
-  }, [recentGame, steamid]);*/
-
-  //transmit Game to farther component => profile
+  //Effect to transmit back the game to the profile to fetch its name for media upload (category)
   useEffect(() => {
     if (recentGame) {
-      // Only call onGameSet if recentGame is not null
       props.onGameSet(recentGame);
     }
   }, [recentGame, props.onGameSet]);
+
   return (
     <div className={styles.gameContainer}>
       {recentGame ? (
@@ -60,6 +38,7 @@ export default function RecentGame(props) {
   );
 }
 
+//Function to represent the game on the profile
 function Game(props) {
   const url = `https://avatars.akamai.steamstatic.com/${props.gameInfo.img_icon_url}_full.jpg`;
   const gameInfo = props.gameInfo;

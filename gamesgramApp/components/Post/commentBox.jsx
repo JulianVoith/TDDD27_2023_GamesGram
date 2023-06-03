@@ -4,10 +4,15 @@ import useSWR from 'swr';
 import CommentSubmit from './commentSubmit';
 import Link from 'next/link';
 
+//Component which will be used to show comments 
 const CommentBox = ({comment, subComment}) => {
 
     //Hook for showing and closing comment section of the post
     const [commentsEnabled, setCommentsEnabled] = useState(false);
+
+    //Hooks for like representation of a comment
+    const [liked, setLiked] = useState(undefined);
+    const [likesCount, setLikesCount] = useState(undefined);
 
     //SWR data feching hooks for commenter and subcomments of a comment
     const fetcher = (...args) => fetch(...args).then(res => res.json())
@@ -18,20 +23,18 @@ const CommentBox = ({comment, subComment}) => {
 
   //Function to show and hide comment section
   const handleCommentReply = () => {
-
     if (!commentsEnabled){
       setCommentsEnabled(true);
     }else {
       setCommentsEnabled(false);
     }
-
   }
 
-  const [liked, setLiked] = useState(undefined);
-  const [likesCount, setLikesCount] = useState(undefined);
+  //Effect for check likes and like count (can be done with SWR)
   useEffect(() => {checkLiked();}, [comment.id]);
   useEffect(() => {getLikeCount();}), [liked];
-  //Get like count every second
+
+  //Get like count in an interval of every second to update like counts
   useEffect(() => {
     const interval = setInterval(() => {
       getLikeCount();
@@ -40,6 +43,8 @@ const CommentBox = ({comment, subComment}) => {
       clearInterval(interval);
     };
   }, []);
+
+  //Function to check like count on server backend
   const checkLiked = async () => {
     if (window.localStorage.getItem("token")) {
       const endpoint = `/api/CommentLike/${comment.id}`
@@ -55,6 +60,8 @@ const CommentBox = ({comment, subComment}) => {
       else if (response.status === 404) setLiked(false);
     }
   };
+
+  //Function to delete like from server backend
   const deleteLike = async () => {
     if (window.localStorage.getItem("token")) {
       const endpoint = `/api/CommentLike/${comment.id}`
@@ -70,6 +77,8 @@ const CommentBox = ({comment, subComment}) => {
       if (response.status === 200) setLiked(false);
     }
   };
+
+  //Function to create like on server backend 
   const createLike = async () => {
     if (window.localStorage.getItem("token")) {
       const endpoint = `/api/CommentLike/${comment.id}`
@@ -85,6 +94,7 @@ const CommentBox = ({comment, subComment}) => {
     }
   };
 
+  //function to fetch like count
   const getLikeCount = async () => {
     if (window.localStorage.getItem("token")) {
       const endpoint = `/api/CommentLike/${comment.id}`
@@ -95,13 +105,13 @@ const CommentBox = ({comment, subComment}) => {
           'token': window.localStorage.getItem("token"),
         },
       }
+
       const response = await fetch(endpoint, options);
       const data = await response.json();
-      // Update likes count based on the response
+      
       if (response.ok) {
         setLikesCount(data.likesCount);
       } else {
-        // Handle error here
         console.error(`Error: ${data}`);
       }
     }

@@ -8,16 +8,20 @@ import Context from '@/context/Context';
 import Head from 'next/head';
 import ChatBox from '@/components/ChatBox';
 
+
+//Page for displaying game new and game related post including a live chat
 export default function Game() {
+
+  //router variable to fetch the appid in the URL
   const router = useRouter();
   const { appid } = router.query;
-  const [gameInfo, setGameInfo] = useState(undefined);
+
+  //Fetch necessary game information from backend
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const { data: gameNews } = useSWR(`/api/getGameNews/${appid}`, fetcher);
   const { data: gamePosts } = useSWR(`/api/getGame/${appid}`, fetcher);
 
-  console.log("POST:", gamePosts);
-  //Fetch userContext
+  //Fetch userContext and make sure its filled when loading the page
   const { userInfo } = useContext(Context);
   const [steamid, setSteamid] = useState(null);
   const [username, setUsername] = useState(null);
@@ -78,7 +82,8 @@ export default function Game() {
 }
 
 //possiblity with get static path etc
-// <ChatBox appid={appid} userName={username} steamid={steamid}/>
+
+//function to display news of the inspected game
 function News(props) {
   const news = props.news;
   const contents = convertStringToHtml(news.contents);
@@ -89,14 +94,14 @@ function News(props) {
   );
 }
 
+//Function to convert string to html
 function convertStringToHtml(str) {
-  // replace [br] by <br>
+  
   str = str.replace(/\[br\]/g, "<br>");
 
-  // replace [h?] by <h?>
   str = str.replace(/\[h3\]/g, "<h3>");
   str = str.replace(/\[\/h3\]/g, "</h3>");
-  // replace [b] by <strong>
+  
   str = str.replace(/\[b\]/g, "<strong>");
   str = str.replace(/\[\/b\]/g, "</strong>");
 

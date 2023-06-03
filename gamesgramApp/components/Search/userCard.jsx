@@ -3,12 +3,13 @@ import styles from '@/styles/Search.module.css';
 import {GetUserInfo} from '@/components/Tools/getUserInfo';
 import { useEffect, useState } from 'react';
 
-
-
-//TODO: commenting
+//Component to create a user card list based on suggestion search
 export default function UserCard(props){
+
+    //Data hook for user information (searched user)
     const [usersInfo, setUsersInfo] = useState(null);
-  
+
+    //Effect to fetch user information of the given steamid
     useEffect(() => {
       const fetchUserInfo = async () => {
         if(props.steamid)
@@ -20,7 +21,6 @@ export default function UserCard(props){
       fetchUserInfo();
     }, [props.steamid]);
     
-    // Render the component
     return (
       <div className={styles.resultItem}>
         {usersInfo !==null ? 

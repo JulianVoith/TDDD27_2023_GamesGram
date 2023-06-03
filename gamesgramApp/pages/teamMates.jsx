@@ -6,17 +6,19 @@ import RecentGame from '@/components/Profile/recentGame';
 
 import { useEffect, useState } from 'react';
 
+//Page for GameNews and chat
 const TeamMates = ({  }) => { 
 
-    //Data Hooks
+    //Data Hooks for recent game in order to fetch them (notused but but necessary to reuse component )
     const [Game, setGame] = useState(null);
 
     //react router variable
     const router = useRouter();
+
     //fetching steamid from url
     const steamid = router.query.steamid;
 
-      //Constant for the sidebar selection highlight which is passed as a prop to child components
+    //Constant for the sidebar selection highlight which is passed as a prop to child components
     const SidebarSelect = 
         {home: "nav-link text-white",
         search: "nav-link text-white",
@@ -25,7 +27,7 @@ const TeamMates = ({  }) => {
         profile: "nav-link text-white",
         signout: "nav-link text-white"};
 
-    //get the game state from children component => resentGame
+    //Function to pass game information from RecentGame component to this component
     const handleGameSet = (newState) => {
         if (newState) {  // Only update if newState is not null
             setGame(newState);
@@ -49,94 +51,3 @@ return (
 
 export default TeamMates;
 
-/*
-    const [socketInstance, setSocketInstance] = useState("");
-    const [loading, setLoading] = useState(true);
-    const [buttonStatus, setButtonStatus] = useState(false);
-  
-    const handleClick = () => {
-      if (buttonStatus === false) {
-        setButtonStatus(true);
-      } else {
-        setButtonStatus(false);
-      }
-    };
-  
-    useEffect(() => {
-      if (buttonStatus === true) {
-        const socket = io("localhost:5001/", {
-          transports: ["websocket"],
-          cors: {
-            origin: "http://localhost:3000/",
-          },
-        });
-  
-        setSocketInstance(socket);
-  
-        socket.on("connect", (data) => {
-          console.log(data);
-        });
-  
-        setLoading(false);
-  
-        socket.on("disconnect", (data) => {
-          console.log(data);
-        });
-  
-        return function cleanup() {
-          socket.disconnect();
-        };
-      }
-    }, [buttonStatus]);
-
-
-        <div className={styles.two}>{!buttonStatus ? (
-        <button onClick={handleClick}>turn chat on</button>
-      ) : (
-        <>
-          <button onClick={handleClick}>turn chat off</button>
-          <div className="line">
-            {!loading && <WebSocketCall socket={socketInstance} />}
-          </div>
-        </>
-      )}</div>
-
-
-function WebSocketCall({ socket }) {
-    const [message, setMessage] = useState("");
-    const [messages, setMessages] = useState([]);
-  
-    const handleText = (e) => {
-      const inputMessage = e.target.value;
-      setMessage(inputMessage);
-    };
-
-    
-  
-    const handleSubmit = () => {
-      if (!message) {
-        return;
-      }
-      socket.emit("data", message);
-      setMessage("");
-    };
-  
-    useEffect(() => {
-      socket.on("data", (data) => {
-        setMessages([...messages, data.data]);
-      });
-    }, [socket, messages]);
-  
-    return (
-      <div>
-        <h2>WebSocket Communication</h2>
-        <input type="text" value={message} onChange={handleText} />
-        <button onClick={handleSubmit}>submit</button>
-        <ul>
-          {messages.map((message, ind) => {
-            return <li key={ind}>{message}</li>;
-          })}
-        </ul>
-      </div>
-    );
-  }*/

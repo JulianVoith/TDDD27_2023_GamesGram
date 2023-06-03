@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-//Card component of the user card component
+//Component for the user card showing in search suggestions
 export default function Card(props){
     const userInfo = props.userInfo;
     return(

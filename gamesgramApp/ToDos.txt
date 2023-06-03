@@ -17,14 +17,13 @@ ToDo/NextSteps:
 
 
 small stuff:
-code and commenting cleanup
+change api instead of adress?
+server side cleanup and commenting
 video/audio streaming to backend
-sidebar bug teammate thingy (julian)
-check sidebar
+check sidebar contedt thing
+change getuserinfo to tool
+rename teamMates
+
 opulate database
-refresh better?? after upload
 
-check go on friends and follower page
-
-refresh data? of users
 

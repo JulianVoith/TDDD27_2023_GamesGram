@@ -1,6 +1,8 @@
 import Pusher from "pusher";
 
+//Pusher api file to send data to the pusher servers
 
+//create pusher variable with needed information
 const pusher = new Pusher({
 
   app_id: "1611665",
@@ -10,6 +12,7 @@ const pusher = new Pusher({
   //useTLS: true
 });
 
+//request handler function which is contacting the pusher servers
 export default async function handler(req, res) {
 
   console.log(req.body);

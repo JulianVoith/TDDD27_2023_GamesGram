@@ -10,29 +10,21 @@ import ShowFriendsAndFollower from "./showFriendsAndFollower";
 //Component for the profile header which is ng informatione like follower etc.
 export default function profile(props) {
 
-    //react router variable
-    const router = useRouter()
-
     //Data Hooks for user context, logged in user and recent games
     const { userInfo } = useContext(Context);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [Game, setGame] = useState(null);
     const [showFriendsAndFollower, setShowFriendsAndFollower] = useState(false);
 
-
-    //TODO:small adjustment as link!
-    const routeToSteam_friends = () => {
-        router.push({
-            pathname: '/steam_friends',
-        });
-    };
-
-    //TODO: change by useUser hook
+    //Effect to make sure context is loaded
     useEffect(() => {
         if (userInfo && !loggedInUser) {
             initFields();
         }
     }, [userInfo]);
+    const initFields = () => {
+        setLoggedInUser(userInfo.steamid);
+    };
 
     //get the game state from children component => resentGame
     const handleGameSet = (newState) => {
@@ -41,15 +33,7 @@ export default function profile(props) {
         }
     };
 
-    const initFields = () => {
-        setLoggedInUser(userInfo.steamid);
-    };
 
-    const handleFriendsAndFollower = (content) => {
-        if (content) {  // Only update if newState is not null
-            setShowFriendsAndFollower(true);
-        }
-    };
 
     return (
 

@@ -3,6 +3,7 @@ import { useState, useEffect,useContext } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+//Component for writing comments
 const CommentSubmit = ({postID, commentID}) => {
 
     //Data hooks for user information of logged in user and comment input field
@@ -11,7 +12,7 @@ const CommentSubmit = ({postID, commentID}) => {
     const [avatar, setAvatar] = useState(null);
     const [commentBox, setCommentBox] = useState(null);
 
-    //TODO: replace with userUser state (SWR)
+    //Effect to make sure context is loaded and set hooks(avatar and steamid)
     useEffect(() => {
         if(userInfo && !steamid){
             initFields();
@@ -22,7 +23,7 @@ const CommentSubmit = ({postID, commentID}) => {
         setAvatar(userInfo.avatarfull);
     };
 
-    //Submit function of comment form
+    //Submit function of comment form. Could be handled by SWR with different fetcher
     const handleCommentSubmit = async (event) => {
 
         //Preventing auto refresh
@@ -36,8 +37,6 @@ const CommentSubmit = ({postID, commentID}) => {
         "content": commentBox //Content of the comment input
         }; 
         
-        //Translate data structure into JSON
-        //TODO: REPLACE BY SWR?
         const JSONComment = JSON.stringify(commentData);
 
         const endpoint = '/api/sendComment';

@@ -3,7 +3,7 @@ import Link from "next/link";
 
 //Component for displaying post on a profile
 const PostWall = ({ userInfo, media }) => {
-  //TODO change to api
+ 
   let url = "http://localhost:5001";
 
   //get steamid of inspected user

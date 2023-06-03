@@ -1,23 +1,24 @@
 import Image from "next/image";
-import { useState, useEffect, useContext } from "react";
-
+import { useState, useEffect } from "react";
 import useSWR from "swr";
 import CommentBox from "./commentBox";
 import CommentSubmit from "./commentSubmit";
 
-//TODO adjust and comment
+//Component or container for posts
 const Post = ({ postID, descr }) => {
-  const [liked, setLiked] = useState(undefined);
+
+  //Data hooks for post
+  const [liked, setLiked] = useState(undefined); 
   const [likesCount, setLikesCount] = useState(undefined);
   const [commentsEnabled, setCommentsEnabled] = useState(false);
 
-  //test of different data fetching
+  //Fetching comments with SWR if they are enabled
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const { data: comments } = useSWR(
     commentsEnabled ? `/api/getComments/${postID}` : null,
     fetcher,
     { refreshInterval: 1000 }
-  ); //can fetch with token and preload on hover or whatever, allows subscribing to real-time data source or websocket
+  ); //can be fetched with token, on preload when hovering etc, allows subscribing to real-time data source or websocket
 
   //Check if the post is liked
   useEffect(() => {
@@ -40,6 +41,8 @@ const Post = ({ postID, descr }) => {
     };
   }, []);
 
+  //Function to check if post has been liked by logged in user
+  //Following functionalities could be put into one reusable file for comment and post likes
   const checkLiked = async () => {
     if (window.localStorage.getItem("token")) {
       const endpoint = `/api/PostLike/${postID}`;
@@ -55,6 +58,8 @@ const Post = ({ postID, descr }) => {
       else if (response.status === 404) setLiked(false);
     }
   };
+
+  //Function to delete a like of logged in user
   const deleteLike = async () => {
     if (window.localStorage.getItem("token")) {
       const endpoint = `/api/PostLike/${postID}`;
@@ -70,6 +75,8 @@ const Post = ({ postID, descr }) => {
       if (response.status === 200) setLiked(false);
     }
   };
+
+  //Function to create a like of logged in user
   const createLike = async () => {
     if (window.localStorage.getItem("token")) {
       const endpoint = `/api/PostLike/${postID}`;
@@ -85,6 +92,7 @@ const Post = ({ postID, descr }) => {
     }
   };
 
+  //Function to get amount of likes
   const getLikeCount = async () => {
     if (window.localStorage.getItem("token")) {
       const endpoint = `/api/PostLike/${postID}`;
@@ -203,8 +211,6 @@ const Post = ({ postID, descr }) => {
       ) : null}
     </>
   );
-  /*console.log(urlPost)
-  return( <div>hi {urlPost} </div>)*/
 };
 
 export default Post;

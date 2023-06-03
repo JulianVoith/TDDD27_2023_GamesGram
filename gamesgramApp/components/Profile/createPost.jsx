@@ -51,6 +51,7 @@ const CreatePost = (props) => {
 
         //Variable for upload form data
         let postData = new FormData();
+        
         //Fill form data
         postData.append("descr", formData.descr);
         postData.append("file", formData.file);

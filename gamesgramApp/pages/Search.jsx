@@ -6,6 +6,8 @@ import Head from 'next/head';
 import SearchBar from '@/components/Search';
 import UserCard from '@/components/Search/usercard';
 
+
+//Page to search user on the platform
 export default function Search(){
 
     //Hook for preserving search results

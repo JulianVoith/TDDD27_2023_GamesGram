@@ -6,9 +6,10 @@ import { useState, useEffect, useContext } from "react";
 import Context from "@/context/Context";
 import { useRouter } from 'next/router';
 
+//Component for the platforms sidebar
 export default function Sidebar(props) {
+
   //Hooks for css states of each sidebar component
-  //Fetch userContext
   const { userInfo, setuserInfo } = useContext(Context);
   const [steamid, setSteamid] = useState();
   const [avatar, setAvatar] = useState();
@@ -16,6 +17,7 @@ export default function Sidebar(props) {
   //react router variable
   const router = useRouter();
 
+  //TODO DIFFERENT WAY OF MAKEING SURE CONTEXT IS IGVEN?
   const GetuserInfo = async () => {
     if (!userInfo && window.localStorage.getItem("token")) {
       // API endpoint where we send form data.
@@ -49,9 +51,8 @@ export default function Sidebar(props) {
     setAvatar(userInfo.avatar);
   };
 
-  //const[loggedInUser, setLoggedInUser] = useState(props.loggedInUser);
 
-  //const for header of side bar
+  //Icon header of the sidebar
   const Header = () => {
     return (
       <Link

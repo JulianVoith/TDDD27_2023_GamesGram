@@ -8,15 +8,14 @@ import PostWall from "@/components/PostWall";
 import Post from "@/components/Post";
 import { Modal } from "react-bootstrap";
 
-//MODAL FOR STEAM FRIENDS?????
-//TODO change mediapost layout
-
+//Dynamic routing page for steam profiles
 const UserProfile = ({
   dataUserInfo,
   userFollower,
   userFriends,
   userPosts,
 }) => {
+  
   //Data hooks for user profile information
   const [userViewInfo, setUserInfo] = useState(dataUserInfo); //Information about inspected user
   const [follower, setFollower] = useState(userFollower); //Follower of inspected user
