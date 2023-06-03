@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import Pusher from "pusher-js";
 
-
+//Component for real-time chat on the Game Page
 const ChatBox = (props) => {
 
+  //
   const [messages, setMessages] = useState(null);
   const [message, setMessage] = useState(null);
   const [username] = useState(props.userName);

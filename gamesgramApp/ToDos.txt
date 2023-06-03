@@ -22,6 +22,7 @@ video/audio streaming to backend
 sidebar bug teammate thingy (julian)
 check sidebar
 opulate database
+refresh better?? after upload
 
 check go on friends and follower page
 

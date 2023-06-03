@@ -8,19 +8,13 @@ import { useRouter } from 'next/router';
 
 export default function Sidebar(props) {
   //Hooks for css states of each sidebar component
-  /*  const[cssStates, setState] = useState({
-    home: "nav-link active",
-    search: "nav-link text-white",
-    reels: "nav-link text-white",
-    teamMates: "nav-link text-white",
-    profile: "nav-link text-white",
-    signout: "nav-link text-white",
-  });*/
-
   //Fetch userContext
   const { userInfo, setuserInfo } = useContext(Context);
   const [steamid, setSteamid] = useState();
   const [avatar, setAvatar] = useState();
+
+  //react router variable
+  const router = useRouter();
 
   const GetuserInfo = async () => {
     if (!userInfo && window.localStorage.getItem("token")) {
@@ -34,9 +28,7 @@ export default function Sidebar(props) {
           token: window.localStorage.getItem("token"),
         },
       };
-
-  //react router variable
-  const router = useRouter();
+    
       // Send the form data to our forms API on Vercel and get a response.
       const response = await fetch(endpoint, options);
       const data = await response.json();
@@ -97,7 +89,6 @@ export default function Sidebar(props) {
             }
             if (typeof window !== "undefined") {router.push('/')}
     }
-  };
 
 //Function for hovering functionality of navigation bar
     const NavigationBar = () => {
@@ -172,4 +163,5 @@ export default function Sidebar(props) {
       </div>
     </>
   );
+
 }
