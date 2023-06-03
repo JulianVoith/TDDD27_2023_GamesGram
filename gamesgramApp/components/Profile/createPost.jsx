@@ -1,138 +1,178 @@
-import { Button, Modal, Form } from 'react-bootstrap';
-import {useState} from 'react';
-import { useRouter } from 'next/router';
+import { Button, Modal, Form } from "react-bootstrap";
+import { useState } from "react";
+import { useRouter } from "next/router";
 
 //Component for create post modal on the profile
 const CreatePost = (props) => {
+  //Data hooks for post creation
+  const [show, setShow] = useState(false); //Show and close modal
+  const [formData, setFormData] = useState({
+    //Form data for uploaded Post
+    descr: null,
+    file: null,
+    access: null,
+    category: null,
+  });
 
-    //Data hooks for post creation
-    const [show, setShow] = useState(false); //Show and close modal
-    const [formData, setFormData] = useState({ //Form data for uploaded Post
-        descr: null,
-        file: null,
-        access: null,
-        category: null
-    });
+  //handle the reload when create new post, return to profile
+  const handleReload = () => {
+    props.handleReload(true);
+  };
 
-    //React router variable
-    const router = useRouter();
+  //React router variable
+  const router = useRouter();
 
-    //Fetch games of user
-    const Games = props.gameCategory;   
-    
-    //Methods to close and open modal
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+  //Fetch games of user
+  const Games = props.gameCategory;
 
-    //Function to handle the form input and save into data hook
-    const handleInput = (e) => {
-        //Fetch the altered field name and value
-        const fieldName = e.target.name;
-        const fieldValue = e.target.value;
+  //Methods to close and open modal
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
-        //Check if its a file or text (fileupload needs different handling)
-        if (fieldName == "file") {
-            setFormData((prevState) => ({
-                ...prevState,
-                [fieldName]: e.target.files[0]
-            }));
-        } else {
-            setFormData((prevState) => ({
-                ...prevState,
-                [fieldName]: fieldValue
-            }));
-        }
+  //Function to handle the form input and save into data hook
+  const handleInput = (e) => {
+    //Fetch the altered field name and value
+    const fieldName = e.target.name;
+    const fieldValue = e.target.value;
+
+    //Check if its a file or text (fileupload needs different handling)
+    if (fieldName == "file") {
+      setFormData((prevState) => ({
+        ...prevState,
+        [fieldName]: e.target.files[0],
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [fieldName]: fieldValue,
+      }));
     }
-    
-    //Submit function of form in modal
-    const handleSubmit = async (event) => {
-        //preventing auto refresh
-        event.preventDefault();
+  };
 
-        //Variable for upload form data
-        let postData = new FormData();
-        
-        //Fill form data
-        postData.append("descr", formData.descr);
-        postData.append("file", formData.file);
-        postData.append("access", formData.access);
-        postData.append("category", formData.category);
+  //Submit function of form in modal
+  const handleSubmit = async (event) => {
+    //preventing auto refresh
+    event.preventDefault();
 
-        const endpoint = '/api/createPost'
+    //Variable for upload form data
+    let postData = new FormData();
+    //Fill form data
+    postData.append("descr", formData.descr);
+    postData.append("file", formData.file);
+    postData.append("access", formData.access);
+    postData.append("category", formData.category);
 
-        
-        const options = {
-            method: 'POST',
-            headers: {
-                'token': localStorage.getItem("token"),
-            },
-            body: postData,
-        }
-        
-        const response = await fetch(endpoint, options); 
+    const endpoint = "/api/createPost";
 
-        if (!response.ok) {
-            console.log("error");
-        } else {
-            console.log("success");
-            router.reload();
-
-        }
-
-        //Close modal after processing
-        setShow(false);
+    const options = {
+      method: "POST",
+      headers: {
+        token: localStorage.getItem("token"),
+      },
+      body: postData,
     };
 
-    return (
-        <>
-            <Button variant="primary" onClick={handleShow}>
-                Create Post
-            </Button>
+    const response = await fetch(endpoint, options);
 
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Create Post</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form id="uploadForm">
-                        <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control as="textarea" rows={3} name="descr" onChange={handleInput} required />
-                        </Form.Group>
-                        <Form.Group controlId="formFile" className="mb-3">
-                            <Form.Label>Select file</Form.Label>
-                            <Form.Control type="file" accept="image/*, video/*, audio/*" name="file" onChange={handleInput} required />
-                        </Form.Group>
-                        <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                            <Form.Label>Who should see your post?</Form.Label>
-                            <Form.Select aria-label="Default select example" name="access" onChange={handleInput}>
-                                <option value="1">Everyone</option>
-                                <option value="2">Followers</option>
-                                <option value="3">Steam friends</option>
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group controlId="formFile" className="mb-3">
-                            <Form.Label>Category/Game</Form.Label>
-                            <Form.Select aria-label="Default select example" name="category" onChange={handleInput}>
-                                <option value = "0">Select a category</option>
-                                {Games ? Games.map((gameInfo) => (<option key={gameInfo.appid} value={gameInfo.appid}>{gameInfo.name}</option>)) : <p>Loading</p>}
+    if (!response.ok) {
+      console.log("error");
+    } else {
+      console.log("success");
+      //router.reload();
+      handleReload();
+    }
 
-                            </Form.Select>
-                        </Form.Group>
+    //Close modal after processing
+    setShow(false);
+  };
 
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button type="submit" form="uploadForm" variant="primary" onClick={handleSubmit}>
-                        Upload
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
-    );
-}
+  return (
+    <>
+      <Button variant="primary" onClick={handleShow}>
+        Create Post
+      </Button>
 
-export default CreatePost
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Create Post</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form id="uploadForm">
+            <Form.Group
+              className="mb-3"
+              controlId="exampleForm.ControlTextarea1"
+            >
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                name="descr"
+                onChange={handleInput}
+                required
+              />
+            </Form.Group>
+            <Form.Group controlId="formFile" className="mb-3">
+              <Form.Label>Select file</Form.Label>
+              <Form.Control
+                type="file"
+                accept="image/*, video/*, audio/*"
+                name="file"
+                onChange={handleInput}
+                required
+              />
+            </Form.Group>
+            <Form.Group
+              className="mb-3"
+              controlId="exampleForm.ControlTextarea1"
+            >
+              <Form.Label>Who should see your post?</Form.Label>
+              <Form.Select
+                aria-label="Default select example"
+                name="access"
+                onChange={handleInput}
+              >
+                <option value="1">Everyone</option>
+                <option value="2">Followers</option>
+                <option value="3">Steam friends</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group controlId="formFile" className="mb-3">
+              <Form.Label>Category/Game</Form.Label>
+              <Form.Select
+                aria-label="Default select example"
+                name="category"
+                onChange={handleInput}
+              >
+                <option value="0">Select a category</option>
+                {Games ? (
+                  Games.map((gameInfo) => (
+                    <option key={gameInfo.appid} value={gameInfo.appid}>
+                      {gameInfo.name}
+                    </option>
+                  ))
+                ) : (
+                  <p>Loading</p>
+                )}
+              </Form.Select>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Close
+          </Button>
+          <Button
+            type="submit"
+            form="uploadForm"
+            variant="primary"
+            onClick={handleSubmit}
+          >
+            Upload
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
+
+export default CreatePost;
