@@ -4,12 +4,13 @@ import { useEffect, useState, useContext } from 'react';
 import {GetUserInfo} from '@/components/Tools/getUserInfo'
 import Sidebar from '@/components/Siderbar';
 import Profile from '@/components/Profile';
-import styles from '@/styles/Home.module.css';
+import styles from '@/styles/Game.module.css';
 import PostWall from '@/components/PostWall';
 import HomeWall from '@/components/HomeWall';
 import Post from '@/components/Post';
 import { Modal } from 'react-bootstrap';
 import Context from '@/context/Context';
+import ChatBox from '@/components/ChatBox';
 
 export default function Game()
 {
@@ -19,6 +20,22 @@ export default function Game()
     const fetcher = (...args) => fetch(...args).then((res) => res.json());
     const { data: gameNews } = useSWR(`/api/getGameNews/${appid}`, fetcher);
     const { data: gamePosts } = useSWR(`/api/getGame/${appid}`, fetcher);
+
+    //Fetch userContext
+    const {userInfo} = useContext(Context); 
+    const[steamid, setSteamid] = useState(null);
+    const[username, setUsername] = useState(null);
+
+    useEffect(() => {
+        if(userInfo && !steamid){
+        initFields();
+        }
+    },[userInfo]);
+    
+    const initFields = () => {
+        setSteamid(userInfo.steamid);
+        setUsername(userInfo.personaname);
+    };
 //chat page
 
 //Left : Sidebar
@@ -47,13 +64,16 @@ return (
                 {gameNews&&<News news={gameNews[0]}/>}
               {gamePosts ? gamePosts.map((gamePost) => <HomeWall key={gamePost.filenam} id={gamePost.filenam} media={gamePost} />) : <p>Here will be our Game page by default</p>}
             </div>
+            <div className={styles.three}>
+                {username ? <ChatBox appid={appid} userName={username} steamid={steamid}/> :null}
+            </div>
         </div>
     </main>
 )
 }
 
 //possiblity with get static path etc
-
+// <ChatBox appid={appid} userName={username} steamid={steamid}/>
 function News(props)
 {
     const news = props.news;

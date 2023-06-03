@@ -2,9 +2,9 @@ import { useRouter } from 'next/router';
 import Sidebar from '@/components/Siderbar';
 import styles from '@/styles/TeamMates.module.css';
 import RecentGame from '@/components/Profile/recentGame';
-import ChatBox from '@/components/ChatBox';
+
 import { useEffect, useState } from 'react';
-import { io } from "socket.io-client";
+
 const TeamMates = ({  }) => { 
 
     //Data Hooks
@@ -31,6 +31,20 @@ const TeamMates = ({  }) => {
         }
     };
 
+return (
+    <>
+    <div className={styles.main}>
+        <div className={styles.one}><Sidebar selection={SidebarSelect}/></div>
+        <div className={styles.two}>{<RecentGame onGameSet={handleGameSet}  steamid={steamid}/>}</div>
+    </div>
+    </>   
+)
+
+}
+
+export default TeamMates;
+
+/*
     const [socketInstance, setSocketInstance] = useState("");
     const [loading, setLoading] = useState(true);
     const [buttonStatus, setButtonStatus] = useState(false);
@@ -70,12 +84,6 @@ const TeamMates = ({  }) => {
       }
     }, [buttonStatus]);
 
-return (
-    <>
-    <div className={styles.main}>
-        <div className={styles.one}><Sidebar selection={SidebarSelect}/></div>
-        <div className={styles.two}>{<RecentGame onGameSet={handleGameSet}  steamid={steamid}/>}</div>
-        <div className={styles.two}>{<ChatBox />}</div>
 
         <div className={styles.two}>{!buttonStatus ? (
         <button onClick={handleClick}>turn chat on</button>
@@ -87,13 +95,6 @@ return (
           </div>
         </>
       )}</div>
-    </div>
-    </>   
-)
-
-}
-
-export default TeamMates;
 
 
 function WebSocketCall({ socket }) {
@@ -133,4 +134,4 @@ function WebSocketCall({ socket }) {
         </ul>
       </div>
     );
-  }
+  }*/

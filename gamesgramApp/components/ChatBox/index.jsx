@@ -1,15 +1,82 @@
-import React, { useEffect, useState } from "react";
-import io from "socket.io-client";
+import { useEffect, useState } from "react";
+import Pusher from "pusher-js";
 
-let socket;
 
-const ChatBox = () => {
+const ChatBox = (props) => {
 
-    const [message, setMessage] = useState("");
-    const [username, setUsername] = useState("");
-    const [allMessages, setAllMessages] = useState([]);
+  const [messages, setMessages] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [username] = useState(props.userName);
+  const [appid] = useState(props.appid);
+  let allMessages = [];
 
-    useEffect(() => {
+
+  console.log(username);
+  console.log(appid);
+  useEffect( () => {
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('eb86425f6a7666bc669d', {
+          cluster: 'eu'
+        });
+    
+        var channel = pusher.subscribe("GamesGram");
+        channel.bind(appid, function(data) {
+          allMessages.push(data);
+          setMessages(allMessages);
+        });
+  });
+
+  const submit = async (e) => {
+    e.preventDefault();
+
+    await fetch('/api/pusher', {
+      method: "POST",
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        username,
+        message,
+        appid, 
+      })
+    });
+    setMessage();
+
+  }
+
+  return (
+  <div className="container">
+    <div className="row">
+        <div className="panel panel-default">
+          <div className="panel-heading">Chat</div>
+          <div className="panel-body">
+            <div className="container">
+              {messages ? messages.map(message => {
+                  <div className="row message-bubble">
+                  <p className="text-muted">{message.username}</p>
+                      <span>{message.message}</span>
+                  </div>
+                }):null}
+            </div>
+            <div className="panel-footer">
+                 <div className="input-group">
+                  <form id="commentInputForm" onSubmit={submit}>
+                          <input required onChange={(e) => setMessage(e.target.value)} value={message} type="text" className="form-control" placeholder="Enter your message..." id="messageBox"/>
+                  </form>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+  );
+
+};
+
+export default ChatBox;
+
+
+/*    /*useEffect(() => {
         socketInitializer();
     
         return () => {
@@ -43,8 +110,12 @@ const ChatBox = () => {
     
         setMessage("");
       }
-    
-      return (
+    */
+
+
+
+
+      /*       return (
       <div>
         <h1>Chat app</h1>
         <h1>Enter a username</h1>
@@ -74,8 +145,4 @@ const ChatBox = () => {
           </form>
         </div>
       </div>
-    );
-
-};
-
-export default ChatBox;
+    );*/
