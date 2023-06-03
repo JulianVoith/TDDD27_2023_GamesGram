@@ -1,9 +1,8 @@
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
 //Component for displaying post on a profile
 const PostWall = ({ userInfo, media }) => {
-
   //TODO change to api
   let url = "http://localhost:5001";
 
@@ -16,7 +15,7 @@ const PostWall = ({ userInfo, media }) => {
       {media.map((mediae) => (
         <Link
           key={mediae.filenam.split(".")[0]}
-          href={`${steamid}/?postID=${mediae.filenam}`}
+          href={`${steamid}/?postID=${mediae.filenam}&descr=${mediae.descr}`}
           as={`/${steamid}/?postID=${mediae.filenam}`}
           shallow={true}
           scroll={false}
@@ -37,8 +36,6 @@ const PostWall = ({ userInfo, media }) => {
       ))}
     </div>
   );
-
-
 };
 
 export default PostWall;

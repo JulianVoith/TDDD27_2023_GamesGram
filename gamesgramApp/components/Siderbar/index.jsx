@@ -1,15 +1,14 @@
-import styles from '@/styles/Sidebar.module.css'
-import cx from 'classnames';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState, useEffect,useContext } from 'react';
-import Context from '@/context/Context';
+import styles from "@/styles/Sidebar.module.css";
+import cx from "classnames";
+import Image from "next/image";
+import Link from "next/link";
+import { useState, useEffect, useContext } from "react";
+import Context from "@/context/Context";
 import { useRouter } from 'next/router';
 
-export default function Sidebar(props){
-
-//Hooks for css states of each sidebar component
-/*  const[cssStates, setState] = useState({
+export default function Sidebar(props) {
+  //Hooks for css states of each sidebar component
+  /*  const[cssStates, setState] = useState({
     home: "nav-link active",
     search: "nav-link text-white",
     reels: "nav-link text-white",
@@ -19,20 +18,40 @@ export default function Sidebar(props){
   });*/
 
   //Fetch userContext
-  const {userInfo} = useContext(Context); 
-  const[steamid, setSteamid] = useState();
-  const[avatar, setAvatar] = useState();
+  const { userInfo, setuserInfo } = useContext(Context);
+  const [steamid, setSteamid] = useState();
+  const [avatar, setAvatar] = useState();
+
+  const GetuserInfo = async () => {
+    if (!userInfo && window.localStorage.getItem("token")) {
+      // API endpoint where we send form data.
+      const endpoint = "/api/GetUserInfo";
+      // Form the request for sending data to the server.
+      const options = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          token: window.localStorage.getItem("token"),
+        },
+      };
 
   //react router variable
   const router = useRouter();
+      // Send the form data to our forms API on Vercel and get a response.
+      const response = await fetch(endpoint, options);
+      const data = await response.json();
+      setuserInfo(data.response.players[0]);
+    }
+  };
 
   //TODO: maybe google if there is a better way
   useEffect(() => {
-    if(userInfo && !steamid){
+    GetuserInfo();
+    if (userInfo && !steamid) {
       initFields();
     }
-  },[userInfo]);
-  
+  }, [userInfo]);
+
   const initFields = () => {
     setSteamid(userInfo.steamid);
     setAvatar(userInfo.avatar);
@@ -40,22 +59,24 @@ export default function Sidebar(props){
 
   //const[loggedInUser, setLoggedInUser] = useState(props.loggedInUser);
 
-
-//const for header of side bar
+  //const for header of side bar
   const Header = () => {
-      return (
-        <Link className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none" href="/">
-          <Image 
-            src={"/images/Gpic.jpg"} 
-            height={60} 
-            width={60} 
-            alt="GGramLogo"
-            className ="rounded-circle"
-            />
-          <h1>amesGram</h1>
-        </Link>
-      );
-    };
+    return (
+      <Link
+        className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none"
+        href="/"
+      >
+        <Image
+          src={"/images/Gpic.jpg"}
+          height={60}
+          width={60}
+          alt="GGramLogo"
+          className="rounded-circle"
+        />
+        <h1>amesGram</h1>
+      </Link>
+    );
+  };
 
     //Function for user signout. Deletes local storage and token from database
     const handleSignout = async ()=>{
@@ -76,6 +97,7 @@ export default function Sidebar(props){
             }
             if (typeof window !== "undefined") {router.push('/')}
     }
+  };
 
 //Function for hovering functionality of navigation bar
     const NavigationBar = () => {
@@ -135,14 +157,19 @@ export default function Sidebar(props){
 
     };
 
-//return of the sidebar
-      return (
-          < >
-          <div className={cx(styles.main,"d-flex flex-column flex-shrink-0 p-3 text-white bg-dark")}>
-            <Header />
-            <hr />
-            <NavigationBar />
-          </div>
-          </>
-      )
-  }
+  //return of the sidebar
+  return (
+    <>
+      <div
+        className={cx(
+          styles.main,
+          "d-flex flex-column flex-shrink-0 p-3 text-white bg-dark"
+        )}
+      >
+        <Header />
+        <hr />
+        <NavigationBar />
+      </div>
+    </>
+  );
+}
