@@ -8,8 +8,7 @@ export default function Card(props){
     return(
             <>
             <h1>{userInfo.personaname}</h1>
-            <Link href={`/${userInfo.steamid}`} as = {`/${userInfo.steamid}`} 
-             shallow={true} >
+            <Link href={`/${userInfo.steamid}`} as = {`/${userInfo.steamid}`} >
               <Image 
               src={userInfo.avatarfull} 
               width={100}

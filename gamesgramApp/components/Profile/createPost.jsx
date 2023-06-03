@@ -1,5 +1,6 @@
 import { Button, Modal, Form } from 'react-bootstrap';
 import {useState} from 'react';
+import { useRouter } from 'next/router';
 
 //Component for create post modal on the profile
 const CreatePost = (props) => {
@@ -12,6 +13,9 @@ const CreatePost = (props) => {
         access: null,
         category: null
     });
+
+    //React router variable
+    const router = useRouter();
 
     //Fetch games of user
     const Games = props.gameCategory;   
@@ -70,6 +74,8 @@ const CreatePost = (props) => {
             console.log("error");
         } else {
             console.log("success");
+            router.reload();
+
         }
 
         //Close modal after processing
@@ -107,6 +113,7 @@ const CreatePost = (props) => {
                         <Form.Group controlId="formFile" className="mb-3">
                             <Form.Label>Category/Game</Form.Label>
                             <Form.Select aria-label="Default select example" name="category" onChange={handleInput}>
+                                <option value = "0">Select a category</option>
                                 {Games ? Games.map((gameInfo) => (<option key={gameInfo.appid} value={gameInfo.appid}>{gameInfo.name}</option>)) : <p>Loading</p>}
 
                             </Form.Select>

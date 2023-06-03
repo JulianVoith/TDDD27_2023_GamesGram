@@ -145,7 +145,7 @@ export default function Home() {
         {!hastoken ? <title>Welcome to GamesGram</title> : <title>GamesGram</title>}
         <link rel="icon" href="/images/GPic.jpg" />
       </Head>
-      <main >
+      <main>
         {!hastoken || !userInfo ? <LoginWSteam /> :
           <div className={styles.main}>
             <div className={styles.one}><Sidebar selection={SidebarSelect} /></div>

@@ -1,15 +1,11 @@
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { useEffect, useState, useContext } from 'react';
-import {GetUserInfo} from '@/components/Tools/getUserInfo'
 import Sidebar from '@/components/Siderbar';
-import Profile from '@/components/Profile';
 import styles from '@/styles/Game.module.css';
-import PostWall from '@/components/PostWall';
 import HomeWall from '@/components/HomeWall';
-import Post from '@/components/Post';
-import { Modal } from 'react-bootstrap';
 import Context from '@/context/Context';
+import Head from 'next/head';
 import ChatBox from '@/components/ChatBox';
 
 export default function Game()
@@ -36,14 +32,6 @@ export default function Game()
         setSteamid(userInfo.steamid);
         setUsername(userInfo.personaname);
     };
-//chat page
-
-//Left : Sidebar
-//Center : News/#Posts about the game
-//Right : Chat
-
-//if a user opens this page -> create websocket -> you cn chat
-
 
   //Constant for the sidebar selection highlight which is passed as a prop to child components
   const SidebarSelect = 
@@ -56,6 +44,10 @@ export default function Game()
 
 return (
     <main>
+        <Head>
+          <title>GamesGram Game News</title>
+          <link rel="icon" href="/images/GPic.jpg" />
+        </Head>
         <div className={styles.main}>
             <div className={styles.one}>
                 <Sidebar selection={SidebarSelect}/>

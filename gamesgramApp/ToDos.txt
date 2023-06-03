@@ -17,25 +17,13 @@ ToDo/NextSteps:
 
 
 small stuff:
-code cleanup
-sidebar bug teammate thingy
-layout chat and profile
-maybe some small layout for login
-
-description to a post
+code and commenting cleanup
+video/audio streaming to backend
+sidebar bug teammate thingy (julian)
+check sidebar
 opulate database
 
-check home after follow etc
-
 check go on friends and follower page
-
-upload none category and refresh aftrer upload
-
-fix teammates thingy post 
-
-video/audio streaming to backend
-
-
 
 refresh data? of users
 

@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState, useContext } from 'react';
+import Head from 'next/head';
 import Sidebar from '@/components/Siderbar';
 import Profile from '@/components/Profile';
 import styles from '@/styles/Home.module.css';
@@ -30,9 +31,12 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
                         teamMates: "nav-link text-white",
                         profile: "nav-link active",
                         signout: "nav-link text-white"};
-
   return (
     <main>
+      <Head>
+          <title>GamesGram Profile</title>
+          <link rel="icon" href="/images/GPic.jpg" />
+      </Head>
      <div>
       <Modal
         show={!!router.query.postID}
@@ -48,9 +52,9 @@ const UserProfile = ({ dataUserInfo, userFollower, userFriends, userPosts }) => 
     <div className={styles.main}>
         <div className={styles.one}><Sidebar selection={SidebarSelect}/></div>
         <div><Profile userInfo={userViewInfo[0]} follower={follower} friends={friends}/></div>
-    </div>
-    <div className={styles.two}>
-      {mediaPosts&&userViewInfo ? <PostWall userInfo={userViewInfo[0]} media={mediaPosts} />: "No posts available"}:
+        <div className={styles.two}>
+          {mediaPosts&&userViewInfo ? <PostWall userInfo={userViewInfo[0]} media={mediaPosts} />: "No posts available"}:
+        </div>
     </div>
 </main>
   );

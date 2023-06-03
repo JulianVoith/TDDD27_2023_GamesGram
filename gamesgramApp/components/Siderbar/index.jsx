@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect,useContext } from 'react';
 import Context from '@/context/Context';
+import { useRouter } from 'next/router';
 
 export default function Sidebar(props){
 
@@ -22,6 +23,8 @@ export default function Sidebar(props){
   const[steamid, setSteamid] = useState();
   const[avatar, setAvatar] = useState();
 
+  //react router variable
+  const router = useRouter();
 
   //TODO: maybe google if there is a better way
   useEffect(() => {
@@ -71,7 +74,7 @@ export default function Sidebar(props){
               localStorage.clear();
               window.localStorage.clear();
             }
-            if (typeof window !== "undefined") {window.location.reload()}
+            if (typeof window !== "undefined") {router.push('/')}
     }
 
 //Function for hovering functionality of navigation bar
@@ -85,28 +88,6 @@ export default function Sidebar(props){
       function hoverLeave(e) {
         e.target.style.background = '';
       }
-
-      /*//onclick funmction which changes styling and returns the selected value back to main login page
-      function onClickNavbar(item) {
-
-        //contents of sidebar
-        const items = ["home", "search", "reels", "teamMates", "profile"];
-
-        //setting css state of sidebar elements
-        setState({
-          home:"nav-link text-white",
-          search:"nav-link text-white",
-          reels:"nav-link text-white",
-          teamMates:"nav-link text-white",
-          profile:"nav-link text-white",
-          [items[item]]:"nav-link active"}
-        );
-        
-        //sends back the selected value to logged-in main page
-
-        //props.navigate(items[item]);
-        return false; 
-      }*/
       
       return (
         <div >

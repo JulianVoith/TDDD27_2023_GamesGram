@@ -213,17 +213,19 @@ class GetFriendList(Resource):
         url = "https://api.steampowered.com/ISteamUser/GetFriendList/v0001/"
         response = requests.get(url, params)
         result = json.loads(response.content)["friendslist"]["friends"]
+        print(len(result))
         steamids = []
         for i in result:
             steamids.append(i["steamid"])
         steamids = ", ".join(map(str, steamids))
-
+        
         # Request user details from the Steam API
         url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
         params = {"key": api_key, "steamids": steamids}
 
         # fetch information from stem api
         details = requests.get(url, params).json()
+
         return make_response(details["response"]["players"], 200)  # OK
 
 
@@ -585,7 +587,7 @@ class GetGame(Resource):
         postResponse = []
         # fatch all post
         posts = database_helper.getGamePosts(appid)
-        print(posts)
+        
         for post in posts:
             typeOfMedia = database_helper.getMedia(post[4])
 

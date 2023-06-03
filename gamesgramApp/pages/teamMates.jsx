@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import Sidebar from '@/components/Siderbar';
+import Head from 'next/head';
 import styles from '@/styles/TeamMates.module.css';
 import RecentGame from '@/components/Profile/recentGame';
 
@@ -34,6 +35,10 @@ const TeamMates = ({  }) => {
 return (
     <>
     <div className={styles.main}>
+        <Head>
+          <title>GamesGram GameNews</title>
+          <link rel="icon" href="/images/GPic.jpg" />
+        </Head>
         <div className={styles.one}><Sidebar selection={SidebarSelect}/></div>
         <div className={styles.two}>{<RecentGame onGameSet={handleGameSet}  steamid={steamid}/>}</div>
     </div>
