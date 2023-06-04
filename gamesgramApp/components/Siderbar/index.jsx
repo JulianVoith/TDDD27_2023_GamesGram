@@ -16,7 +16,7 @@ export default function Sidebar(props) {
   //react router variable
   const router = useRouter();
 
-  //TODO: maybe google if there is a better way
+  //Effect to make sure data hooks are not empty
   useEffect(() => {
     if (userInfo && !steamid) {
       initFields();
@@ -64,7 +64,13 @@ export default function Sidebar(props) {
       window.localStorage.clear();
     }
     if (typeof window !== "undefined") {
-      router.push("/");
+      //In case location is on root url
+      if (router.route === "/"){
+        router.reload();
+      }else {
+        router.push('/');
+      }
+      
     }
   };
 

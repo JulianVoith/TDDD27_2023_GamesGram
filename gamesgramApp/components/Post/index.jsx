@@ -116,7 +116,8 @@ const Post = ({ postID, descr }) => {
   };
 
   //General variables. Could be somwhere in the config files
-  let urlImgaes = "http://localhost:5001/image_feed/" + postID;
+  //let urlImgaes = "http://localhost:5001/image_feed/" + postID;
+  let urlImgaes = "/image_feed/" + postID;
   //let urlVideos = "http://localhost:5001/video_feed/"; // not yet implemented for future use maybe
   //let urlAUdios = "http://localhost:5001/audio_feed/"; // not yet implemented
 

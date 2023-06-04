@@ -5,10 +5,6 @@ module.exports = () => {
   const rewrites = () => {
     return [
       {
-        source: "/api/login/:path*",
-        destination: "http://127.0.0.1:5001/login/:path*",
-      },
-      {
         source: "/authWSteam2/:path*",
         destination: "http://127.0.0.1:5001/authWSteam2/:path*",
       },

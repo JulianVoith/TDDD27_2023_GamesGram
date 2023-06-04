@@ -4,7 +4,6 @@ from flask import g
 
 DATANASE_URI = "database.db"
 
-
 # create db connection
 def get_db():
     db = getattr(g, "db", None)
@@ -22,10 +21,8 @@ def disconnect():
         g.db = None
 
 
-# not used any more
-# store user's token
+#Create user session by storing token in database
 def createUserSession(steamid, token):
-    # insert user's steamid and token
     try:
         get_db().execute("insert into userSessions values (?,?);", [steamid, token])
         get_db().commit()
@@ -33,9 +30,7 @@ def createUserSession(steamid, token):
     except:
         return False
 
-
-# not used any more
-# check active session by token
+# check if session is active with token
 def activeSession(token):
     cursor = get_db().execute(
         "select token from userSessions where token like ?;", [token]
@@ -73,7 +68,7 @@ def deleteSession(token):
 
 # get steamid of user by the token
 def getSteamidByToken(token):
-    # print("database,token",token)
+    
     cursor = get_db().execute(
         "select steamid from userSessions where token like ?;", [token]
     )
@@ -83,15 +78,13 @@ def getSteamidByToken(token):
     return userSteamid[0][0]
 
 
-# method to check existence of user
+# method to check existence of user by steamid
 def userExists(steamid):
-    # fetch user by email
     cursor = get_db().execute(
         "select steamid from userInfo where steamid like ?;", [steamid]
     )
     user = cursor.fetchall()
     cursor.close()
-    # check if user exists and return true or false
     if user != []:
         return True
     else:
@@ -99,8 +92,8 @@ def userExists(steamid):
 
 
 # create user with platform specific information
+# dictionary needs to be inserted
 def createUser(userInformation):
-    # insert passed dictionary and create user in database
     try:
         get_db().execute(
             "insert into userInfo values (?,?,?);",
@@ -116,33 +109,33 @@ def createUser(userInformation):
         return False
 
 
-# get user information from database
+# get stored user information from database
 def getUser(steamid):
-    # fetch user by email
+    
     cursor = get_db().execute("select * from userInfo where steamid like ?;", [steamid])
     userInfo = cursor.fetchall()
     cursor.close()
-    # check if user exists and return true or false
+    
     if userInfo != []:
         return userInfo[0]
     else:
         return False
 
 
-# get user information from database
+# get steamid of all users on the platfrom from database
 def getAllUser():
-    # fetch user by email
+    
     cursor = get_db().execute("select steamid from userInfo;")
     users = cursor.fetchall()
     cursor.close()
-    # check if user exists and return true or false
+    
     if users != []:
         return users
     else:
         return False
 
 
-# method to fuzzy search User
+# Seatch user with wildcard on the database
 def searchUser(searchTerm):
     cursor = get_db().execute(
         "select steamid from userInfo where personname like ?;", (f"%{searchTerm}%",)
@@ -152,10 +145,10 @@ def searchUser(searchTerm):
     return userSteamid
 
 
-# method to reate post in database
+# method to create post on the database
 def createPost(steamid, appid, descr, accessRuleID, postMedia):
     try:
-        print(steamid, appid, descr, accessRuleID, postMedia)
+        
         cursor = get_db().execute(
             "insert into userPost (steamid, appid, descr, accessRuleID, postMedia, ts) values (?, ?, ?, ?, ?, CURRENT_TIMESTAMP);",
             [steamid, appid, descr, accessRuleID, postMedia],
@@ -168,7 +161,7 @@ def createPost(steamid, appid, descr, accessRuleID, postMedia):
         return False
 
 
-# method to fetch id for media filename (based on last id)
+# method to fetch id for latest media entry. (used to create new entry)
 def getLastUsedID():
     cursor = get_db().execute("select max(rowid) from userMedia;")
 
@@ -178,7 +171,7 @@ def getLastUsedID():
     return lastId[0][0]
 
 
-# create database entry for media
+# create database entry for uploaded media
 def uploadMedia(filenam, typeofm):
     try:
         cursor = get_db().execute(
@@ -192,7 +185,7 @@ def uploadMedia(filenam, typeofm):
         return False
 
 
-# delete database entry for media
+# delete database entry for uploaded media
 def deleteMedia(filenam):
     try:
         cursor = get_db().execute(
@@ -206,20 +199,19 @@ def deleteMedia(filenam):
         return False
 
 
-# fetch posts of user
+# fetch posts of a user by steamid
 def getUserPosts(steamid):
     cursor = get_db().execute(
         "select * from userPost where steamid like ?ORDER BY ts DESC;", [steamid]
     )
     posts = cursor.fetchall()
     cursor.close()
-    # if posts != []:
+    
     return posts
-    # else:
-    #    return False
 
 
-# fetch posts of game
+
+# fetch posts related to a specific game
 def getGamePosts(appid):
     cursor = get_db().execute(
         "SELECT * FROM userPost WHERE appid LIKE ? ORDER BY ts DESC;", [appid]
@@ -229,19 +221,17 @@ def getGamePosts(appid):
     return posts
 
 
-# fetch media for a post
+# fetch media related to a specific post
 def getMedia(filenam):
     cursor = get_db().execute(
         "select * from userMedia where filenam like ?;", [filenam]
     )
     media = cursor.fetchall()
     cursor.close()
-    # if media != []:
+    
     return media[0]
-    # else:
-    #    return False
 
-
+#create follow entry on the database
 def setFollow(steamid, followid):
     try:
         get_db().execute("insert into followRel values (?,?);", [steamid, followid])
@@ -250,7 +240,7 @@ def setFollow(steamid, followid):
     except:
         return False
 
-
+#delete follow entry on the database
 def deleteFollow(steamid, followid):
     try:
         get_db().execute(
@@ -263,7 +253,7 @@ def deleteFollow(steamid, followid):
         return False
 
 
-# fetch followers
+# fetch followers of a user by steamid
 def getFollowers(steamid):
     cursor = get_db().execute(
         "select steamid from followRel where followsID like ?;", [steamid]
@@ -275,8 +265,6 @@ def getFollowers(steamid):
     else:
         return []
 
-
-# LIKE part
 # Check if a user has liked a specific post
 def isPostLiked(steamid, postID):
     cursor = get_db().execute(
@@ -301,7 +289,7 @@ def deletePostLiked(steamid, postID):
         return False
 
 
-# Handle users adding new likes
+# Handle users adding new likes to a post
 def addPostLiked(steamid, postID):
     try:
         get_db().execute("insert into postLikes values (?,?);", [steamid, postID])
@@ -310,7 +298,7 @@ def addPostLiked(steamid, postID):
     except:
         return False
 
-
+#Count likes of a specific post
 def countPostLiked(postID):
     cursor = get_db().execute(
         "select count(*) from postLikes where postID = ?;",
@@ -318,14 +306,12 @@ def countPostLiked(postID):
     )
     liked = cursor.fetchone()
     cursor.close()
-    # Check if liked is None before trying to access it
+    
     if liked is not None:
         return liked[0]
     else:
-        return 0  # Or whatever value is appropriate in your case
+        return 0  
 
-
-## commontLike
 # Check if a user has liked a specific comment
 def isCommentLiked(steamid, commentID):
     cursor = get_db().execute(
@@ -368,11 +354,11 @@ def countCommentLiked(commentID):
     )
     liked = cursor.fetchone()
     cursor.close()
-    # Check if liked is None before trying to access it
+    
     if liked is not None:
         return liked[0]
     else:
-        return 0  # Or whatever value is appropriate in your case
+        return 0  
 
 
 # create comment in a post on the database
@@ -397,7 +383,7 @@ def getComments(postID):
     )
     comments = cursor.fetchall()
     cursor.close()
-    # if followers != []:
+    
     return comments
 
 
@@ -409,5 +395,5 @@ def getSubComments(postID, commentID):
     )
     comments = cursor.fetchall()
     cursor.close()
-    # if followers != []:
+    
     return comments

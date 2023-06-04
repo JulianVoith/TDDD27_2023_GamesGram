@@ -13,36 +13,20 @@ from flask import (
     Response,
     jsonify,
     make_response,
-    redirect,
     request,
-    send_file,
-    send_from_directory,
-    session,
 )
-#from flask_socketio import SocketIO, emit
 
-
-# from flask_bcrypt import Bcrypt  # DOCU
 from flask_cors import CORS, cross_origin
 from flask_restful import Api, Resource, fields, marshal_with, reqparse
-
-# from flask_sock import Sock  # DOCU
 from pysteamsignin.steamsignin import SteamSignIn  # import for steam signin
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-
 api = Api(app)
-# sockets = Sock(app)
-# bcrypt = Bcrypt(app)
-CORS(app, resources={r"/*": {"origins": "*"}})  # enable CORS on all routes
-#socketio = SocketIO(app, cors_allowed_origins="*")
-
-# global dictionary for all active websockets
-client_list = {}
-
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Gloabal declarations
+
 # Steam authentification
 steam_openid_url = "https://steamcommunity.com/openid/login"
 api_key = "FB453E73DBD4107207669FA395CBC366"
@@ -57,15 +41,6 @@ upload_path_video = os.path.join(app.root_path, video_path)
 
 parser = reqparse.RequestParser()
 parser.add_argument("task")
-
-
-class Message(Resource):
-    def get(self):
-        return {"message": "Hello World"}
-
-
-api.add_resource(Message, "/hello")
-
 
 #@app.route("/http-call")
 #def http_call():
@@ -121,29 +96,8 @@ api.add_resource(Message, "/hello")
 #        else:
 #            sockets.close(1000, "signOut")
 
-
-@api.resource("/login")  # Not in use now
-class Login(Resource):
-    def post(self):
-        data = request.json
-        steamid = data["steamID"]
-        if database_helper.activeSessionSteamid(steamid):
-            token = database_helper.activeSessionSteamid(steamid)
-            tokenResp = {"token": token}
-            return make_response(jsonify(tokenResp), 200)  # OK
-        else:
-            token = hashlib.sha1(os.urandom(24)).hexdigest()
-            # created dictonary response
-            tokenResp = {"token": token}
-            if database_helper.createUserSession(steamid, token):
-                # session created and user is logged in
-                return make_response(jsonify(tokenResp), 201)  # CREATED
-            else:
-                # database error
-                return "", 500  # internal server error
-
-
-@api.resource("/signout")  # Not in use now
+#API to sign user out and delete session
+@api.resource("/signout")  
 class SignOut(Resource):
     def delete(self):
         if request.headers["token"]:
@@ -157,7 +111,7 @@ class SignOut(Resource):
             # response if not signed in
             return "", 401  # UNAUTHORIZED
 
-
+#API to get user information of a user. Without transmitted steam id it will be fetched based on the token
 @api.resource("/GetUserInfo", "/GetUserInfo/<string:steamid>")
 class GetUserInfo(Resource):
     def get(self, steamid=None):
@@ -191,7 +145,7 @@ class GetUserInfo(Resource):
 
         return make_response(details, 200)  # OK
 
-
+#API to fetch recently played games from the steam servers
 @api.resource("/GetRecentlyPlayedGames/<string:steamid>")
 class GetRecentlyPlayedGames(Resource):
     def get(self, steamid):
@@ -204,11 +158,12 @@ class GetRecentlyPlayedGames(Resource):
         else:
             return 404  # NO FOUND
 
-
+#API to fetch the friendlist of a specific profile
 @api.resource("/GetFriendList/<string:steamid>")
 class GetFriendList(Resource):
     def get(self, steamid):
-        # steamid = request.json["steamid"]  # fetch steamid from client
+        
+        #Fetch steamids of the users friends from the Steam API
         params = {"key": api_key, "steamid": steamid, "relationship": "friend"}
         url = "https://api.steampowered.com/ISteamUser/GetFriendList/v0001/"
         response = requests.get(url, params)
@@ -219,7 +174,7 @@ class GetFriendList(Resource):
             steamids.append(i["steamid"])
         steamids = ", ".join(map(str, steamids))
         
-        # Request user details from the Steam API
+        # Request friends details from the Steam API
         url = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/"
         params = {"key": api_key, "steamids": steamids}
 
@@ -228,27 +183,19 @@ class GetFriendList(Resource):
 
         return make_response(details["response"]["players"], 200)  # OK
 
-
-# build method for fetching details of users. only when needed!
-
-
+#API Endpoint for authentification via Steam servers. Is using third-party extension for python.
 @app.route("/authWSteam2")
 def loginSteam():
     steamLogin = SteamSignIn()
     return steamLogin.RedirectUser(steamLogin.ConstructURL("http://localhost:3000/"))
 
-
+#API to process the login onto the platform. Creates user information on databaase if its a users first sign in
 @api.resource("/processSteamLogin")
 class processSteamLogin(Resource):
     def post(self):
         returnData = request.json
         steamid = returnData["openid.claimed_id"][37:]
 
-        # Better method, should fix it latter
-        """ 
-        SteamLogin = SteamSignIn()
-        steamid = SteamLogin.ValidateResults(returnData)
-        """
         if database_helper.activeSessionSteamid(steamid) and steamid:
             token = database_helper.activeSessionSteamid(steamid)
             tokenResp = {"token": token}
@@ -288,14 +235,12 @@ class processSteamLogin(Resource):
                             # database error
                             return "", 500  # internal server error
                     else:
-                        return "", 500
+                        return "", 500 #internal server error
                 else:
                     # steam server is not available
                     return "", 502  # Bad Gateway
 
-            # session created and user is logged in
-
-
+#API to search user on the platform
 @api.resource("/search/<string:searchTerm>")
 class GetUser(Resource):
     def get(self, searchTerm):
@@ -308,14 +253,17 @@ class GetUser(Resource):
             return "", 404  # NO FOUND
 
 
-# Interface for creating a post with media
+#Interface for creating a post with media
+#Capable of uploading image audio and video
 @api.resource("/createPost")
 class CreatePost(Resource):
     def post(self):
+
         # Fetch token from header and check if session is acrive
         token = request.headers.get("token")
         if database_helper.activeSession(token):
-            # get media data
+
+            # get transmitted media data
             media = request.files.get("file")
 
             # validate if file is an image, audio or video
@@ -324,6 +272,7 @@ class CreatePost(Resource):
                 or media.content_type[0:5] == "audio"
                 or media.content_type[0:5] == "video"
             ) and media is not None:
+                
                 # make safe filename give it the next id and save it into message data
                 mediaFilename = media.filename
                 # create new filename with an unique ID
@@ -372,21 +321,15 @@ class CreatePost(Resource):
                         return "", 500  # internal server error
 
                 else:
-                    # incase upload goes wron. remove linkage from emssage
-                    database_helper.updateUserMessageMedia(
-                        "", request.form.get("messageID")
-                    )
                     # database error
                     return "", 500  # internal server error
             else:
                 return "", 400  # badrequst
-            # check content type
-        # create database entry with id
         else:
             return "", 401  # Unauthorized
 
 
-# Interface about post like system
+# API for the post like system
 # @head -> # Check if a user has liked a specific post
 # @delete ->  # Handling user unlikes of posts
 # @post ->  # Handle users adding new likes
@@ -437,7 +380,7 @@ class PostLike(Resource):
             return "", 401  # Unauthorized
 
 
-# Interface about comment like system
+# API for comment like system
 # @head -> # Check if a user has liked a specific comment
 # @delete ->  # Handling user unlikes of comment
 # @post ->  # Handle users adding new likes of a comment
@@ -488,15 +431,15 @@ class CommentLike(Resource):
             return "", 401  # Unauthorized
 
 
-# Interface for creating a post with media
+# API for creating a post with media
 @api.resource("/getPosts/<string:steamid>")
 class GetPosts(Resource):
     def get(self, steamid):
         # Fetch token from header and check if session is acrive
-        ##token = request.headers.get('token') MAYBE BACK TODO
+        ##token = request.headers.get('token') 
 
         # Check if there is an active session
-        ##if database_helper.activeSession(token): TODO
+        ##if database_helper.activeSession(token):
 
         # response init
         postResponse = []
@@ -537,15 +480,19 @@ class GetPosts(Resource):
         ##   return "", 401 #unauthorized
 
 
-# Interface for returning all message on Home page
+# API for returning all post relevant for Home page
 @api.resource("/getHome/<string:steamid>")
 class GetHome(Resource):
     def get(self, steamid):
         postResponse = []
         followers = []
         followers.append(steamid)
+
+        #Fetch all follower
         for follower in database_helper.getFollowers(steamid):
             followers.append(str(follower))
+
+        #Only get posts based on followship
         for follow in followers:
             # fatch all post
             posts = database_helper.getUserPosts(follow)
@@ -580,7 +527,7 @@ class GetHome(Resource):
             return 404  # notfound
 
 
-# Interface for returning all message on Home page
+# API for fetching posts related to a game 
 @api.resource("/getGame/<string:appid>")
 class GetGame(Resource):
     def get(self, appid):
@@ -616,7 +563,7 @@ class GetGame(Resource):
         else:
             return 404  # notfound
 
-
+#API to fetch latest news about a game from the Steam API
 @api.resource("/getGameNews/<string:appid>")
 class GetGameNews(Resource):
     def get(self, appid):
@@ -631,7 +578,7 @@ class GetGameNews(Resource):
             return "", 502  # Bad Gateway
 
 
-# function for streaming an image to the wall
+#Router to steam image from backend to the platform frontend
 @app.route("/image_feed/<image>", methods=["GET"])
 def image_feed(image):
     # partition for correct mimetype
@@ -648,27 +595,70 @@ def image_feed(image):
 
     return Response(gen(image), status=200, mimetype=mimetype), 200
 
+""" # function to stream an audio to the wall in chunks. allows scrolling around
+@app.route("/audio_feed/<audio>", methods=["GET"])
+def audio_feed(audio):
+    # partition for correct mimetype
+    mime = audio.rpartition(".")
+    mimetype = "audio/" + mime[2]
+
+    # create response in chunks
+    return Response(get_chunk(upload_path_audio + audio), status=200, mimetype=mimetype)
+
+
+# function to stream an video to the wall in chunks. allows scrolling around
+@app.route("/video_feed/<video>", methods=["GET"])
+def video_feed(video):
+    # partition for correct mimetype
+    mime = video.rpartition(".")
+    mimetype = "video/" + mime[2]
+
+    # create response in chunks
+    return Response(get_chunk(upload_path_video + video), status=200, mimetype=mimetype)
+
+# creates chunks of media pgiles and streams them to the client 
+def get_chunk(filepath):
+    #fetch filesize and set step siz of data packets
+    filesize = os.path.getsize(filepath)
+    yielded = 0
+    yield_size = 1024 * 1024
+
+    # if byte1 is not None:
+    #    if not byte2:
+    #        byte2 = filesize
+    #    yielded = byte1
+    #    filesize = byte2
+
+    with open(filepath, "rb") as f:
+        content = f.read()
+
+    # stream content to client
+    while True:
+        remaining = filesize - yielded
+        if yielded == filesize:
+            break
+        if remaining >= yield_size:
+            yield content[yielded : yielded + yield_size]
+            yielded += yield_size
+        else:
+            yield content[yielded : yielded + remaining]
+            yielded += remaining """
 
 # API resource to get all users for server site rendering of dynamic route
 @api.resource("/getUsers")
-# @app.route("/getUsers", methods=["GET"])
 class GetUsers(Resource):
     def get(self):
-        # def getUsers():
-        # print(database_helper.getAllUser())
         if database_helper.getAllUser():
             databaseUser = database_helper.getAllUser()
             userResponse = []
             for user in databaseUser:
-                # print(user)
-                userResponse.append(str(user)[1:18])  # needs check why!!!!!! TODO:
-            # print(userResponse)
+                userResponse.append(str(user)[1:18]) 
             return make_response(jsonify(userResponse), 200)
         else:
             return "", 404  #
 
 
-# function for setting up follower
+# API for following a user
 @api.resource("/follow/<string:followid>")
 class Follow(Resource):
     # function for following
@@ -679,7 +669,7 @@ class Follow(Resource):
             if database_helper.setFollow(steamid, followid):
                 return "", 201  # successfully followed
             else:
-                return "", 500
+                return "", 500 # internal server error
         else:
             return "", 401  # unauthorized
 
@@ -696,7 +686,7 @@ class Follow(Resource):
             return "", 401  # unauthorized
 
 
-# function for getting followers
+#API for fetching followers of a user
 @api.resource("/getFollowers/<string:steamid>")
 class GetFollowers(Resource):
     def get(self, steamid):
@@ -716,7 +706,7 @@ class GetFollowers(Resource):
         return make_response(details["response"]["players"], 200)  # OK
 
 
-# function to create a comment on a post
+# API to create a comment on a post
 @api.resource("/sendComment")
 class SendComment(Resource):
     def post(self):
@@ -736,7 +726,7 @@ class SendComment(Resource):
             return "", 401  # unauthorized
 
 
-# function to get comments of a post
+#API to get comments and subcommentsof a post
 @api.resource(
     "/getComments/<string:postID>", "/getComments/<string:postID>/<string:commentID>"
 )

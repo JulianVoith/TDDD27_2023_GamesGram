@@ -3,8 +3,6 @@ import Link from "next/link";
 
 //Component for displaying post on a profile
 const PostWall = ({ userInfo, media }) => {
- 
-  let url = "http://localhost:5001";
 
   //get steamid of inspected user
   const steamid = userInfo ? userInfo.steamid : media.steamid;
@@ -21,7 +19,7 @@ const PostWall = ({ userInfo, media }) => {
           scroll={false}
         >
           <Image
-            src={url + mediae.url}
+            src={mediae.url}
             width={400}
             height={400}
             className="transform rounded-lg brightness-90 transition group-hover:brightness-110"

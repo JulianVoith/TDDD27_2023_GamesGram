@@ -6,6 +6,7 @@ import LoginWSteam from "@/components/Login&SignUp/loginWSteam";
 import HomeWall from "@/components/HomeWall";
 import { useRouter } from "next/router";
 import Context from "@/context/Context";
+import { GetUserInfo } from "@/components/Tools/getUserInfo";
 
 //Start page of GamesGram app
 export default function Home() {
@@ -32,7 +33,7 @@ export default function Home() {
   }, []);
 
   //Method: Fetch posts from server and store in state mediaPosts
-  const GetPost = async () => {
+  const GetPosts = async () => {
     try {
       if (window.localStorage.getItem("token") && userInfo) {
         // API endpoint where we send form data.
@@ -46,6 +47,7 @@ export default function Home() {
             token: window.localStorage.getItem("token"),
           },
         };
+
         const response = await fetch(endpoint, options);
         const data = await response.json();
         setMediaPosts(data);
@@ -58,22 +60,8 @@ export default function Home() {
 //Function to get user infomation from backend and place in context
   const GetuserInfo = async () => {
     if (!userInfo && window.localStorage.getItem("token")) {
-      
-      //TODO: CHANGE TO our method
-      const endpoint = "/api/GetUserInfo";
-      
-      const options = {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          token: window.localStorage.getItem("token"),
-        },
-      };
-
-      
-      const response = await fetch(endpoint, options);
-      const data = await response.json();
-      setuserInfo(data.response.players[0]);
+      const data = await GetUserInfo();
+      setuserInfo(data[0]);
     }
   };
   useEffect(() => {
@@ -92,10 +80,10 @@ export default function Home() {
   // Send the information to server once reciverd steam server information
   // and call handleLogin
   useEffect(() => {
-    postData();
+    processLogin();
   }, [router.query]);
 
-  const postData = async () => {
+  const processLogin = async () => {
     if (Object.keys(router.query).length !== 0 && !hastoken) {
       const JSONdata = JSON.stringify(router.query);
       // API endpoint where we send form data.
@@ -129,10 +117,11 @@ export default function Home() {
     signout: "nav-link text-white",
   };
 
+
   //Effect to fetch media post for the home wall
   useEffect(() => {
     if (!mediaPosts) {
-      GetPost();
+      GetPosts();
     }
   }, [userInfo]);
 
@@ -147,7 +136,7 @@ export default function Home() {
         <link rel="icon" href="/images/GPic.jpg" />
       </Head>
       <main>
-        {!hastoken || !userInfo ? <LoginWSteam /> :
+        {!hastoken ? <LoginWSteam /> :
           <div className={styles.main}>
             <div className={styles.one}>
               <Sidebar selection={SidebarSelect} />

@@ -1,4 +1,4 @@
-import { useState, useEffect,useContext } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import useSWR from 'swr';
 import CommentSubmit from './commentSubmit';

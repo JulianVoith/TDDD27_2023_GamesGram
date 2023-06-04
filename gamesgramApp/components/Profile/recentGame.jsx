@@ -6,17 +6,29 @@ import { useEffect, useState, useContext } from "react";
 import styles from "@/styles/Profile.module.css";
 
 //Component for recent games of a user
-//TODO commenting!
+
 export default function RecentGame(props) {
   const { userInfo } = useContext(Context);
-  //const [recentGame, setRecentGame] = useState(null);
-  const steamid = props.steamid || userInfo.steamid;
+  const [steamidLoggedInUser, setSteamidLoggedInUser] = useState(null);
+
+  //Effect to make sure context is loaded and set hooks(steamid of logged in user)
+  useEffect(() => {
+    if(userInfo && !steamidLoggedInUser){
+        initFields();
+    }
+  },[userInfo]);
+  const initFields = () => {
+    setSteamidLoggedInUser(userInfo.steamid);
+  };
+
+  const steamid = props.steamid || steamidLoggedInUser;
 
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const { data: recentGame } = useSWR(
     `/api/GetRecentlyPlayedGames/${steamid}`,
     fetcher
   );
+  
 
   //Effect to transmit back the game to the profile to fetch its name for media upload (category)
   useEffect(() => {

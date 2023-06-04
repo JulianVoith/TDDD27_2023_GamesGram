@@ -1,6 +1,6 @@
 
 import Sidebar from '@/components/Siderbar';
-import { useEffect, useState, useCallback, useContext } from 'react';
+import { useState, useCallback } from 'react';
 import styles from '@/styles/Search.module.css';
 import Head from 'next/head';
 import SearchBar from '@/components/Search';
