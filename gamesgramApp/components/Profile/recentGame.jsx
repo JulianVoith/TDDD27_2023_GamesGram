@@ -39,7 +39,7 @@ export default function RecentGame(props) {
 
   return (
     <div className={styles.gameContainer}>
-      {recentGame ? (
+      {recentGame&&!(recentGame===404) ? (
         recentGame.map((gameInfo) => (
           <Game key={gameInfo.appid} gameInfo={gameInfo} />
         ))

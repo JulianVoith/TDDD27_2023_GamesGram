@@ -10,7 +10,6 @@ import { GetUserInfo } from "@/components/Tools/getUserInfo";
 
 //Start page of GamesGram app
 export default function Home() {
-  //VERCEL provides useSession??
 
   //Hooks for data handling (token, user, posts)
   const [hastoken, setToken] = useState(false); //Hook for generated token
