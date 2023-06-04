@@ -21,7 +21,6 @@ export default function profile(props) {
     const { userInfo } = useContext(Context);
     const [loggedInUser, setLoggedInUser] = useState(null);
     const [Game, setGame] = useState(null);
-    const [showFriendsAndFollower, setShowFriendsAndFollower] = useState(false);
 
     //Effect to make sure context is loaded
     useEffect(() => {
@@ -40,7 +39,6 @@ export default function profile(props) {
       setGame(newState);
     }
   };
-
 
 
   return (
@@ -76,7 +74,7 @@ export default function profile(props) {
               <br />
               {loggedInUser ? (
                 loggedInUser !== props.userInfo.steamid ? (
-                  <Follow userInfo={props.userInfo} />
+                  <Follow userInfo={props.userInfo} follower={props.follower}/>
                 ) : (
                   <CreatePost gameCategory={Game} handleReload={handleReload} />
                 )

@@ -489,7 +489,7 @@ class GetHome(Resource):
         followers.append(steamid)
 
         #Fetch all follower
-        for follower in database_helper.getFollowers(steamid):
+        for follower in database_helper.getUserFollowed(steamid):
             followers.append(str(follower))
 
         #Only get posts based on followship

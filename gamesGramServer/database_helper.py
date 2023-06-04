@@ -264,6 +264,18 @@ def getFollowers(steamid):
         return followers[0]
     else:
         return []
+    
+# fetch followedUser of a user by steamid
+def getUserFollowed(steamid):
+    cursor = get_db().execute(
+        "select followsID from followRel where steamid like ?;", [steamid]
+    )
+    followers = cursor.fetchall()
+    cursor.close()
+    if followers != []:
+        return followers[0]
+    else:
+        return []
 
 # Check if a user has liked a specific post
 def isPostLiked(steamid, postID):

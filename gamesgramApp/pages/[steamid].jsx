@@ -8,6 +8,8 @@ import PostWall from "@/components/PostWall";
 import Post from "@/components/Post";
 import { Modal } from "react-bootstrap";
 
+import useSWR from 'swr';
+
 //Dynamic routing page for steam profiles
 const UserProfile = ({
   dataUserInfo,
@@ -19,12 +21,16 @@ const UserProfile = ({
   
   //Data hooks for user profile information
   const [userViewInfo, setUserInfo] = useState(dataUserInfo); //Information about inspected user
-  const [follower, setFollower] = useState(userFollower); //Follower of inspected user
+  //const [follower, setFollower] = useState(userFollower); //Follower of inspected user
   const [friends, setFriends] = useState(userFriends); //Firends of inspected user
   const [mediaPosts, setMediaPosts] = useState(userPosts); //Posts of inspected user
   const [isReload, setReload] = useState(false); //Reload hook for profile information
 
-  console.log("steamid", steamid);
+  //SWR data feching hook for follower count
+  const fetcher = (...args) => fetch(...args).then(res => res.json())
+  //Interval for follower is set to regularly check for new comments which are going to be displayed immediately
+  const { data: follower } = useSWR(`/api/getFollowers/${steamid}`, fetcher, { refreshInterval: 1000 });
+
   //React router variable
   const router = useRouter();
 
@@ -34,7 +40,7 @@ const UserProfile = ({
 
   //fetching post from server
   const fetchPost = async () => {
-    const resposts = await fetch(`http://127.0.0.1:5001/getPosts/${steamid}`);
+    const resposts = await fetch(`api/getPosts/${steamid}`);
     const posts = await resposts.json();
     setMediaPosts(posts);
   };
@@ -89,12 +95,12 @@ const UserProfile = ({
           <Sidebar selection={SidebarSelect} />
         </div>
         <div>
-          <Profile
+          { follower ? <Profile
             userInfo={userViewInfo[0]}
             follower={follower}
             friends={friends}
             handleReload={handleReload}
-          />
+          /> : <p>Loading...</p>}
         </div>
         <div className={styles.two}>
           {mediaPosts && userViewInfo ? (
