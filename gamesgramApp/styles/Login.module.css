@@ -1,44 +1,9 @@
-.login-gamesgram {
+.main {
+
     width: 100%;
-    max-width: 330px;
-    padding: 1rem;
-    margin: auto;
-  }
-  
-  .login-gamesgram .checkbox {
-    font-weight: 400;
-  }
-  
-  .login-gamesgram .form-floating:focus-within {
-    z-index: 2;
-  }
-  
-  .flogin-gamesgram input[type="email"] {
-    margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-  
-  .login-gamesgram input[type="password"] {
-    margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    height: 100%;
+    max-width: 100%;
+    
+   
   }
 
-  .login-gamesgram .signUp{
-    padding-top: 1rem;
-    color: black;
-  }
-  
-  .login-gamesgram .h2{
-    width: 100%;
-    text-align: center;
-    border-bottom: 1px solid #000;
-    line-height: 0.1em;
-    margin: 10px 0 20px;
-  }
-
-  .login-gamesgram .h2span{
-    background: #fff;
-    padding: 0 10px;
-  }

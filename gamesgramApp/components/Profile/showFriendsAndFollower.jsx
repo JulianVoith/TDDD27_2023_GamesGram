@@ -2,8 +2,7 @@ import { Button, Modal } from 'react-bootstrap';
 import {useState} from 'react';
 import Card from '@/components/Search/card';
 
-
-
+//Component to show a useres follower and steam freinds
 const ShowFriendsAndFollower = ({friends, follower}) => {
 
 
@@ -27,7 +26,6 @@ const ShowFriendsAndFollower = ({friends, follower}) => {
         setShow(true);
     }
 
-    //<Card key={entry.steamid} userInfo={entry} />
     return (
         <>  
             <a onClick={handleFollowerClick} className="d-inline-block text-dark">
@@ -62,6 +60,5 @@ const ShowFriendsAndFollower = ({friends, follower}) => {
         </>
     );
 }
-
 
 export default ShowFriendsAndFollower

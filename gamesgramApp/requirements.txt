@@ -2,3 +2,6 @@ bootstrap
 react-bootstrap bootstrap --save
 classnames --save
 swr --save
+
+npm i socket.io socket.io-client --save
+npm install pusher --save

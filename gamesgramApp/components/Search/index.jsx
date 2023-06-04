@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import styles from '@/styles/Search.module.css';
 
-
+//Main component of the search page (searchbar)
 export default function SearchBar(props){
 
   //Data hooks for user search
     const [searchTerm, setSearchTerm] = useState('');       //Hook for modifying the search bar
     const [searchResults, setSearchResults] = useState([]); //Hook to display the results of the search
   
-    //TODO: replace with swr
+    //Effect to read database when typing into searchbar to provide suggestions
     useEffect(() => {
       const fetchData = async () => {
         if (typeof searchTerm !== '') {
@@ -33,7 +33,7 @@ export default function SearchBar(props){
       fetchData();
     }, [searchTerm]);
     
-    //Method: Communicate search result back to father component
+    //Effect to propagate back the searchresult to the father search page 
     useEffect(()=>{
       props.onSearch(searchResults);
     },[searchResults]);

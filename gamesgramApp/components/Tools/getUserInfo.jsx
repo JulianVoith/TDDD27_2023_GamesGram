@@ -1,4 +1,5 @@
-//TODO REPLACE WITH SWR
+//Helper function to fetch user information from backend. Could be transferred to SWR
+//if no steam id is provided the logged in user is fetched
 export async function GetUserInfo(steamid = null) {
     // Default options are marked with *
     const endpoint = steamid ? `/api/GetUserInfo/${steamid}` : '/api/GetUserInfo';

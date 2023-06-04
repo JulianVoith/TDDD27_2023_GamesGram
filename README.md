@@ -2,11 +2,21 @@
 
 ## Updates
 
+- [2023.06.04] Version 0.4 with TeamMates and Game pages, allow users to see the Game News, related Posts, and chat to others
 - [2023.06.02] Version 0.3 with working profile and image upload. Possibility to interact with posts and profiles. Adding a home feed page for post of users
 - [2023.04.26] Version 0.2 with overall mock-up of the platform GamesGram including user profile outline and user search.
 - [2023.04.06] We updated a readme document.
 
 ## Overview
+
+### Final Screencast
+
+- Project Screencast: [Click here](https://liuonline-my.sharepoint.com/:v:/g/personal/julvo429_student_liu_se/EY_LE4oPvL1Co_f8bLHXJbkBpF2drmURXd2AMSVmgIOkqw?e=QAXvMz)
+
+### Induvidual Code Screencast:
+
+- Weixiong Zheng: [Click here](https://liuonline-my.sharepoint.com/:v:/g/personal/weizh994_student_liu_se/Eb_HRvu4q8pNn2JUHLLSdzQBa8PkddPFWpm8OkZzY1FFHw?e=8gs5KX )
+- Julian Voith: [Click here](https://liuonline-my.sharepoint.com/:v:/g/personal/julvo429_student_liu_se/ERSmpBMYhmRIudDK9aTbqT8BjqNEqJrMG09pvIsFHnzl8Q?e=VLTHQO)
 
 ### Team members
 
@@ -35,6 +45,6 @@ The overall goal is also to make it mobile adjusted so an iOS web application ca
 
 #### Database Framework
 
-- [LiteSQL](https://litesql.org/)
+- [SQLite](https://www.sqlite.org/index.html/)
 
 

@@ -1,57 +1,71 @@
-import Context from '@/context/Context';
-import Image from 'next/image';
-import { useEffect, useState, useContext } from 'react';
-import styles from '@/styles/Profile.module.css';
+import Context from "@/context/Context";
+import Image from "next/image";
+import Link from "next/link";
+import useSWR from "swr";
+import { useEffect, useState, useContext } from "react";
+import styles from "@/styles/Profile.module.css";
 
 //Component for recent games of a user
-//TODO commenting!
+
 export default function RecentGame(props) {
   const { userInfo } = useContext(Context);
-  const [recentGame, setRecentGame] = useState(null);
-  const steamid = props.steamid || userInfo.steamid;
+  const [steamidLoggedInUser, setSteamidLoggedInUser] = useState(null);
 
-  //get recent games of a user
-  const getGame = async () => {
-    const endpoint = `/api/GetRecentlyPlayedGames/${steamid}`;
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'token': window.localStorage.getItem("token"),
-      },
-    };
-    const response = await fetch(endpoint, options);
-    const data = await response.json();
-    if (data && data !== 404) {  // Check if data is valid before setting state
-      setRecentGame(data);
+  //Effect to make sure context is loaded and set hooks(steamid of logged in user)
+  useEffect(() => {
+    if(userInfo && !steamidLoggedInUser){
+        initFields();
     }
+  },[userInfo]);
+  const initFields = () => {
+    setSteamidLoggedInUser(userInfo.steamid);
   };
 
-  //fetch game once page loads, not supported as real time
-  useEffect(() => {
-    if (!recentGame) { getGame(); }
-  }, [recentGame, steamid]);
+  const steamid = props.steamid || steamidLoggedInUser;
 
-  //transmit Game to farther component => profile
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+  const { data: recentGame } = useSWR(
+    `/api/GetRecentlyPlayedGames/${steamid}`,
+    fetcher
+  );
+  
+
+  //Effect to transmit back the game to the profile to fetch its name for media upload (category)
   useEffect(() => {
-    if (recentGame) {  // Only call onGameSet if recentGame is not null
+    if (recentGame) {
       props.onGameSet(recentGame);
     }
   }, [recentGame, props.onGameSet]);
+
   return (
     <div className={styles.gameContainer}>
-      {recentGame ? recentGame.map((gameInfo) => <Game key={gameInfo.appid} gameInfo={gameInfo} />) : <p>No recent games available</p>}
+      {recentGame&&!(recentGame===404) ? (
+        recentGame.map((gameInfo) => (
+          <Game key={gameInfo.appid} gameInfo={gameInfo} />
+        ))
+      ) : (
+        <p>No recent games available</p>
+      )}
     </div>
-  )
+  );
 }
 
+//Function to represent the game on the profile
 function Game(props) {
-  const url = `https://avatars.akamai.steamstatic.com/${props.gameInfo.img_icon_url}_full.jpg`
+  const url = `https://avatars.akamai.steamstatic.com/${props.gameInfo.img_icon_url}_full.jpg`;
   const gameInfo = props.gameInfo;
   return (
     <div className={styles.gameIterm}>
-      <Image src={url} alt={gameInfo.name} width={50} height={50} className={"rounded-circle"} />
-      <div className={styles.name}>{gameInfo.name} </div>
+      <Link href={`/game/${gameInfo.appid}`}>
+        <Image
+          src={url}
+          alt={gameInfo.name}
+          width={50}
+          height={50}
+          className={"rounded-circle"}
+        />
+        <div className={styles.name}>{gameInfo.name} </div>
+      </Link>
     </div>
-  )
+  );
 }

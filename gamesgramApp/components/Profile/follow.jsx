@@ -1,48 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState,useContext } from 'react';
+import Context from "@/context/Context";
 import {Button} from 'react-bootstrap';
 
-
 //Component for following fucntionality 
-export default function  Follow(props){
-
+export default function Follow(props){
+    const { userInfo } = useContext(Context);
     //Followed  -> True means has followed, False means has not followed
     const [Followed, updateFollowed] = useState(undefined);
-
     
-    useEffect(() => {
-      const checkAndSetFollowed = async () => {
-        const followers = await checkFollowed();
-        if (followers) {
-          for (let i = 0; i < followers.length; i++) {
-            let match = followers[i][0].match(/\((\d+),\)/);
-            let number = match ? match[1] : null;
-            if (number === (props.userInfo.steamid)) {
-              updateFollowed(true);
-              return;
-            }
+    //Method to check if logged in user follows a specific user. needs optimization
+    const checkAndSetFollowed = () => {
+      const followers = props.follower;
+      updateFollowed(false);
+      if (followers) {
+        for (let follower of followers) {
+          if (follower.steamid === (userInfo.steamid)) {
+            updateFollowed(true);
+            break;
           }
         }
-        updateFollowed(false);
-      };
-  
+      }
+    };
+    //on load check if user has already been followed by logged-in follower. adjust button depending on state
+    useEffect(() => {
       if (Followed === undefined) {
         checkAndSetFollowed();
       }
     }, [props.userInfo.steamid]);
 
-    const checkFollowed = async() => {
-        const endpoint = `/api/getFollowers/${window.localStorage.getItem("steamid")}`;
-          const options = {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'token': window.localStorage.getItem("token"),
-            },
-          };
-          const response = await fetch(endpoint, options);
-          const data = await response.json();
-          return data;
-    }
+    //Function to follow a user
     const setFollow = async() => {
         const endpoint = `/api/follow/${props.userInfo.steamid}`;
           const options = {
@@ -58,6 +44,7 @@ export default function  Follow(props){
           }
     }
 
+    //Function to unfollow
     const unFollow = async() => {
         const endpoint = `/api/follow/${props.userInfo.steamid}`;
           const options = {
@@ -77,8 +64,8 @@ export default function  Follow(props){
     return (
       <>
       {Followed 
-          ? <Button variant="primary" onClick={unFollow}>Unfollow</Button>
-          : <Button variant="primary" onClick={setFollow}>Follow</Button>}
+          ? <Button className="btn btn-outline-primary" onClick={unFollow}>Unfollow</Button>
+          : <Button className="btn btn-primary" onClick={setFollow}>Follow</Button>}
       </>
     );
 }

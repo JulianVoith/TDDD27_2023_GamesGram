@@ -1,10 +1,13 @@
 
 import Sidebar from '@/components/Siderbar';
-import { useEffect, useState, useCallback, useContext } from 'react';
+import { useState, useCallback } from 'react';
 import styles from '@/styles/Search.module.css';
+import Head from 'next/head';
 import SearchBar from '@/components/Search';
 import UserCard from '@/components/Search/usercard';
 
+
+//Page to search user on the platform
 export default function Search(){
 
     //Hook for preserving search results
@@ -30,6 +33,10 @@ export default function Search(){
 
     return(
       <div className={styles.main}>
+        <Head>
+          <title>GamesGram Search</title>
+          <link rel="icon" href="/images/GPic.jpg" />
+        </Head>
         <div className={styles.one}><Sidebar selection={SidebarSelect}/></div>
         <div className={styles.two} >
         <SearchBar onSearch = {handlesearchResults}/>
